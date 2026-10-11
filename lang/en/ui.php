@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'skip' => 'Skip to main content',
+    'menu' => 'Menu',
+    'soon' => 'Soon',
+    'points' => 'Points',
+    'days_left' => 'Subscription days left',
+    'buy' => 'Get a subscription',
+    'logout' => 'Log out',
+    'switch_lang' => 'Switch language to Persian',
+    'switch_to' => 'فا',
+    'avg_grade' => 'Average grade',
+    'close' => 'Close',
+    'cancel' => 'Cancel',
+
+    'nav' => [
+        'dashboard' => 'Dashboard',
+        'music' => 'Music',
+        'podcast' => 'Podcast',
+        'video' => 'Movies & Videos',
+        'game' => 'Games',
+        'books' => 'Books',
+        'words' => 'Highlighted words & phrases',
+        'level_test' => 'Level test',
+        'dictionary' => 'Dictionary',
+        'support' => 'Support',
+        'more' => 'More',
+    ],
+    'nav_short' => [
+        'dashboard' => 'Home',
+        'music' => 'Music',
+        'words' => 'Words',
+        'dictionary' => 'Dictionary',
+    ],
+
+    // Shared page tools
+    'focus' => 'Focus mode',
+    'focus_exit' => 'Exit focus',
+    'report' => 'Report a problem',
+    'report_hint' => 'If something is wrong on this page, tell us. A screenshot of the page is sent to support along with your description.',
+    'report_shot_alt' => 'Page screenshot preview',
+    'report_shot_none' => 'Screenshot unavailable; the report will be sent without an image.',
+    'report_attach' => 'Attach page screenshot',
+    'report_placeholder' => 'Briefly describe the problem…',
+    'report_required' => 'Please write a short description.',
+    'report_send' => 'Send report',
+    'report_failed' => 'Could not send. Please try again.',
+    'report_done_title' => 'Your report was sent',
+    'report_done_text' => 'Thanks for helping. The support team will take a look.',
+];

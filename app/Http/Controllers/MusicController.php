@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+
+/**
+ * ⚠️ فقط برای نمایش فرانت‌اند: داده‌ها نمونه (mock) هستند.
+ * بک‌اند‌کار باید mock() و محاسبه‌ی $stats/$user را با داده‌ی واقعی عوض کند
+ * و فیلتر/مرتب‌سازی/صفحه‌بندی را روی دیتابیس انجام دهد. قرارداد داده در README.md است.
+ */
+class MusicController extends Controller
+{
+    private const PER_PAGE = 9;
+
+    public function index(Request $request)
+    {
+        $level = in_array($request->query('level'), ['a', 'b', 'c'], true) ? $request->query('level') : 'a';
+        $q = trim((string) $request->query('q', ''));
+        $filter = in_array($request->query('filter'), ['all', 'new', 'in_progress', 'done', 'free'], true) ? $request->query('filter') : 'all';
+        $sort = in_array($request->query('sort'), ['default', 'newest', 'points', 'duration', 'title'], true) ? $request->query('sort') : 'default';
+
+        $songs = $this->mock()->where('level', $level);
+
+        if ($q !== '') {
+            $songs = $songs->filter(fn ($s) => mb_stripos($s['title'] . ' ' . $s['artist'], $q) !== false);
+        }
+
+        $songs = match ($filter) {
+            'new', 'in_progress', 'done' => $songs->where('status', $filter),
+            'free' => $songs->where('is_free', true),
+            default => $songs,
+        };
+
+        $songs = match ($sort) {
+            'newest' => $songs->sortByDesc('id'),
+            'points' => $songs->sortByDesc('points'),
+            'duration' => $songs->sortBy('duration'),
+            'title' => $songs->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE),
+            default => $songs,
+        };
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $paginator = new LengthAwarePaginator(
+            $songs->forPage($page, self::PER_PAGE)->values(),
+            $songs->count(),
+            self::PER_PAGE,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('music.index', [
+            'songs' => $paginator,
+            'level' => $level,
+            'filters' => ['q' => $q, 'filter' => $filter, 'sort' => $sort],
+            'subscribed' => false, // TODO(backend): آیا کاربر اشتراک فعال دارد؟
+            'stats' => ['completed' => 15, 'in_progress' => 15, 'points' => 560, 'highlights' => 56],
+            'user' => [
+                'name' => 'مهدی پوربشیری',
+                'days_left' => 0,
+                'points' => 560,
+                'level' => 'A2',
+                'skills' => ['listening' => 'A3', 'reading' => 'A1', 'writing' => 'A2', 'speaking' => 'A2'],
+            ],
+        ]);
+    }
+
+    /** ۳۶ آهنگ نمونه: ۱۲ تا برای هر سطح. سه آهنگ اول (id 1..3) کاملاً رایگان‌اند. */
+    private function mock(): Collection
+    {
+        $catalog = [
+            'a' => [
+                ['Let Justice Run Down', 'Gregory Watson'], ['Say My Name', 'David Guetta'], ['Twilight', 'Henry Longfellow'],
+                ['Perfect', 'Ed Sheeran'], ['Count on Me', 'Bruno Mars'], ['Happy', 'Pharrell Williams'],
+                ['Shake It Off', 'Taylor Swift'], ['Counting Stars', 'OneRepublic'], ['Let Her Go', 'Passenger'],
+                ['Dance Monkey', 'Tones and I'], ['Sunflower', 'Post Malone'], ['Believer', 'Imagine Dragons'],
+            ],
+            'b' => [
+                ['Someone Like You', 'Adele'], ['Photograph', 'Ed Sheeran'], ['Stay With Me', 'Sam Smith'],
+                ['Skyfall', 'Adele'], ['Shallow', 'Lady Gaga'], ['Viva La Vida', 'Coldplay'],
+                ['Take Me to Church', 'Hozier'], ['Radioactive', 'Imagine Dragons'], ['Demons', 'Imagine Dragons'],
+                ['Hello', 'Adele'], ['Fix You', 'Coldplay'], ['Riptide', 'Vance Joy'],
+            ],
+            'c' => [
+                ['Bohemian Rhapsody', 'Queen'], ['Hotel California', 'Eagles'], ['Imagine', 'John Lennon'],
+                ['Hallelujah', 'Jeff Buckley'], ['Stairway to Heaven', 'Led Zeppelin'], ['Fast Car', 'Tracy Chapman'],
+                ['The Sound of Silence', 'Simon & Garfunkel'], ['Creep', 'Radiohead'], ['Yesterday', 'The Beatles'],
+                ['Wish You Were Here', 'Pink Floyd'], ['Space Oddity', 'David Bowie'], ['Losing My Religion', 'R.E.M.'],
+            ],
+        ];
+
+        $id = 0;
+        $out = collect();
+
+        foreach ($catalog as $level => $list) {
+            foreach ($list as $i => [$title, $artist]) {
+                $id++;
+                $status = match (true) {
+                    $id === 1 => 'done',
+                    $id === 2 => 'in_progress',
+                    $i % 5 === 3 => 'in_progress',
+                    $i % 7 === 5 => 'done',
+                    default => 'new',
+                };
+
+                $out->push([
+                    'id' => $id,
+                    'title' => $title,
+                    'artist' => $artist,
+                    'cover' => null, // آدرس کاور واقعی (ترجیحاً WebP و از دامنه‌ی خودتان)
+                    'level' => $level,
+                    'duration' => sprintf('%02d:%02d', 2 + ($id % 3), 10 + ($id * 7) % 50),
+                    'points' => 50,
+                    'progress' => match ($status) {'done' => 100, 'in_progress' => 75, default => 0},
+                    'status' => $status,
+                    'is_free' => $id <= 3,
+                    'free_steps' => 2,
+                    'total_steps' => 8,
+                ]);
+            }
+        }
+
+        return $out;
+    }
+}

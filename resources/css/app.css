@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   متغیرهای چیدمان: عرض سایدبار در هر breakpoint
+   موبایل: بدون سایدبار | تبلت: ریل آیکونی | دسکتاپ: سایدبار کامل
+---------------------------------------------------------------- */
+:root {
+    --rail: 0px;
+    --topbar-h: 4rem;
+}
+@media (min-width: 768px) {
+    :root { --rail: 5rem; }
+}
+@media (min-width: 1024px) {
+    :root { --rail: 18rem; }
+}
+/* حالت تمرکز: سایدبار جمع می‌شود و محتوا کل عرض را می‌گیرد */
+html.focus-mode { --rail: 0px; }
+
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+    }
+    html.dialog-open { overflow: hidden; }
+
+    html[lang='fa'] body {
+        font-family: 'Vazirmatn', 'Vazirmatn Variable', system-ui, sans-serif;
+    }
+    html[lang='en'] body {
+        font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
+    }
+    body {
+        @apply min-h-dvh bg-[#f4f5fa] text-slate-700 antialiased;
+        background-image: repeating-linear-gradient(135deg, rgb(15 23 42 / 0.018) 0 2px, transparent 2px 9px);
+    }
+    :focus-visible {
+        @apply outline outline-2 outline-offset-2 outline-brand-600;
+    }
+    ::selection { @apply bg-brand-100; }
+}
+
+@layer components {
+    /* ---------- کارت و دکمه‌ها ---------- */
+    .card {
+        @apply rounded-2xl bg-white shadow-card;
+    }
+    .chip-btn {
+        @apply inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 transition duration-200
+               hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-[.97];
+    }
+    .chip-btn[aria-pressed='true'] {
+        @apply border-brand-700 bg-brand-700 text-white hover:bg-brand-800 hover:text-white;
+    }
+    .btn-primary {
+        @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 text-sm font-bold text-white transition duration-200
+               hover:bg-brand-800 hover:shadow-lift active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
+    }
+    .btn-ghost {
+        @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 text-sm font-semibold text-slate-600 transition duration-200
+               hover:bg-slate-200 active:scale-[.98];
+    }
+    .icon-btn {
+        @apply grid size-11 place-items-center rounded-full bg-white text-slate-500 shadow-card transition duration-200 hover:text-brand-700 active:scale-95;
+    }
+    .field {
+        @apply w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 transition duration-200
+               placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+    }
+    .busy { @apply pointer-events-none opacity-70; }
+
+    /* ---------- سایدبار و ناوبری ---------- */
+    .app-shell {
+        padding-inline-start: var(--rail);
+        transition: padding-inline-start 0.3s ease;
+    }
+    .sidebar {
+        width: var(--rail);
+        transition: width 0.3s ease, opacity 0.2s ease, visibility 0.3s;
+    }
+    html.focus-mode .sidebar { opacity: 0; visibility: hidden; }
+
+    .nav-link {
+        @apply relative flex min-h-12 items-center gap-3 rounded-xl px-3.5 text-sm font-medium text-slate-500 transition duration-200
+               hover:bg-brand-50 hover:text-brand-700;
+    }
+    .nav-link[aria-current='page'] {
+        @apply bg-brand-50 font-bold text-brand-700;
+    }
+    .nav-link[aria-current='page']::before {
+        content: '';
+        @apply absolute inset-y-2.5 -start-3 w-1 rounded-full bg-brand-700;
+    }
+    .nav-link[aria-disabled='true'] { @apply cursor-default opacity-60 hover:bg-transparent hover:text-slate-500; }
+
+    .bottom-nav-item {
+        @apply relative flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium text-slate-400 transition-colors duration-200 active:scale-95;
+    }
+    .bottom-nav-item[aria-current='page'] { @apply font-bold text-brand-700; }
+    .bottom-nav-item[aria-current='page']::before {
+        content: '';
+        @apply absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-brand-700;
+    }
+    .bottom-nav-item svg { transition: transform 0.25s ease; }
+    .bottom-nav-item[aria-current='page'] svg { transform: translateY(-1px) scale(1.1); }
+
+    /* ---------- حالت تمرکز ---------- */
+    html.focus-mode [data-focus-hide] { display: none !important; }
+    .page-wrap { @apply mx-auto w-full max-w-[90rem]; transition: max-width 0.3s ease; }
+    html.focus-mode .page-wrap { max-width: 64rem; }
+
+    /* ---------- دیالوگ: موبایل = Bottom Sheet | دسکتاپ = مودال وسط ---------- */
+    .dialog {
+        @apply invisible fixed inset-0 z-50 flex items-end justify-center opacity-0 transition-[opacity,visibility] duration-200 md:items-center md:p-6;
+    }
+    .dialog.is-open { @apply visible opacity-100; }
+    .dialog-backdrop { @apply absolute inset-0 bg-slate-900/50; }
+    .dialog-panel {
+        @apply relative max-h-[92dvh] w-full max-w-lg translate-y-8 overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 shadow-lift
+               transition duration-300 md:max-h-[85dvh] md:translate-y-4 md:scale-95 md:rounded-3xl md:p-6;
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+    .dialog.is-open .dialog-panel { @apply translate-y-0 md:scale-100; }
+    .dialog-handle { @apply mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-200; }
+
+    /* ---------- فیلتر: موبایل = Bottom Sheet | md به بالا = inline در ردیف ابزار ---------- */
+    .filter-dialog {
+        @apply invisible fixed inset-0 z-50 flex items-end opacity-0 transition-[opacity,visibility] duration-200;
+    }
+    .filter-dialog.is-open { @apply visible opacity-100; }
+    .filter-dialog__panel {
+        @apply relative w-full translate-y-8 space-y-3 rounded-t-3xl bg-white p-5 shadow-lift transition duration-300;
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+    .filter-dialog.is-open .filter-dialog__panel { @apply translate-y-0; }
+    @media (min-width: 768px) {
+        .filter-dialog { display: contents; visibility: visible; opacity: 1; }
+        .filter-dialog__panel { display: contents; }
+    }
+
+    /* ---------- انتخابگر (Select) به شکل قرص ---------- */
+    .select-pill {
+        @apply relative flex min-h-12 items-center gap-2 rounded-full border border-slate-200 bg-white ps-4 pe-3 text-sm transition duration-200
+               focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 hover:border-slate-300;
+    }
+    .select-pill select {
+        @apply min-w-0 flex-1 cursor-pointer appearance-none bg-transparent py-3 pe-6 font-bold text-brand-900 focus:outline-none;
+    }
+    .select-pill .chev { @apply pointer-events-none absolute end-4 size-4 text-slate-400; }
+
+    /* ---------- تب‌های سطح ---------- */
+    .level-tab {
+        @apply flex min-h-12 flex-1 items-center justify-center px-2 text-center text-sm font-bold text-slate-600 transition-colors duration-200 hover:bg-brand-50 sm:text-base;
+    }
+    .level-tab[aria-current='page'] { @apply bg-brand-700 text-white hover:bg-brand-700; }
+
+    /* ---------- ریبون گوشه‌ی کارت ---------- */
+    .ribbon {
+        @apply pointer-events-none absolute end-0 top-0 size-24 overflow-hidden;
+    }
+    .ribbon > span {
+        @apply absolute top-[15px] -end-[32px] w-[124px] py-1 text-center text-[11px] font-bold tracking-wide text-white;
+    }
+    [dir='rtl'] .ribbon > span { transform: rotate(-45deg); }
+    [dir='ltr'] .ribbon > span { transform: rotate(45deg); }
+}
+
+/* attribute hidden باید همیشه برنده باشد (وگرنه کلاس‌هایی مثل flex آن را خنثی می‌کنند) */
+[hidden] { display: none !important; }
+
+/* ---------- لودینگ دکمه‌ها (CSS خالص، سبک) ---------- */
+.is-loading { position: relative; pointer-events: none; }
+.is-loading > * { opacity: 0.35; }
+.is-loading::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: -0.55rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 9999px;
+    animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* کاربرانی که انیمیشن نمی‌خواهند */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
