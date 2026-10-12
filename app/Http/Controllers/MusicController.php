@@ -96,7 +96,9 @@ class MusicController extends Controller
         $completed = (int) $song['completed_steps'];
 
         // وضعیت هر مرحله برای نوار مراحل: done | current | upcoming | locked
-        $steps = collect(self::STEPS)->map(function (string $key, int $i) use ($song, $n, $completed) {
+        // current (نارنجی) = مرحله‌ی بعدی که باید انجام شود، نه لزوماً مرحله‌ای که الان باز است.
+        // (بعد از لود، جاوااسکریپت صفحه همین وضعیت‌ها را زنده نگه می‌دارد.)
+        $steps = collect(self::STEPS)->map(function (string $key, int $i) use ($song, $completed) {
             $num = $i + 1;
             $locked = $this->isLocked($song, $num);
 
@@ -106,15 +108,15 @@ class MusicController extends Controller
                 'locked' => $locked,
                 'state' => match (true) {
                     $locked => 'locked',
-                    $num === $n => 'current',
                     $num <= $completed => 'done',
+                    $num === $completed + 1 => 'current',
                     default => 'upcoming',
                 },
                 'href' => route('music.step', ['id' => $song['id'], 'step' => $num]),
             ];
         });
 
-        $fraction = $n === $completed + 1 ? (float) $song['current_step_fraction'] : 0.0;
+        $finishUrl = route('music.index', ['level' => $song['level']]);
 
         return view('music.lesson', [
             'song' => $song,
@@ -122,14 +124,12 @@ class MusicController extends Controller
             'step' => $n,
             'stepKey' => self::STEPS[$n - 1],
             'total' => $total,
-            'locked' => $this->isLocked($song, $n),
             'completed' => $completed,
-            'fraction' => $fraction,
-            'percent' => Progress::percent($completed, $fraction, $total),
+            // چه بخشی از «مرحله‌ی بعد از آخرین مرحله‌ی تمام‌شده» انجام شده (۰ تا ۱)
+            'fraction' => $completed < $total ? (float) $song['current_step_fraction'] : 0.0,
             'prevUrl' => $n > 1 ? route('music.step', ['id' => $song['id'], 'step' => $n - 1]) : null,
-            'nextUrl' => $n < $total
-                ? route('music.step', ['id' => $song['id'], 'step' => $n + 1])
-                : route('music.index', ['level' => $song['level']]),
+            'nextUrl' => $n < $total ? route('music.step', ['id' => $song['id'], 'step' => $n + 1]) : $finishUrl,
+            'finishUrl' => $finishUrl,
             'subscribed' => $this->subscribed(),
             'user' => $this->user(),
         ]);

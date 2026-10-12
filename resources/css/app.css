@@ -16,8 +16,14 @@
 @media (min-width: 1024px) {
     :root { --rail: 18rem; }
 }
-/* حالت تمرکز: سایدبار جمع می‌شود و محتوا کل عرض را می‌گیرد */
-html.focus-mode { --rail: 0px; }
+/* حالت تمرکز یا سایدبار بسته: سایدبار جمع می‌شود و محتوا کل عرض را می‌گیرد */
+html.focus-mode,
+html.sidebar-closed { --rail: 0px; }
+
+/* لوگو در هدر: وقتی سایدبار بسته است، در تبلت و دسکتاپ هم نشان داده شود */
+@media (min-width: 768px) {
+    html.sidebar-closed .topbar-logo { display: block; }
+}
 
 @layer base {
     html {
@@ -28,7 +34,7 @@ html.focus-mode { --rail: 0px; }
 
     /* فونت‌ها در resources/css/custom.css (متغیرهای --font-fa و --font-en) تعیین می‌شوند */
     html[lang='fa'] body {
-        font-family: var(--font-fa, 'yekanBakh', system-ui, sans-serif);
+        font-family: var(--font-fa, 'Yekan Bakh', system-ui, sans-serif);
     }
     html[lang='en'] body {
         font-family: var(--font-en, 'Funnel Display', system-ui, sans-serif);
@@ -50,29 +56,29 @@ html.focus-mode { --rail: 0px; }
     }
     .chip-btn {
         @apply inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 transition duration-200
-               hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-[.97];
+        hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-[.97];
     }
     .chip-btn[aria-pressed='true'] {
         @apply border-brand-700 bg-brand-700 text-white hover:bg-brand-800 hover:text-white;
     }
     .btn-primary {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 text-sm font-bold text-white transition duration-200
-               hover:bg-brand-800 hover:shadow-lift active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
+        hover:bg-brand-800 hover:shadow-lift active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
     }
     .btn-ghost {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 text-sm font-semibold text-slate-600 transition duration-200
-               hover:bg-slate-200 active:scale-[.98];
+        hover:bg-slate-200 active:scale-[.98];
     }
     .btn-outline {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-bold text-brand-700 transition duration-200
-               hover:border-brand-200 hover:bg-brand-50 active:scale-[.98];
+        hover:border-brand-200 hover:bg-brand-50 active:scale-[.98];
     }
     .icon-btn {
         @apply grid size-11 place-items-center rounded-full bg-white text-slate-500 shadow-card transition duration-200 hover:text-brand-700 active:scale-95;
     }
     .field {
         @apply w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 transition duration-200
-               placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+        placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
     }
     .busy { @apply pointer-events-none opacity-70; }
 
@@ -85,11 +91,12 @@ html.focus-mode { --rail: 0px; }
         width: var(--rail);
         transition: width 0.3s ease, opacity 0.2s ease, visibility 0.3s;
     }
-    html.focus-mode .sidebar { opacity: 0; visibility: hidden; }
+    html.focus-mode .sidebar,
+    html.sidebar-closed .sidebar { opacity: 0; visibility: hidden; }
 
     .nav-link {
         @apply relative flex min-h-12 items-center gap-3 rounded-xl px-3.5 text-sm font-medium text-slate-500 transition duration-200
-               hover:bg-brand-50 hover:text-brand-700;
+        hover:bg-brand-50 hover:text-brand-700;
     }
     .nav-link[aria-current='page'] {
         @apply bg-brand-50 font-bold text-brand-700;
@@ -124,7 +131,7 @@ html.focus-mode { --rail: 0px; }
     .dialog-backdrop { @apply absolute inset-0 bg-slate-900/50; }
     .dialog-panel {
         @apply relative max-h-[92dvh] w-full max-w-lg translate-y-8 overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 shadow-lift
-               transition duration-300 md:max-h-[85dvh] md:translate-y-4 md:scale-95 md:rounded-3xl md:p-6;
+        transition duration-300 md:max-h-[85dvh] md:translate-y-4 md:scale-95 md:rounded-3xl md:p-6;
         padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
     }
     .dialog.is-open .dialog-panel { @apply translate-y-0 md:scale-100; }
@@ -148,7 +155,7 @@ html.focus-mode { --rail: 0px; }
     /* ---------- انتخابگر (Select) به شکل قرص ---------- */
     .select-pill {
         @apply relative flex min-h-12 items-center gap-2 rounded-full border border-slate-200 bg-white ps-4 pe-3 text-sm transition duration-200
-               focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 hover:border-slate-300;
+        focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 hover:border-slate-300;
     }
     .select-pill select {
         @apply min-w-0 flex-1 cursor-pointer appearance-none bg-transparent py-3 pe-6 font-bold text-brand-900 focus:outline-none;
@@ -203,6 +210,9 @@ html.focus-mode { --rail: 0px; }
     .step-item[data-state='current'] .step-dot > [data-dot='icon'],
     .step-item[data-state='upcoming'] .step-dot > [data-dot='num'] { display: block; }
     .step-link[aria-current='step'] .step-label { @apply font-bold text-brand-900; }
+    /* مرحله‌ای که الان نگاه می‌کنید (غیر از نارنجی که خودش پالس دارد) یک حلقه‌ی ملایم می‌گیرد */
+    .step-item:not([data-state='current']) .step-link[aria-current='step'] .step-dot { box-shadow: 0 0 0 4px rgb(var(--brand-200) / 0.7); }
+    .is-disabled { @apply pointer-events-none opacity-50; }
 
     .no-scrollbar { scrollbar-width: none; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -225,18 +235,34 @@ html.focus-mode { --rail: 0px; }
         html.focus-mode .step-actions { padding-bottom: 0; }
     }
 
-    /* ---------- نوار پیشرفت ---------- */
-    .progress-track { @apply h-2 overflow-hidden rounded-full bg-slate-100; }
-    .progress-bar {
-        @apply h-full w-full origin-left rounded-full bg-gradient-to-r from-brand-500 to-brand-700 rtl:origin-right rtl:bg-gradient-to-l;
-        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
-    }
-
-    /* ---------- حلقه‌ی پیشرفت کارت آهنگ (مقدار از --dash می‌آید) ---------- */
+    /* ---------- حلقه‌ی پیشرفت کارت آهنگ (مقدار از --dash می‌آید) ----------
+       backwards: انیمیشن فقط هنگام ورود؛ بعد از آن تغییر --dash با transition نرم عوض می‌شود. */
     .ring-fill {
         stroke-dasharray: var(--dash, 0) 56.55;
-        animation: ring-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+        transition: stroke-dasharray 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+        animation: ring-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
     }
+
+    /* ---------- ظاهر کارت آهنگ فقط بر اساس data-status (new | in_progress | done) ---------- */
+    .song-card[data-status='in_progress'] { @apply border-amber-400; }
+    .song-card[data-status='done'] { @apply border-emerald-400; }
+
+    .song-card .ribbon { display: none; }
+    .song-card[data-status='in_progress'] .ribbon[data-ribbon='in_progress'],
+    .song-card[data-status='done'] .ribbon[data-ribbon='done'] { display: block; }
+
+    .song-card [data-cta] { display: none; }
+    .song-card[data-status='new'] [data-cta='start'],
+    .song-card[data-status='in_progress'] [data-cta='continue'],
+    .song-card[data-status='done'] [data-cta='review'] { display: inline; }
+
+    .song-card[data-status='done'] [data-prog-ring] { display: none; }
+    .song-card:not([data-status='done']) [data-prog-done] { display: none; }
+    .song-card[data-status='done'] [data-prog-text] { @apply text-emerald-600; }
+
+    .prog-arc { @apply text-slate-300; }
+    .song-card[data-status='in_progress'] .prog-arc { @apply text-amber-500; }
+    .song-card[data-status='new'] .prog-arc { stroke-linecap: butt; }
 
     /* ---------- ریبون گوشه‌ی کارت ---------- */
     .ribbon {

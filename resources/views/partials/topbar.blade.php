@@ -6,9 +6,17 @@
 
 <header data-focus-hide class="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-slate-200 bg-white px-4 md:px-6 lg:px-8">
 
-    {{-- موبایل: لوگو (در دسکتاپ لوگو داخل سایدبار است) --}}
-    <a href="{{ url('/dashboard') }}" class="md:hidden" aria-label="Teodel">
-        <img src="{{ asset('images/logo.png') }}" alt="Teodel" width="110" height="32" class="h-8 w-auto">
+    {{-- دکمه‌ی بستن/باز کردن سایدبار (فقط تبلت و دسکتاپ؛ موبایل ناوبری پایین دارد) --}}
+    <button type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="true"
+        data-label-close="{{ __('ui.sidebar_close') }}" data-label-open="{{ __('ui.sidebar_open') }}"
+        class="hidden size-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition duration-200 hover:bg-brand-50 hover:text-brand-700 active:scale-95 md:grid"
+        aria-label="{{ __('ui.sidebar_close') }}" title="{{ __('ui.sidebar_close') }}">
+        <x-icon name="panel" class="size-5 rtl:-scale-x-100" />
+    </button>
+
+    {{-- لوگو: موبایل همیشه | تبلت و دسکتاپ فقط وقتی سایدبار بسته است (وگرنه لوگو داخل سایدبار است) --}}
+    <a href="{{ url('/dashboard') }}" class="topbar-logo md:hidden" aria-label="Teodel">
+        <img src="{{ asset('images/logo.svg') }}" alt="Teodel" width="110" height="32" class="h-8 w-auto">
     </a>
 
     <div class="ms-auto flex items-center gap-2 md:gap-3">

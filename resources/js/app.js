@@ -10,6 +10,8 @@ window.$ = window.jQuery = $;
 
 import './modules/dialogs';
 import './modules/focus-mode';
+import './modules/sidebar';
 import './modules/music-list';
 import './modules/report';
 import './modules/lesson';
+import './modules/progress-sync';

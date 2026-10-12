@@ -5,12 +5,12 @@
 @endphp
 
 {{-- دسکتاپ: سایدبار کامل | تبلت: ریل آیکونی | موبایل: مخفی (ناوبری پایین) --}}
-<aside class="sidebar fixed inset-y-0 start-0 z-40 hidden overflow-hidden border-e border-slate-200 bg-white md:block" aria-label="{{ __('ui.menu') }}">
+<aside id="sidebar" class="sidebar fixed inset-y-0 start-0 z-40 hidden overflow-hidden border-e border-slate-200 bg-white md:block" aria-label="{{ __('ui.menu') }}">
     <div class="flex h-full w-20 flex-col lg:w-72">
 
         <div class="flex h-16 shrink-0 items-center justify-center border-b border-slate-100 px-4">
             <a href="{{ url('/dashboard') }}" class="block" aria-label="Teodel">
-                <img src="{{ asset('images/logo.png') }}" alt="Teodel" width="120" height="36" class="hidden h-9 w-auto lg:block">
+                <img src="{{ asset('images/logo.svg') }}" alt="Teodel" width="120" height="36" class="hidden h-9 w-auto lg:block">
                 <span class="grid size-10 place-items-center rounded-xl bg-brand-700 text-lg font-extrabold text-white lg:hidden" aria-hidden="true">T</span>
             </a>
         </div>

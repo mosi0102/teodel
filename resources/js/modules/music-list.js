@@ -68,7 +68,11 @@ $(document).on('click', '[data-song-info]', function () {
     fill('points', d('points'));
     fill('steps', d('steps-text'));
     fill('access', d('access-text'));
-    fill('status', d('status-text'));
+    // وضعیت و متن دکمه از وضعیت «فعلی» کارت خوانده می‌شود (پیشرفت زنده ممکن است عوضش کرده باشد)
+    const status = d('status');
+    const ctaKey = { new: 'start', in_progress: 'continue', done: 'review' }[status] || 'start';
+    const ctaText = $.trim($card.find('[data-cta="' + ctaKey + '"]').first().text());
+    fill('status', d('label-' + status));
 
     // کاور: تصویر واقعی یا گرادیان جایگزین
     const $cover = $dlg.find('[data-fill-cover]');
@@ -83,7 +87,7 @@ $(document).on('click', '[data-song-info]', function () {
 
     // اگر آهنگ محدود است، دکمه‌ی خرید اشتراک نمایش داده شود
     $dlg.find('[data-fill-upgrade]').prop('hidden', d('limited') !== '1');
-    $dlg.find('[data-fill-start]').attr('href', d('href')).find('[data-fill-start-label]').text(d('cta-text'));
+    $dlg.find('[data-fill-start]').attr('href', d('href')).find('[data-fill-start-label]').text(ctaText);
 
     openDialog('#info-dialog');
 });

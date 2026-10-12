@@ -3,6 +3,8 @@
 return [
     'skip' => 'Skip to main content',
     'menu' => 'Menu',
+    'sidebar_close' => 'Close sidebar',
+    'sidebar_open' => 'Open sidebar',
     'soon' => 'Soon',
     'points' => 'Points',
     'days_left' => 'Subscription days left',

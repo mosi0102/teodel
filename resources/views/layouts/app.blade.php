@@ -11,10 +11,11 @@
     <meta name="theme-color" content="#2f3a9e">
     <title>@yield('title', config('app.name')) | {{ config('app.name', 'Teodel') }}</title>
 
-    {{-- حالت تمرکز قبل از رندر اعمال می‌شود تا صفحه پرش نکند --}}
-    <script>try{if(localStorage.getItem('teodel:focus')==='1')document.documentElement.classList.add('focus-mode')}catch(e){}</script>
+    {{-- حالت تمرکز و وضعیت سایدبار (بسته/باز) قبل از رندر اعمال می‌شوند تا صفحه پرش نکند --}}
+    <script>try{var d=document.documentElement,s=localStorage;if(s.getItem('teodel:focus')==='1')d.classList.add('focus-mode');if(s.getItem('teodel:sidebar')==='closed')d.classList.add('sidebar-closed')}catch(e){}</script>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- استایل‌ها (fonts / app / custom) از داخل app.js وارد می‌شوند --}}
+    @vite(['resources/js/app.js'])
 </head>
 <body>
     <a href="#main" class="sr-only z-[60] rounded-lg bg-white px-4 py-2 font-bold text-brand-700 shadow-lift focus:not-sr-only focus:fixed focus:start-4 focus:top-4">
