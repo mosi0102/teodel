@@ -1,6 +1,7 @@
+// ترتیب مهم است: فونت‌ها ← استایل‌های اصلی ← استایل شخصی شما (آخر، تا برنده باشد)
+import '../css/fonts.css';
 import '../css/app.css';
-import 'vazirmatn/Vazirmatn-Variable-font-face.css';
-import '@fontsource-variable/inter';
+import '../css/custom.css';
 
 import $ from 'jquery';
 
@@ -11,3 +12,4 @@ import './modules/dialogs';
 import './modules/focus-mode';
 import './modules/music-list';
 import './modules/report';
+import './modules/lesson';

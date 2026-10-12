@@ -10,5 +10,8 @@ use Illuminate\Support\Facades\Route;
  */
 Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
-    // Route::get('/music/{id}', ...)->name('music.show');  // صفحه‌ی آموزش (مراحل ۱ تا ۸)
+
+    // صفحه‌ی آموزش: /music/5 به مرحله‌ی فعلی کاربر می‌رود؛ /music/5/step/2 مرحله‌ی دوم
+    Route::get('/music/{id}', [MusicController::class, 'show'])->whereNumber('id')->name('music.show');
+    Route::get('/music/{id}/step/{step}', [MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
 });

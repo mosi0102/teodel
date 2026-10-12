@@ -8,7 +8,7 @@
 
     {{-- موبایل: لوگو (در دسکتاپ لوگو داخل سایدبار است) --}}
     <a href="{{ url('/dashboard') }}" class="md:hidden" aria-label="Teodel">
-        <img src="{{ asset('images/logo.svg') }}" alt="Teodel" width="110" height="32" class="h-8 w-auto">
+        <img src="{{ asset('images/logo.png') }}" alt="Teodel" width="110" height="32" class="h-8 w-auto">
     </a>
 
     <div class="ms-auto flex items-center gap-2 md:gap-3">

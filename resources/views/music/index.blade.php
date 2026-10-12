@@ -43,7 +43,7 @@
 
             <div class="flex gap-2 md:grid md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] md:gap-3">
 
-                <label class="relative block min-w-0 flex-1">
+                <label class="relative block min-w-0 flex-1 mt-3">
                     <span class="sr-only">{{ __('music.search') }}</span>
                     <x-icon name="search" class="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-slate-400" />
                     <input type="search" name="q" value="{{ $q }}" enterkeyhint="search" autocomplete="off"
@@ -67,7 +67,7 @@
                         <div class="dialog-handle md:hidden"></div>
                         <p class="pb-1 text-base font-extrabold text-brand-900 md:hidden">{{ __('music.filters') }}</p>
 
-                        <label class="select-pill">
+                        <label class="select-pill mt-3 pt-0">
                             <span class="shrink-0 text-slate-500">{{ __('music.filter_label') }}</span>
                             <select name="filter">
                                 @foreach (['all', 'new', 'in_progress', 'done', 'free'] as $opt)
@@ -77,7 +77,7 @@
                             <x-icon name="chevron-down" class="chev" />
                         </label>
 
-                        <label class="select-pill">
+                        <label class="select-pill mt-3 pt-0">
                             <span class="shrink-0 text-slate-500">{{ __('music.sort_label') }}</span>
                             <select name="sort">
                                 @foreach (['default', 'newest', 'points', 'duration', 'title'] as $opt)

@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Progress;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
  * ⚠️ فقط برای نمایش فرانت‌اند: داده‌ها نمونه (mock) هستند.
- * بک‌اند‌کار باید mock() و محاسبه‌ی $stats/$user را با داده‌ی واقعی عوض کند
+ * بک‌اند‌کار باید mock()، user() و مقدار $subscribed را با داده‌ی واقعی عوض کند
  * و فیلتر/مرتب‌سازی/صفحه‌بندی را روی دیتابیس انجام دهد. قرارداد داده در README.md است.
  */
 class MusicController extends Controller
 {
     private const PER_PAGE = 9;
 
+    /** ترتیب ثابت ۸ مرحله‌ی آموزش (همین کلیدها در فایل lesson.php زبان‌ها و پوشه‌ی resources/views/music/steps هم هستند) */
+    public const STEPS = ['play', 'lyrics', 'words', 'listening', 'shadowing', 'karaoke', 'repeat', 'details'];
+
+    /* ------------------------------------------------------------------
+     | لیست موزیک‌ها
+     ------------------------------------------------------------------ */
     public function index(Request $request)
     {
         $level = in_array($request->query('level'), ['a', 'b', 'c'], true) ? $request->query('level') : 'a';
@@ -55,16 +62,113 @@ class MusicController extends Controller
             'songs' => $paginator,
             'level' => $level,
             'filters' => ['q' => $q, 'filter' => $filter, 'sort' => $sort],
-            'subscribed' => false, // TODO(backend): آیا کاربر اشتراک فعال دارد؟
+            'subscribed' => $this->subscribed(),
             'stats' => ['completed' => 15, 'in_progress' => 15, 'points' => 560, 'highlights' => 56],
-            'user' => [
-                'name' => 'مهدی پوربشیری',
-                'days_left' => 0,
-                'points' => 560,
-                'level' => 'A2',
-                'skills' => ['listening' => 'A3', 'reading' => 'A1', 'writing' => 'A2', 'speaking' => 'A2'],
-            ],
+            'user' => $this->user(),
         ]);
+    }
+
+    /* ------------------------------------------------------------------
+     | صفحه‌ی آموزش
+     ------------------------------------------------------------------ */
+
+    /** /music/{id}  →  هدایت به مرحله‌ای که کاربر باید ادامه بدهد */
+    public function show(string $id)
+    {
+        $song = $this->findOrFail((int) $id);
+
+        $next = min($song['completed_steps'] + 1, count(self::STEPS));
+        if ($this->isLocked($song, $next)) {
+            $next = $song['free_steps'];
+        }
+
+        return redirect()->route('music.step', ['id' => $song['id'], 'step' => max($next, 1)]);
+    }
+
+    /** /music/{id}/step/{step} */
+    public function step(string $id, string $step)
+    {
+        $song = $this->findOrFail((int) $id);
+        $total = count(self::STEPS);
+        $n = (int) $step;
+        abort_if($n < 1 || $n > $total, 404);
+
+        $completed = (int) $song['completed_steps'];
+
+        // وضعیت هر مرحله برای نوار مراحل: done | current | upcoming | locked
+        $steps = collect(self::STEPS)->map(function (string $key, int $i) use ($song, $n, $completed) {
+            $num = $i + 1;
+            $locked = $this->isLocked($song, $num);
+
+            return [
+                'n' => $num,
+                'key' => $key,
+                'locked' => $locked,
+                'state' => match (true) {
+                    $locked => 'locked',
+                    $num === $n => 'current',
+                    $num <= $completed => 'done',
+                    default => 'upcoming',
+                },
+                'href' => route('music.step', ['id' => $song['id'], 'step' => $num]),
+            ];
+        });
+
+        $fraction = $n === $completed + 1 ? (float) $song['current_step_fraction'] : 0.0;
+
+        return view('music.lesson', [
+            'song' => $song,
+            'steps' => $steps,
+            'step' => $n,
+            'stepKey' => self::STEPS[$n - 1],
+            'total' => $total,
+            'locked' => $this->isLocked($song, $n),
+            'completed' => $completed,
+            'fraction' => $fraction,
+            'percent' => Progress::percent($completed, $fraction, $total),
+            'prevUrl' => $n > 1 ? route('music.step', ['id' => $song['id'], 'step' => $n - 1]) : null,
+            'nextUrl' => $n < $total
+                ? route('music.step', ['id' => $song['id'], 'step' => $n + 1])
+                : route('music.index', ['level' => $song['level']]),
+            'subscribed' => $this->subscribed(),
+            'user' => $this->user(),
+        ]);
+    }
+
+    /* ------------------------------------------------------------------
+     | داده‌ی نمونه (بک‌اند‌کار جایگزین کند)
+     ------------------------------------------------------------------ */
+
+    /** TODO(backend): آیا کاربر اشتراک فعال دارد؟ */
+    private function subscribed(): bool
+    {
+        return false;
+    }
+
+    /** TODO(backend): کاربر واقعی */
+    private function user(): array
+    {
+        return [
+            'name' => 'مهدی پوربشیری',
+            'days_left' => 0,
+            'points' => 560,
+            'level' => 'A2',
+            'skills' => ['listening' => 'A3', 'reading' => 'A1', 'writing' => 'A2', 'speaking' => 'A2'],
+        ];
+    }
+
+    /** مرحله‌ی $n برای کاربر رایگان روی آهنگ‌های غیررایگان قفل است (بعد از free_steps مرحله) */
+    private function isLocked(array $song, int $n): bool
+    {
+        return ! $this->subscribed() && ! $song['is_free'] && $n > $song['free_steps'];
+    }
+
+    private function findOrFail(int $id): array
+    {
+        $song = $this->mock()->firstWhere('id', $id);
+        abort_if($song === null, 404);
+
+        return $song;
     }
 
     /** ۳۶ آهنگ نمونه: ۱۲ تا برای هر سطح. سه آهنگ اول (id 1..3) کاملاً رایگان‌اند. */
@@ -91,19 +195,24 @@ class MusicController extends Controller
             ],
         ];
 
+        $total = count(self::STEPS);
         $id = 0;
         $out = collect();
 
         foreach ($catalog as $level => $list) {
             foreach ($list as $i => [$title, $artist]) {
                 $id++;
-                $status = match (true) {
-                    $id === 1 => 'done',
-                    $id === 2 => 'in_progress',
-                    $i % 5 === 3 => 'in_progress',
-                    $i % 7 === 5 => 'done',
-                    default => 'new',
+
+                // چند مرحله تمام شده؟ (آهنگ ۱: کامل | ۲: در حال انجام | بقیه به‌صورت نمونه)
+                $completed = match (true) {
+                    $id === 1 => $total,
+                    $id === 2 => 1,
+                    $i % 5 === 3 => 1 + ($id % 4),
+                    $i % 7 === 5 => $total,
+                    default => 0,
                 };
+                $fraction = ($completed > 0 && $completed < $total) ? 0.5 : 0.0;
+                $percent = Progress::percent($completed, $fraction, $total);
 
                 $out->push([
                     'id' => $id,
@@ -113,11 +222,13 @@ class MusicController extends Controller
                     'level' => $level,
                     'duration' => sprintf('%02d:%02d', 2 + ($id % 3), 10 + ($id * 7) % 50),
                     'points' => 50,
-                    'progress' => match ($status) {'done' => 100, 'in_progress' => 75, default => 0},
-                    'status' => $status,
+                    'completed_steps' => $completed,          // چند مرحله کاملاً تمام شده
+                    'current_step_fraction' => $fraction,     // چقدر از مرحله‌ی بعدی انجام شده (۰ تا ۱)
+                    'progress' => $percent,
+                    'status' => Progress::status($percent),
                     'is_free' => $id <= 3,
                     'free_steps' => 2,
-                    'total_steps' => 8,
+                    'total_steps' => $total,
                 ]);
             }
         }

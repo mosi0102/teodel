@@ -26,11 +26,12 @@ html.focus-mode { --rail: 0px; }
     }
     html.dialog-open { overflow: hidden; }
 
+    /* فونت‌ها در resources/css/custom.css (متغیرهای --font-fa و --font-en) تعیین می‌شوند */
     html[lang='fa'] body {
-        font-family: 'Vazirmatn', 'Vazirmatn Variable', system-ui, sans-serif;
+        font-family: var(--font-fa, 'yekanBakh', system-ui, sans-serif);
     }
     html[lang='en'] body {
-        font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
+        font-family: var(--font-en, 'Funnel Display', system-ui, sans-serif);
     }
     body {
         @apply min-h-dvh bg-[#f4f5fa] text-slate-700 antialiased;
@@ -61,6 +62,10 @@ html.focus-mode { --rail: 0px; }
     .btn-ghost {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 text-sm font-semibold text-slate-600 transition duration-200
                hover:bg-slate-200 active:scale-[.98];
+    }
+    .btn-outline {
+        @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-bold text-brand-700 transition duration-200
+               hover:border-brand-200 hover:bg-brand-50 active:scale-[.98];
     }
     .icon-btn {
         @apply grid size-11 place-items-center rounded-full bg-white text-slate-500 shadow-card transition duration-200 hover:text-brand-700 active:scale-95;
@@ -156,6 +161,83 @@ html.focus-mode { --rail: 0px; }
     }
     .level-tab[aria-current='page'] { @apply bg-brand-700 text-white hover:bg-brand-700; }
 
+    /* ---------- نوار مراحل آموزش (Stepper) ----------
+       وضعیت هر مرحله با data-state روی <li> تعیین می‌شود: done | current | upcoming | locked */
+    .step-item { position: relative; text-align: center; }
+    .step-line {
+        position: absolute;
+        top: 1.375rem;
+        inset-inline-start: 50%;
+        width: 100%;
+        border-top: 2px dashed rgb(203 213 225);
+        transition: border-color 0.3s ease;
+    }
+    @media (min-width: 640px) { .step-line { top: 1.5rem; } }
+    .step-item[data-state='done'] .step-line { border-color: rgb(52 211 153); }
+
+    .step-dot {
+        @apply relative z-10 mx-auto grid size-11 place-items-center rounded-full bg-slate-100 text-sm font-extrabold text-slate-400 transition duration-300 sm:size-12;
+    }
+    .step-item[data-state='done'] .step-dot { @apply bg-emerald-500 text-white; }
+    .step-item[data-state='current'] .step-dot { @apply bg-amber-400 text-white; }
+    .step-item[data-state='current'] .step-dot::after {
+        content: '';
+        @apply absolute inset-0 rounded-full border-2 border-amber-400;
+        animation: pulse-ring 1.8s ease-out infinite;
+    }
+    .step-label { @apply mt-2 block truncate px-0.5 text-xs font-medium text-slate-500 transition-colors duration-200 sm:text-sm; }
+    .step-item[data-state='current'] .step-label { @apply font-bold text-brand-900; }
+    .step-item[data-state='done'] .step-label { @apply text-slate-700; }
+    .step-item[data-state='locked'] .step-label { @apply text-slate-400; }
+
+    @media (hover: hover) {
+        .step-link:hover .step-dot { transform: scale(1.08); }
+        .step-item[data-state='upcoming'] .step-link:hover .step-dot { @apply bg-brand-50 text-brand-700; }
+        .step-link:hover .step-label { @apply text-brand-700; }
+    }
+
+    /* داخل دایره‌ی مرحله فقط یک نمایش بسته به وضعیت دیده می‌شود (وضعیت را JS هم عوض می‌کند) */
+    .step-dot > [data-dot] { display: none; }
+    .step-item[data-state='done'] .step-dot > [data-dot='check'],
+    .step-item[data-state='locked'] .step-dot > [data-dot='lock'],
+    .step-item[data-state='current'] .step-dot > [data-dot='icon'],
+    .step-item[data-state='upcoming'] .step-dot > [data-dot='num'] { display: block; }
+    .step-link[aria-current='step'] .step-label { @apply font-bold text-brand-900; }
+
+    .no-scrollbar { scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* ---------- دکمه‌های قبل/بعد: موبایل = نوار ثابت بالای ناوبری پایین | md به بالا = کنار عنوان ---------- */
+    .step-actions {
+        position: fixed;
+        inset-inline: 0;
+        bottom: calc(3.5rem + 1px + env(safe-area-inset-bottom));
+        z-index: 30;
+        display: flex;
+        gap: 0.625rem;
+        padding: 0.625rem 1rem;
+        background: #fff;
+        border-top: 1px solid rgb(226 232 240);
+    }
+    html.focus-mode .step-actions { bottom: 0; padding-bottom: calc(0.625rem + env(safe-area-inset-bottom)); }
+    @media (min-width: 768px) {
+        .step-actions { position: static; padding: 0; background: transparent; border: 0; }
+        html.focus-mode .step-actions { padding-bottom: 0; }
+    }
+
+    /* ---------- نوار پیشرفت ---------- */
+    .progress-track { @apply h-2 overflow-hidden rounded-full bg-slate-100; }
+    .progress-bar {
+        @apply h-full w-full origin-left rounded-full bg-gradient-to-r from-brand-500 to-brand-700 rtl:origin-right rtl:bg-gradient-to-l;
+        transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    /* ---------- حلقه‌ی پیشرفت کارت آهنگ (مقدار از --dash می‌آید) ---------- */
+    .ring-fill {
+        stroke-dasharray: var(--dash, 0) 56.55;
+        animation: ring-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+
     /* ---------- ریبون گوشه‌ی کارت ---------- */
     .ribbon {
         @apply pointer-events-none absolute end-0 top-0 size-24 overflow-hidden;
@@ -187,6 +269,14 @@ html.focus-mode { --rail: 0px; }
     animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes ring-in {
+    from { stroke-dasharray: 0 56.55; }
+    to { stroke-dasharray: var(--dash, 0) 56.55; }
+}
 
 /* کاربرانی که انیمیشن نمی‌خواهند */
 @media (prefers-reduced-motion: reduce) {

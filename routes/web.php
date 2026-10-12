@@ -19,3 +19,5 @@ Route::get('/lang/{locale}', function (string $locale) {
     return redirect()->back();
 });
 Route::get('/music', [\App\Http\Controllers\MusicController::class, 'index'])->name('music.index');
+Route::get('/music/{id}', [\App\Http\Controllers\MusicController::class, 'show'])->whereNumber('id')->name('music.show');
+Route::get('/music/{id}/step/{step}', [\App\Http\Controllers\MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
