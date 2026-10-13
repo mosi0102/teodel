@@ -218,8 +218,10 @@ class MusicController extends Controller
                     'id' => $id,
                     'title' => $title,
                     'artist' => $artist,
-                    'cover' => null, // آدرس کاور واقعی (ترجیحاً WebP و از دامنه‌ی خودتان)
-                    'audio' => "/songs/Benny Rivers – Step by Step in Time.mp3", // آدرس فایل صوتی موزیک (خالی = پخش‌کننده در حالت دمو)
+                    'cover' => '/covers/111.jpg', // آدرس کاور واقعی (ترجیحاً WebP و از دامنه‌ی خودتان)
+                    'audio' => '/songs/Benny Rivers – Step by Step in Time.mp3', // آدرس فایل صوتی موزیک (خالی = پخش‌کننده در حالت دمو)
+                    // بخش‌هایی که خواننده می‌خواند: [[شروع، پایان], ...] به ثانیه (داده‌ی نمونه؛ بک‌اند از زمان‌بندی لیریک بسازد)
+                    'vocals' => collect(range(0, 5))->map(fn ($i) => [10 + $i * 32, 32 + $i * 32])->all(),
                     'level' => $level,
                     // فقط برای دیالوگ «اطلاعات موزیک» (داده‌ی نمونه؛ بک‌اند مقدار واقعی بدهد)
                     'accent' => ['us', 'uk', 'au', 'ie'][$id % 4],

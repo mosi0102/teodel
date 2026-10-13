@@ -49,6 +49,7 @@ return [
         'slower' => 'Slower',
         'faster' => 'Faster',
         'error' => 'The audio could not be loaded. Check your connection and try again.',
+        'vocals' => 'Where the singer sings',
     ],
 
     // Step 1 (play) and step 7 (repeat): "How much did you understand?" from 1 to 10

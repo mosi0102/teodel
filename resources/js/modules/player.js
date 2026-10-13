@@ -60,25 +60,86 @@ function demoEngine(duration, hooks) {
     };
 }
 
-/** موتور واقعی: <audio> (فقط هنگام اولین پخش ساخته می‌شود تا صفحه سبک بماند) */
+/**
+ * موتور واقعی: <audio> (فقط هنگام اولین پخش ساخته می‌شود تا صفحه سبک بماند)
+ *
+ * نکته: بعضی سرورها (مثل php artisan serve) «Range request» را پشتیبانی نمی‌کنند و در آن‌ها پرش
+ * روی نوار، موزیک را از اول پخش می‌کند. اگر چنین چیزی دیده شود، فایل یک‌بار کامل دانلود می‌شود
+ * (blob) تا پرش همیشه دقیق باشد.
+ */
 function audioEngine(src, fallbackDuration, hooks) {
     const a = new Audio();
+    let blobbed = false;
+    let want = null; // مقصد آخرین پرش
+
     a.preload = 'metadata';
     a.src = src;
+
+    /** فایل را کامل می‌گیرد و از آن پخش می‌کند (پرش در آن همیشه کار می‌کند) */
+    async function toBlob() {
+        if (blobbed) return;
+        blobbed = true;
+        const target = want !== null ? want : a.currentTime;
+        const wasPlaying = !a.paused;
+        try {
+            const res = await fetch(src, { credentials: 'same-origin' });
+            if (!res.ok) throw new Error(res.status);
+            const url = URL.createObjectURL(await res.blob());
+            a.src = url;
+            a.addEventListener('loadedmetadata', function once() {
+                a.removeEventListener('loadedmetadata', once);
+                a.currentTime = target;
+            });
+            if (wasPlaying) {
+                a.addEventListener('canplay', function again() {
+                    a.removeEventListener('canplay', again);
+                    a.play().catch(() => {});
+                });
+            }
+        } catch (err) {
+            // دانلود کامل نشد (مثلاً CORS)؛ پخش عادی بدون خطا ادامه دارد، فقط پرش دقیق نیست
+            console.warn('[player] blob fallback failed:', err);
+        }
+    }
+
     a.addEventListener('timeupdate', hooks.tick);
     a.addEventListener('play', hooks.state);
     a.addEventListener('pause', hooks.state);
     a.addEventListener('ended', () => { hooks.state(); hooks.ended(); });
-    a.addEventListener('error', hooks.error);
-    a.addEventListener('loadedmetadata', hooks.tick);
+    a.addEventListener('error', () => {
+        // فقط خطای واقعیِ فایل (۴۰۴، فرمت نامعتبر، ...) خطا نشان می‌دهد
+        const e = a.error;
+        console.warn('[player] audio error', e && e.code, e && e.message, a.currentSrc || src);
+        hooks.error();
+    });
+    a.addEventListener('loadedmetadata', () => {
+        hooks.tick();
+        hooks.meta();
+    });
+    a.addEventListener('seeked', () => {
+        // پرش انجام نشد (برگشت به اول) → راه امن: blob
+        if (!blobbed && want !== null && want > 2 && a.currentTime < want - 2) toBlob();
+        want = null;
+    });
+
     return {
         get time() { return a.currentTime || 0; },
         get duration() { return Number.isFinite(a.duration) && a.duration > 0 ? a.duration : fallbackDuration; },
         get playing() { return !a.paused && !a.ended; },
         set rate(v) { a.playbackRate = v; },
-        play() { const p = a.play(); if (p && p.catch) p.catch(hooks.error); },
+        play() {
+            const p = a.play();
+            if (p && p.catch) p.catch((err) => {
+                if (err && err.name === 'AbortError') return; // پخش با عوض‌شدن منبع (blob) قطع شد؛ خطا نیست
+                console.warn('[player] play() rejected:', err && err.name, err && err.message);
+                hooks.error();
+            });
+        },
         pause() { a.pause(); },
-        seek(v) { a.currentTime = Math.min(Math.max(v, 0), this.duration); },
+        seek(v) {
+            want = Math.min(Math.max(v, 0), this.duration);
+            a.currentTime = want;
+        },
     };
 }
 
@@ -96,7 +157,7 @@ function init(el) {
     let lastT = 0;
     let lastPct = -1;
 
-    const hooks = { tick, state, ended: onEnded, error: onError };
+    const hooks = { tick, state, ended: onEnded, error: onError, meta: drawMarks };
     const engine = src ? null : demoEngine(baseDuration, hooks);
     let eng = engine; // موتور واقعی هنگام اولین پخش ساخته می‌شود
 
@@ -112,6 +173,22 @@ function init(el) {
         $p.find('[data-p-total]').text(fmt(d));
         if (!scrubbing) $seek.val(Math.round(r * 1000));
         $seek.attr('aria-valuetext', fmt(t) + ' / ' + fmt(d));
+    }
+
+    /** نشانه‌های بخش‌های خوانده‌شده؛ با زمان واقعی فایل هم‌اندازه می‌شوند */
+    function drawMarks() {
+        const $m = $p.find('[data-p-marks]');
+        if (!$m.length) return;
+        let segs = [];
+        try { segs = JSON.parse($p.attr('data-vocals') || '[]'); } catch (e) { /* خالی */ }
+        const d = dur();
+        const html = segs
+            .filter((x) => Array.isArray(x) && x[0] >= 0 && x[0] < d)
+            .map(([a, b]) => '<b style="left:' + (a / d) * 100 + '%;width:' + ((Math.min(b, d) - a) / d) * 100 + '%"></b>'
+                + '<i style="left:' + (a / d) * 100 + '%"></i>')
+            .join('');
+        $m.html(html);
+        $p.find('[data-p-legend]').prop('hidden', !html);
     }
 
     function ratio() {
@@ -184,20 +261,31 @@ function init(el) {
     $p.on('click', '[data-p-slower]', () => setSpeed(rateIdx - 1));
     $p.on('click', '[data-p-faster]', () => setSpeed(rateIdx + 1));
 
+    // کشیدن نوار: فقط پیش‌نمایش (بدون درخواست به سرور)؛ پرش واقعی بعد از رها کردن / کلیک انجام می‌شود
     $seek.on('input', function () {
         scrubbing = true;
+        const d = dur();
+        const t = (Number(this.value) / 1000) * d;
+        $p.find('[data-p-fill]').css('width', t / d * 100 + '%');
+        $p.find('[data-p-thumb]').css('left', t / d * 100 + '%');
+        $p.find('[data-p-cur]').text(fmt(t));
+    });
+    $seek.on('change', function () {
         const e = ensure();
         e.seek((Number(this.value) / 1000) * e.duration);
         lastT = e.time;
+        ended = false;
+        scrubbing = false;
         render();
     });
-    $seek.on('change blur', () => { scrubbing = false; });
+    $seek.on('blur', () => { scrubbing = false; render(); });
 
     $p.data('player', { pause: () => eng && eng.playing && eng.pause(), ratio });
 
     setSpeed(rateIdx);
     state();
     render();
+    drawMarks();
 }
 
 window.Teodel = window.Teodel || {};

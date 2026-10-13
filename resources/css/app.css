@@ -249,6 +249,12 @@ html.sidebar-closed { --rail: 0px; }
     .p-seek:has(input:focus-visible) .p-thumb { box-shadow: 0 0 0 4px rgb(255 255 255 / 0.4); }
     .p-seek:active .p-thumb { transform: translate(-50%, -50%) scale(1.25); }
 
+    /* نشانه‌ی بخش‌های خوانده‌شده روی نوار: نقطه‌ی کوچک بالای شروع هر بخش + پررنگ‌تر شدن همان بخش نوار */
+    .p-marks i { position: absolute; top: 1px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 9999px; background: #fcd34d; box-shadow: 0 0 0 1.5px rgb(0 0 0 / 0.35); }
+    .p-marks b { position: absolute; top: 50%; height: 6px; margin-top: -3px; border-radius: 9999px; background: rgb(252 211 77 / 0.55); }
+    .p-legend { @apply flex items-center gap-1.5 text-[10px] font-bold text-white/80 md:text-xs; }
+    .p-legend i { @apply block size-[5px] rounded-full bg-amber-300; }
+
     .player__eq i { @apply block w-[3px] rounded-full bg-white/80; height: 30%; }
     .player[data-state='playing'] .player__eq i { animation: eq 0.9s ease-in-out infinite; }
     .player__eq i:nth-child(2) { animation-delay: -0.3s !important; }

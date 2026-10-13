@@ -5,6 +5,8 @@
 
     🔌 hook بک‌اند: $song['audio'] = آدرس فایل صوتی.
        اگر خالی باشد، پخش‌کننده در حالت «دمو» با زمان‌سنج کار می‌کند (فقط برای تست فرانت).
+    🔌 hook بک‌اند: $song['vocals'] = [[شروع، پایان], ...] به ثانیه؛ بخش‌هایی که خواننده می‌خواند.
+       روی نوار زمان با نشانه‌ی کوچک دیده می‌شود (خالی = نشانه‌ای نمی‌آید).
     مدت زمان از $song['duration'] (mm:ss) خوانده می‌شود.
 --}}
 @php
@@ -14,7 +16,7 @@
 @endphp
 
 <div class="player group relative isolate aspect-square w-full overflow-hidden rounded-2xl bg-slate-900 text-white shadow-card md:aspect-[5/4] lg:aspect-square"
-    data-player data-song="{{ $song['id'] }}" data-src="{{ $song['audio'] ?? '' }}" data-duration="{{ $seconds }}"
+    data-player data-song="{{ $song['id'] }}" data-src="{{ $song['audio'] ?? '' }}" data-duration="{{ $seconds }}" data-vocals="{{ json_encode($song['vocals'] ?? []) }}"
     data-state="paused" role="group" aria-label="{{ __('lesson.player.label') }}">
 
     {{-- کاور (تصویر واقعی یا گرادیان جایگزین) --}}
@@ -41,12 +43,15 @@
                 <div class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/30">
                     <div data-p-fill class="h-full w-0 rounded-full bg-white"></div>
                 </div>
+                {{-- نشانه‌های بخش‌های خوانده‌شده (با player.js ساخته می‌شوند) --}}
+                <div data-p-marks class="p-marks pointer-events-none absolute inset-x-0 top-0 h-full" aria-hidden="true"></div>
                 <span data-p-thumb class="p-thumb pointer-events-none absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-md" style="left:0%"></span>
                 <input data-p-seek type="range" min="0" max="1000" value="0" step="1"
                     class="absolute inset-0 size-full cursor-pointer opacity-0" aria-label="{{ __('lesson.player.seek') }}">
             </div>
             <div class="flex justify-between text-xs font-bold tabular-nums text-white/90 md:text-sm">
                 <span data-p-cur>{{ num('00:00') }}</span>
+                <span data-p-legend hidden class="p-legend"><i></i>{{ __('lesson.player.vocals') }}</span>
                 <span data-p-total>{{ num(sprintf('%02d:%02d', intdiv($seconds, 60), $seconds % 60)) }}</span>
             </div>
         </div>
