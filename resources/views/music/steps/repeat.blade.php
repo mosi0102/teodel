@@ -1,8 +1,2 @@
-{{--
-    مرحله 7: repeat
-    محتوای این مرحله را اینجا بسازید و کامپوننت زیر را پاک کنید.
-    برای پیشرفت زنده، از جی‌کوئری این‌ها را صدا بزنید:
-        Teodel.lesson.setStepProgress(0.4);   // ۴۰٪ از این مرحله انجام شد
-        Teodel.lesson.completeStep();         // این مرحله تمام شد
---}}
-<x-music.step-placeholder :step="$step" step-key="repeat" />
+{{-- مرحله 7: repeat — همان ساختار مرحله 1؛ فقط متن پرسش و مقایسه‌ی با امتیاز اول فرق دارد --}}
+@include('music.steps._listen-rate', ['kind' => 'repeat'])

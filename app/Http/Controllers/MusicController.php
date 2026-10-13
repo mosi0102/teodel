@@ -219,6 +219,7 @@ class MusicController extends Controller
                     'title' => $title,
                     'artist' => $artist,
                     'cover' => null, // آدرس کاور واقعی (ترجیحاً WebP و از دامنه‌ی خودتان)
+                    'audio' => "/songs/Benny Rivers – Step by Step in Time.mp3", // آدرس فایل صوتی موزیک (خالی = پخش‌کننده در حالت دمو)
                     'level' => $level,
                     // فقط برای دیالوگ «اطلاعات موزیک» (داده‌ی نمونه؛ بک‌اند مقدار واقعی بدهد)
                     'accent' => ['us', 'uk', 'au', 'ie'][$id % 4],
@@ -229,6 +230,9 @@ class MusicController extends Controller
                     'album' => 'Sample Album ' . $id,
                     'duration' => sprintf('%02d:%02d', 2 + ($id % 3), 10 + ($id * 7) % 50),
                     'points' => 50,
+                    // امتیاز «چقدر متوجه شدی؟» (۱ تا ۱۰) در مرحله‌ی ۱ و ۷؛ null = هنوز ثبت نشده
+                    'play_score' => $completed >= 1 ? 3 + ($id % 4) : null,
+                    'repeat_score' => $completed >= 7 ? min(10, 6 + ($id % 4)) : null,
                     'completed_steps' => $completed,          // چند مرحله کاملاً تمام شده
                     'current_step_fraction' => $fraction,     // چقدر از مرحله‌ی بعدی انجام شده (۰ تا ۱)
                     'progress' => $percent,

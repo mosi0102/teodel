@@ -56,29 +56,29 @@ html.sidebar-closed { --rail: 0px; }
     }
     .chip-btn {
         @apply inline-flex min-h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 transition duration-200
-        hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-[.97];
+               hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-[.97];
     }
     .chip-btn[aria-pressed='true'] {
         @apply border-brand-700 bg-brand-700 text-white hover:bg-brand-800 hover:text-white;
     }
     .btn-primary {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 text-sm font-bold text-white transition duration-200
-        hover:bg-brand-800 hover:shadow-lift active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
+               hover:bg-brand-800 hover:shadow-lift active:scale-[.98] disabled:pointer-events-none disabled:opacity-60;
     }
     .btn-ghost {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 text-sm font-semibold text-slate-600 transition duration-200
-        hover:bg-slate-200 active:scale-[.98];
+               hover:bg-slate-200 active:scale-[.98];
     }
     .btn-outline {
         @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 text-sm font-bold text-brand-700 transition duration-200
-        hover:border-brand-200 hover:bg-brand-50 active:scale-[.98];
+               hover:border-brand-200 hover:bg-brand-50 active:scale-[.98];
     }
     .icon-btn {
         @apply grid size-11 place-items-center rounded-full bg-white text-slate-500 shadow-card transition duration-200 hover:text-brand-700 active:scale-95;
     }
     .field {
         @apply w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 transition duration-200
-        placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
+               placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-100;
     }
     .busy { @apply pointer-events-none opacity-70; }
 
@@ -96,7 +96,7 @@ html.sidebar-closed { --rail: 0px; }
 
     .nav-link {
         @apply relative flex min-h-12 items-center gap-3 rounded-xl px-3.5 text-sm font-medium text-slate-500 transition duration-200
-        hover:bg-brand-50 hover:text-brand-700;
+               hover:bg-brand-50 hover:text-brand-700;
     }
     .nav-link[aria-current='page'] {
         @apply bg-brand-50 font-bold text-brand-700;
@@ -131,7 +131,7 @@ html.sidebar-closed { --rail: 0px; }
     .dialog-backdrop { @apply absolute inset-0 bg-slate-900/50; }
     .dialog-panel {
         @apply relative max-h-[92dvh] w-full max-w-lg translate-y-8 overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 shadow-lift
-        transition duration-300 md:max-h-[85dvh] md:translate-y-4 md:scale-95 md:rounded-3xl md:p-6;
+               transition duration-300 md:max-h-[85dvh] md:translate-y-4 md:scale-95 md:rounded-3xl md:p-6;
         padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
     }
     .dialog.is-open .dialog-panel { @apply translate-y-0 md:scale-100; }
@@ -155,7 +155,7 @@ html.sidebar-closed { --rail: 0px; }
     /* ---------- انتخابگر (Select) به شکل قرص ---------- */
     .select-pill {
         @apply relative flex min-h-12 items-center gap-2 rounded-full border border-slate-200 bg-white ps-4 pe-3 text-sm transition duration-200
-        focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 hover:border-slate-300;
+               focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-100 hover:border-slate-300;
     }
     .select-pill select {
         @apply min-w-0 flex-1 cursor-pointer appearance-none bg-transparent py-3 pe-6 font-bold text-brand-900 focus:outline-none;
@@ -235,6 +235,71 @@ html.sidebar-closed { --rail: 0px; }
         html.focus-mode .step-actions { padding-bottom: 0; }
     }
 
+    /* ---------- پخش‌کننده‌ی موزیک (مرحله‌های play و repeat) ----------
+       ظاهر فقط به data-state روی .player وابسته است: paused | playing */
+    .p-btn {
+        @apply grid size-9 place-items-center rounded-full bg-white/15 text-white backdrop-blur-sm transition duration-200 active:scale-90 md:size-10;
+    }
+    @media (hover: hover) { .p-btn:hover { @apply bg-white/25; } .p-main:hover { transform: scale(1.06); } }
+    .player .p-ico-pause { display: none; }
+    .player[data-state='playing'] .p-ico-play { display: none; }
+    .player[data-state='playing'] .p-ico-pause { display: block; }
+    .player__cover { transition: transform 8s ease-out; }
+    .player[data-state='playing'] .player__cover { transform: scale(1.06); }
+    .p-seek:has(input:focus-visible) .p-thumb { box-shadow: 0 0 0 4px rgb(255 255 255 / 0.4); }
+    .p-seek:active .p-thumb { transform: translate(-50%, -50%) scale(1.25); }
+
+    .player__eq i { @apply block w-[3px] rounded-full bg-white/80; height: 30%; }
+    .player[data-state='playing'] .player__eq i { animation: eq 0.9s ease-in-out infinite; }
+    .player__eq i:nth-child(2) { animation-delay: -0.3s !important; }
+    .player__eq i:nth-child(3) { animation-delay: -0.6s !important; }
+    .player__eq i:nth-child(4) { animation-delay: -0.15s !important; }
+
+    /* ---------- امتیازدهی ۱ تا ۱۰ ----------
+       رنگ هر عدد از --h می‌آید (۰ قرمز تا ۱۳۰ سبز). وضعیت: locked | ready | done */
+    .rate { display: block; cursor: pointer; }
+    .rate-btn {
+        @apply grid h-12 place-items-center rounded-xl border-2 border-slate-200 bg-white text-base font-extrabold text-slate-500 transition duration-200 select-none md:h-11;
+    }
+    .rate input:focus-visible + .rate-btn { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+    .rating:not([data-state='locked']) .rate:active .rate-btn { transform: scale(0.94); }
+    @media (hover: hover) {
+        .rating:not([data-state='locked']) .rate:hover .rate-btn {
+            border-color: hsl(var(--h) 65% 55%);
+            background: hsl(var(--h) 90% 96%);
+            color: hsl(var(--h) 70% 34%);
+        }
+    }
+    .rate input:checked + .rate-btn {
+        border-color: hsl(var(--h) 72% 45%);
+        background: hsl(var(--h) 72% 45%);
+        color: #fff;
+        transform: scale(1.08);
+        box-shadow: 0 6px 14px hsl(var(--h) 72% 45% / 0.35);
+    }
+    .rating[data-state='locked'] .rate { cursor: not-allowed; }
+    .rating[data-state='locked'] .rate-btn { opacity: 0.45; }
+
+    .rating[data-state='locked'] .rating__ready,
+    .rating[data-state='done'] .rating__ready { display: none; }
+    .rating[data-state='ready'] .rating__lock,
+    .rating[data-state='done'] .rating__lock,
+    .rating[data-state='done'] .rating__form,
+    .rating:not([data-state='done']) .rating__result { display: none; }
+    .rating[data-state='done'] .rating__result { animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .rating.is-nudge .rating__lock { animation: nudge 0.45s ease; }
+
+    .score-badge {
+        @apply relative grid size-16 shrink-0 place-items-center rounded-full text-2xl font-extrabold leading-none text-white;
+        background: hsl(var(--h, 130) 72% 45%);
+        box-shadow: 0 0 0 5px hsl(var(--h, 130) 72% 45% / 0.18);
+    }
+    .score-badge small { @apply absolute bottom-2 text-[10px] font-bold opacity-80; }
+    .score-badge > span:first-child { transform: translateY(-3px); }
+
+    /* وقتی مرحله تمام شد، دکمه‌ی «مرحله بعد» ملایم توجه می‌گیرد */
+    .step-actions [data-step-next].is-ready { animation: ready-glow 1.8s ease-in-out infinite; }
+
     /* ---------- حلقه‌ی پیشرفت کارت آهنگ (مقدار از --dash می‌آید) ----------
        backwards: انیمیشن فقط هنگام ورود؛ بعد از آن تغییر --dash با transition نرم عوض می‌شود. */
     .ring-fill {
@@ -306,6 +371,20 @@ html.sidebar-closed { --rail: 0px; }
 @keyframes ring-in {
     from { stroke-dasharray: 0 56.55; }
     to { stroke-dasharray: var(--dash, 0) 56.55; }
+}
+
+@keyframes eq {
+    0%, 100% { height: 25%; }
+    50% { height: 100%; }
+}
+@keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+@keyframes ready-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(var(--brand-500) / 0.45); }
+    50% { box-shadow: 0 0 0 7px rgb(var(--brand-500) / 0); }
 }
 
 /* کاربرانی که انیمیشن نمی‌خواهند */

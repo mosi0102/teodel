@@ -10,4 +10,6 @@ import './modules/sidebar';
 import './modules/music-list';
 import './modules/report';
 import './modules/lesson';
+import './modules/player';
+import './modules/rating';
 import './modules/progress-sync';

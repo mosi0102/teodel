@@ -94,6 +94,7 @@ if ($root.length) {
         n = Math.min(Math.max(Number(n) || 1, 1), total);
         const changed = n !== state.step;
         state.step = n;
+        if (changed) $actions.find('[data-step-next]').removeClass('is-ready');
 
         const $li = item(n);
         let $active = $();
@@ -158,6 +159,7 @@ if ($root.length) {
             if (isLocked(state.step)) return;
             state.fr[state.step] = 1;
             renderStepper();
+            $actions.find('[data-step-next]').addClass('is-ready'); // دکمه‌ی «مرحله بعد» ملایم توجه می‌گیرد
             const data = payload();
             $(document).trigger('lesson:progress', [data]);
             $(document).trigger('lesson:step-complete', [data]);
