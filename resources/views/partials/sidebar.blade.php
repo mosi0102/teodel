@@ -10,7 +10,7 @@
 
         <div class="flex h-16 shrink-0 items-center justify-center border-b border-slate-100 px-4">
             <a href="{{ url('/dashboard') }}" class="block" aria-label="Teodel">
-                <img src="{{ asset('images/logo.svg') }}" alt="Teodel" width="120" height="36" class="hidden h-9 w-auto lg:block">
+                <img src="{{ asset('images/logo.png') }}" alt="Teodel"  class="hidden h-10 w-auto lg:block">
                 <span class="grid size-10 place-items-center rounded-xl bg-brand-700 text-lg font-extrabold text-white lg:hidden" aria-hidden="true">T</span>
             </a>
         </div>

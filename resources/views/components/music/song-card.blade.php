@@ -5,6 +5,9 @@
     قرارداد داده ($song): id, title, artist, cover(nullable), level(a|b|c), duration("02:32"), points,
                           completed_steps, current_step_fraction(0-1), total_steps,
                           is_free(bool: یکی از ۳ آهنگ کاملاً رایگان), free_steps(int)
+    فقط برای دیالوگ «اطلاعات موزیک» (هر کدام null باشد «—» نشان داده می‌شود):
+                          accent(us|uk|au|ie), year(int), genre, wpm(لغت در دقیقه), topic, album
+                          — genre و topic و album را بک‌اند به زبان کاربر بفرستد.
     کاربر رایگان: روی آهنگ‌های غیر is_free فقط free_steps مرحله‌ی اول باز است.
 
     پیشرفت داینامیک: ظاهر کارت (حلقه، درصد، ریبون، رنگ حاشیه، متن دکمه) فقط به data-status و
@@ -23,7 +26,6 @@
     $href = url('/music/' . $song['id']);
 
     $limitedText = __('music.limited', ['free' => num($freeSteps), 'total' => num($totalSteps)]);
-    $stepsText = __('music.steps_total', ['n' => num($totalSteps)]);
     $accessText = $limited ? __('music.access_limited', ['free' => num($freeSteps), 'total' => num($totalSteps)]) : __('music.access_full');
 
     // حلقه‌ی پیشرفت (محیط دایره‌ی r=9 تقریباً 56.55 است)
@@ -44,7 +46,12 @@
     data-level-text="{{ __('music.levels.' . $song['level']) }}"
     data-duration="{{ num($song['duration']) }}"
     data-points="{{ num($song['points']) }}"
-    data-steps-text="{{ $stepsText }}"
+    data-accent-text="{{ filled($song['accent'] ?? null) ? __('music.accents.' . $song['accent']) : '' }}"
+    data-year="{{ filled($song['year'] ?? null) ? num($song['year']) : '' }}"
+    data-genre="{{ $song['genre'] ?? '' }}"
+    data-wpm-text="{{ filled($song['wpm'] ?? null) ? __('music.info.wpm_value', ['n' => num($song['wpm'])]) : '' }}"
+    data-topic="{{ $song['topic'] ?? '' }}"
+    data-album="{{ $song['album'] ?? '' }}"
     data-access-text="{{ $accessText }}"
     data-label-new="{{ __('music.status.new') }}"
     data-label-in_progress="{{ __('music.status.in_progress') }}"
@@ -61,10 +68,10 @@
         <div class="relative size-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:size-[72px]">
             @if ($song['cover'])
                 <img src="{{ $song['cover'] }}" alt="" width="72" height="72" loading="lazy" decoding="async"
-                    class="size-full object-cover transition-transform duration-500 group-hover:scale-110">
+                     class="size-full object-cover transition-transform duration-500 group-hover:scale-110">
             @else
                 <span class="grid size-full place-items-center text-white transition-transform duration-500 group-hover:scale-110"
-                    style="background: linear-gradient(135deg, hsl({{ $hue }} 70% 55%), hsl({{ ($hue + 40) % 360 }} 70% 40%))">
+                      style="background: linear-gradient(135deg, hsl({{ $hue }} 70% 55%), hsl({{ ($hue + 40) % 360 }} 70% 40%))">
                     <x-icon name="music" class="size-7" />
                 </span>
             @endif
@@ -110,7 +117,7 @@
             <svg data-prog-ring class="size-5 -rotate-90" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" class="text-slate-200" />
                 <circle data-prog-arc cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                    style="--dash: {{ $dash }}" class="ring-fill prog-arc" />
+                        style="--dash: {{ $dash }}" class="ring-fill prog-arc" />
             </svg>
             <x-icon name="check-circle" class="size-5 text-emerald-500" data-prog-done />
             <dt class="text-[11px] text-slate-500">{{ __('music.card.progress') }}</dt>
@@ -129,7 +136,7 @@
         </a>
 
         <button type="button" data-song-info
-            class="min-h-10 rounded-full bg-brand-50 px-4 text-xs font-bold text-brand-700 transition duration-200 hover:bg-brand-100 active:scale-95">
+                class="min-h-10 rounded-full bg-brand-50 px-4 text-xs font-bold text-brand-700 transition duration-200 hover:bg-brand-100 active:scale-95">
             {{ __('music.card.info') }}
         </button>
     </div>

@@ -243,6 +243,10 @@ html.sidebar-closed { --rail: 0px; }
         animation: ring-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
     }
 
+    /* هنگام لود لیست (تعویض تب/فیلتر) کمی کم‌رنگ می‌شود */
+    #music-results { transition: opacity 0.2s ease; }
+    #music-results.is-loading-list { @apply pointer-events-none opacity-50; }
+
     /* ---------- ظاهر کارت آهنگ فقط بر اساس data-status (new | in_progress | done) ---------- */
     .song-card[data-status='in_progress'] { @apply border-amber-400; }
     .song-card[data-status='done'] { @apply border-emerald-400; }

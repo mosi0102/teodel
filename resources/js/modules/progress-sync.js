@@ -53,8 +53,8 @@ $(document).on('lesson:progress', (e, data) => {
     }
 });
 
-/* لیست موزیک: مقدار ذخیره‌شده را روی کارت‌ها اعمال کن */
-$(function () {
+/* لیست موزیک: مقدار ذخیره‌شده را روی کارت‌ها اعمال کن (هنگام لود و بعد از هر تعویض تب/نمایش بیشتر) */
+function applySaved() {
     if (!LOCAL_PROGRESS) return;
     $('[data-song]').each(function () {
         try {
@@ -64,4 +64,7 @@ $(function () {
             /* localStorage در دسترس نیست */
         }
     });
-});
+}
+
+$(applySaved);
+$(document).on('music:list-updated', applySaved);

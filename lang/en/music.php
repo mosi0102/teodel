@@ -66,9 +66,23 @@ return [
     'steps_total' => ':n steps',
     'access_limited' => 'On the free plan only the first :free of :total steps are open. Get a subscription to unlock every step.',
     'access_full' => 'All steps of this song are open to you.',
+    // Song info dialog
     'info' => [
-        'steps' => 'Lesson steps',
-        'status' => 'Status',
+        'level' => 'Song level',
+        'accent' => 'Accent',
+        'year' => 'Release year',
+        'genre' => 'Genre',
+        'wpm' => 'Words per minute',
+        'wpm_value' => ':n WPM',
+        'duration' => 'Duration',
+        'topic' => 'Topic',
+        'album' => 'Album',
+    ],
+    'accents' => [
+        'us' => 'American',
+        'uk' => 'British',
+        'au' => 'Australian',
+        'ie' => 'Irish',
     ],
 
     'empty' => [

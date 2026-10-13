@@ -5,4 +5,6 @@
         Teodel.lesson.setStepProgress(0.4);   // ۴۰٪ از این مرحله انجام شد
         Teodel.lesson.completeStep();         // این مرحله تمام شد
 --}}
+
 <x-music.step-placeholder :step="$step" step-key="lyrics" />
+

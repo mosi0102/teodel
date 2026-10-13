@@ -220,6 +220,13 @@ class MusicController extends Controller
                     'artist' => $artist,
                     'cover' => null, // آدرس کاور واقعی (ترجیحاً WebP و از دامنه‌ی خودتان)
                     'level' => $level,
+                    // فقط برای دیالوگ «اطلاعات موزیک» (داده‌ی نمونه؛ بک‌اند مقدار واقعی بدهد)
+                    'accent' => ['us', 'uk', 'au', 'ie'][$id % 4],
+                    'year' => 2005 + ($id * 7) % 20,
+                    'genre' => ['Pop', 'Rock', 'Soul', 'Folk', 'Dance', 'R&B'][$id % 6],
+                    'wpm' => 80 + ($id * 13) % 90,
+                    'topic' => ['Love', 'Friendship', 'Freedom', 'Hope', 'Life', 'Dreams'][($id * 5) % 6],
+                    'album' => 'Sample Album ' . $id,
                     'duration' => sprintf('%02d:%02d', 2 + ($id % 3), 10 + ($id * 7) % 50),
                     'points' => 50,
                     'completed_steps' => $completed,          // چند مرحله کاملاً تمام شده

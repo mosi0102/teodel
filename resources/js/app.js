@@ -1,8 +1,4 @@
-// ترتیب مهم است: فونت‌ها ← استایل‌های اصلی ← استایل شخصی شما (آخر، تا برنده باشد)
-import '../css/fonts.css';
-import '../css/app.css';
-import '../css/custom.css';
-
+// استایل‌ها (fonts / app / custom) اینجا import نمی‌شوند؛ با @vite در layouts/app.blade.php لود می‌شوند.
 import $ from 'jquery';
 
 // جی‌کوئری سراسری: صفحات بعدی (مراحل ۱ تا ۸) هم از همین نمونه استفاده می‌کنند
