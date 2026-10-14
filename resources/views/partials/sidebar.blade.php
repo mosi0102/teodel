@@ -62,7 +62,7 @@
             </nav>
 
             {{-- میانگین نمره‌ی مهارت‌ها (فقط دسکتاپ؛ جای کافی دارد) --}}
-            <div class="hidden rounded-2xl bg-gradient-to-br from-brand-50 to-indigo-100 p-3.5 lg:block">
+            <div class="hidden rounded-2xl bg-gradient-to-br from-brand-50 to-indigo-100 p-3.5 lg:block avgSidebar">
                 <p class="mb-3 text-xs font-bold text-brand-800">
                     {{ __('ui.avg_grade') }}: <span dir="ltr" class="inline-block rounded-md bg-brand-700 px-2 py-0.5 text-white">{{ $u['level'] }}</span>
                 </p>

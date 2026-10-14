@@ -173,6 +173,7 @@ function init(el) {
         $p.find('[data-p-total]').text(fmt(d));
         if (!scrubbing) $seek.val(Math.round(r * 1000));
         $seek.attr('aria-valuetext', fmt(t) + ' / ' + fmt(d));
+        $(document).trigger('player:time', [{ el, song, time: t, duration: d }]);
     }
 
     /** نشانه‌های بخش‌های خوانده‌شده؛ با زمان واقعی فایل هم‌اندازه می‌شوند */
@@ -280,7 +281,26 @@ function init(el) {
     });
     $seek.on('blur', () => { scrubbing = false; render(); });
 
-    $p.data('player', { pause: () => eng && eng.playing && eng.pause(), ratio });
+    // API برای مرحله‌های دیگر (مثلاً لیریک): زمان فعلی، پرش، پخش
+    $p.data('player', {
+        pause: () => eng && eng.playing && eng.pause(),
+        ratio,
+        time: () => (eng ? eng.time : 0),
+        playing: () => !!(eng && eng.playing),
+        seek(t) {
+            const e = ensure();
+            e.seek(t);
+            lastT = e.time;
+            ended = false;
+            render();
+        },
+        play() {
+            const e = ensure();
+            $p.find('[data-p-error]').prop('hidden', true);
+            if (!e.playing) e.play();
+            window.Teodel.player.pauseAll(el);
+        },
+    });
 
     setSpeed(rateIdx);
     state();

@@ -34,5 +34,13 @@ html.focus-mode .page-wrap {
 }
 header
 {
-    z-index: 1000;
+    z-index: 1000 !important;
+}
+.wd.is-saved {
+    background: rgb(var(--brand-50) / var(--tw-bg-opacity, 1));
+    box-shadow: inset 0 -2px 0 rgb(var(--brand-700));
+}
+.avgSidebar
+{
+    font-family: 'Funnel Display';
 }

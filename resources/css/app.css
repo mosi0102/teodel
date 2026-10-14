@@ -255,6 +255,99 @@ html.sidebar-closed { --rail: 0px; }
     .p-legend { @apply flex items-center gap-1.5 text-[10px] font-bold text-white/80 md:text-xs; }
     .p-legend i { @apply block size-[5px] rounded-full bg-amber-300; }
 
+    /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
+       وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
+       کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */
+    .lyrics__scroll { scroll-behavior: auto; overscroll-behavior: contain; }
+    .lyric-line {
+        @apply block w-full rounded-xl px-3 py-2 text-start text-[1.05rem] font-bold leading-8 text-brand-900/80 md:px-4 md:text-lg md:leading-9;
+        transition: color 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+    }
+    .lyric-line[data-state='past'] { @apply text-slate-400; }
+    .lyric-line[data-state='now'] { @apply bg-amber-50 text-brand-900; }
+    @media (hover: hover) { .lyric-line:hover { @apply bg-slate-50; } .lyric-line[data-state='now']:hover { @apply bg-amber-50; } }
+    .lyric-line:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+    .lw { border-radius: 0.3rem; padding: 0.05rem 0.12rem; margin: 0 -0.12rem; transition: background-color 0.25s ease, color 0.25s ease; }
+    .lyric-line[data-state='now'] .lw.is-sung { background-color: #fde68a; color: rgb(var(--brand-900)); }
+    .lyric-tr { @apply mt-0.5 hidden text-sm font-medium leading-6 text-slate-500; }
+    .lyrics[data-tr='on'] .lyric-tr { display: block; }
+
+    .lyrics-chip {
+        @apply inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-bold text-slate-600 transition duration-200 md:text-sm;
+    }
+    .lyrics-chip[aria-pressed='true'] { @apply border-brand-200 bg-brand-50 text-brand-700; }
+    @media (hover: hover) { .lyrics-chip:hover { @apply border-brand-200 text-brand-700; } }
+    .lyrics-now {
+        @apply absolute bottom-4 start-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-brand-700 px-4 py-2 text-sm font-bold text-white shadow-lift transition active:scale-95;
+        animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    .lyrics-now[hidden] { display: none; }
+
+    /* ---------- مرحله‌ی ۳ (words): لیریک + کارت توضیحات لغت ----------
+       وضعیت کارت با data-state: empty | loading | ready | nodata */
+    .wline { @apply py-1 text-left text-[1.05rem] font-bold leading-[2.35rem] text-brand-900 md:text-lg md:leading-[2.5rem]; }
+    .wd { border-radius: 0.375rem; transition: background-color 0.2s ease, box-shadow 0.2s ease; }
+    .wd[data-w-word] { cursor: pointer; }
+    @media (hover: hover) { .wd[data-w-word]:hover { @apply bg-brand-50; } }
+    .wd--support {
+        @apply cursor-pointer bg-amber-200 px-1 font-extrabold text-brand-900;
+        margin: 0 -0.05rem;
+        -webkit-box-decoration-break: clone; box-decoration-break: clone;
+    }
+    @media (hover: hover) { .wd--support:hover { @apply bg-amber-300; } }
+    .wd.is-active { @apply bg-brand-100; box-shadow: 0 0 0 2px rgb(var(--brand-600)); }
+    .wd--support.is-active { @apply bg-amber-300; }
+    .wd.is-saved { box-shadow: inset 0 -3px 0 rgb(var(--brand-700)); }
+    .wd.is-saved.is-active { box-shadow: 0 0 0 2px rgb(var(--brand-600)), inset 0 -3px 0 rgb(var(--brand-700)); }
+    .wd:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+
+    .wcard { @apply flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white; }
+    .wcard__empty { @apply flex flex-1 flex-col items-center justify-center p-6 text-center; }
+    .wcard__body { @apply min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-5; }
+    .wcard__loading { @apply flex flex-1 items-center justify-center gap-2.5 p-6 text-sm font-bold text-slate-500; }
+    .wcard__nav { @apply flex shrink-0 items-center justify-between gap-2 bg-brand-700 px-3 py-3 md:px-4; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    .wcard[data-state='empty'] .wcard__body,
+    .wcard[data-state='empty'] .wcard__loading,
+    .wcard[data-state='empty'] .wcard__nav,
+    .wcard[data-state='loading'] .wcard__body,
+    .wcard[data-state='loading'] .wcard__empty,
+    .wcard[data-state='ready'] .wcard__empty,
+    .wcard[data-state='ready'] .wcard__loading,
+    .wcard[data-state='nodata'] .wcard__empty,
+    .wcard[data-state='nodata'] .wcard__loading { display: none; }
+    .spinner { width: 1.1rem; height: 1.1rem; border: 2px solid currentColor; border-top-color: transparent; border-radius: 9999px; animation: spin 0.7s linear infinite; }
+    .wcard[data-state='ready'] .wcard__body,
+    .wcard[data-state='nodata'] .wcard__body { animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+    .wc-bookmark { @apply grid size-10 place-items-center rounded-full text-slate-400 transition duration-200; }
+    @media (hover: hover) { .wc-bookmark:hover { @apply bg-slate-100 text-brand-700; } }
+    .wc-bookmark[aria-pressed='true'] { @apply bg-brand-50 text-brand-700; }
+    .wc-bookmark[aria-pressed='true'] svg { fill: currentColor; }
+    .wc-speak { @apply grid size-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 active:scale-95; }
+    @media (hover: hover) { .wc-speak:hover { @apply bg-brand-100; } }
+    .wc-ctx .ctx-hit { @apply rounded bg-amber-200 px-0.5; }
+
+    .wc-table { @apply divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200; }
+    .wc-table > div { @apply grid grid-cols-[5.5rem_minmax(0,1fr)] md:grid-cols-[6.5rem_minmax(0,1fr)]; }
+    .wc-table dt { @apply border-e border-slate-200 bg-slate-50 px-3 py-3 text-sm font-bold text-slate-600; }
+    .wc-table dd { @apply flex min-w-0 items-center px-3 py-3 text-sm leading-6 text-slate-800; }
+
+    /* ترجمه‌ی تار: کلیک = نمایش / پنهان */
+    .w-tr { @apply relative inline-flex max-w-full items-center rounded-lg text-start; }
+    .w-tr__text { @apply select-none text-sm font-bold text-brand-900; filter: blur(6px); transition: filter 0.3s ease; }
+    .w-tr__veil { @apply absolute inset-0 flex items-center justify-center gap-1.5 rounded-lg bg-white/50 text-xs font-extrabold text-slate-700 transition-opacity duration-200; }
+    .w-tr .w-tr__on { display: none; }
+    .w-tr[aria-pressed='true'] .w-tr__text { filter: none; @apply select-text; }
+    .w-tr[aria-pressed='true'] .w-tr__veil { @apply pointer-events-none opacity-0; }
+    @media (hover: hover) { .w-tr[aria-pressed='false']:hover .w-tr__text { filter: blur(5px); } }
+    .w-tr:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+
+    .wc-nav-btn {
+        @apply inline-flex h-10 items-center gap-1.5 rounded-full border border-white/70 px-4 text-sm font-bold text-white transition duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-40;
+    }
+    .wc-nav-btn--solid { @apply border-white bg-white text-brand-800; }
+    @media (hover: hover) { .wc-nav-btn:not(.wc-nav-btn--solid):hover { @apply bg-white/15; } .wc-nav-btn--solid:hover { @apply bg-brand-50; } }
+
     .player__eq i { @apply block w-[3px] rounded-full bg-white/80; height: 30%; }
     .player[data-state='playing'] .player__eq i { animation: eq 0.9s ease-in-out infinite; }
     .player__eq i:nth-child(2) { animation-delay: -0.3s !important; }

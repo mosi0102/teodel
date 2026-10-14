@@ -12,4 +12,6 @@ import './modules/report';
 import './modules/lesson';
 import './modules/player';
 import './modules/rating';
+import './modules/lyrics';
+import './modules/words';
 import './modules/progress-sync';

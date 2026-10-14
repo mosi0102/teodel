@@ -1,10 +1,13 @@
 {{--
-    مرحله 2: lyrics
-    محتوای این مرحله را اینجا بسازید و کامپوننت زیر را پاک کنید.
-    برای پیشرفت زنده، از جی‌کوئری این‌ها را صدا بزنید:
-        Teodel.lesson.setStepProgress(0.4);   // ۴۰٪ از این مرحله انجام شد
-        Teodel.lesson.completeStep();         // این مرحله تمام شد
+    مرحله 2: lyrics — موزیک دوباره پخش می‌شود و لیریک هم‌زمان دیده می‌شود؛
+    خط (و کلمه‌ی) در حال خواندن رنگ می‌گیرد. رفتار: resources/js/modules/lyrics.js
+    موبایل: پخش‌کننده بالا، لیریک پایین | دسکتاپ: دو ستون کنار هم (هم‌ارتفاع).
 --}}
-
-<x-music.step-placeholder :step="$step" step-key="lyrics" />
-
+@php
+    $lyricLines = \App\Support\Lrc::forSong($song);
+    $playerSong = $lyricLines ? array_merge($song, ['vocals' => \App\Support\Lrc::vocals($lyricLines)]) : $song;
+@endphp
+<div class="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-6 lg:items-stretch">
+    <x-lesson.player :song="$playerSong" kind="lyrics" />
+    <x-lesson.lyrics :song="$song" />
+</div>
