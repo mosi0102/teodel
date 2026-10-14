@@ -12,15 +12,15 @@ import { digits } from './digits';
  *   $(document).on('player:listened', (e, { el, song, ratio, ended }) => {...})   ratio = ۰ تا ۱
  * API:  Teodel.player.pauseAll()
  */
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
+export const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
 
-const fmt = (sec) => {
+export const fmt = (sec) => {
     sec = Math.max(0, Math.floor(sec));
     return digits(String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'));
 };
 
 /** موتور دمو: همان رابط <audio> را با زمان‌سنج شبیه‌سازی می‌کند */
-function demoEngine(duration, hooks) {
+export function demoEngine(duration, hooks) {
     let t = 0;
     let rate = 1;
     let timer = null;
@@ -67,7 +67,7 @@ function demoEngine(duration, hooks) {
  * روی نوار، موزیک را از اول پخش می‌کند. اگر چنین چیزی دیده شود، فایل یک‌بار کامل دانلود می‌شود
  * (blob) تا پرش همیشه دقیق باشد.
  */
-function audioEngine(src, fallbackDuration, hooks) {
+export function audioEngine(src, fallbackDuration, hooks) {
     const a = new Audio();
     let blobbed = false;
     let want = null; // مقصد آخرین پرش
@@ -329,4 +329,5 @@ $(document).on('lesson:step-change', () => {
 });
 $(document).on('click', '[data-p-toggle]', function () {
     window.Teodel.player.pauseAll($(this).closest('[data-player]')[0]);
+    if (window.Teodel.clips) window.Teodel.clips.pauseAll();
 });

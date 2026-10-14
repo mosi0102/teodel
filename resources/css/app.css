@@ -255,6 +255,48 @@ html.sidebar-closed { --rail: 0px; }
     .p-legend { @apply flex items-center gap-1.5 text-[10px] font-bold text-white/80 md:text-xs; }
     .p-legend i { @apply block size-[5px] rounded-full bg-amber-300; }
 
+    /* ---------- مرحله‌ی ۴: listening ----------
+       .lsec = سرتیتر بخش (آسان/سخت)، .clip = کلیپ کوچک، .lx = یک تمرین
+       وضعیت تمرین با data-state روی .lx: idle | wrong | correct | revealed */
+    .lsec { @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl px-4 py-3 md:px-5 md:py-3.5; }
+    .lsec--easy { background: linear-gradient(to right, rgb(220 252 231), rgb(240 253 244 / 0.3)); }
+    .lsec--hard { background: linear-gradient(to right, rgb(254 226 226), rgb(254 242 242 / 0.3)); }
+    [dir='rtl'] .lsec--easy { background: linear-gradient(to left, rgb(220 252 231), rgb(240 253 244 / 0.3)); }
+    [dir='rtl'] .lsec--hard { background: linear-gradient(to left, rgb(254 226 226), rgb(254 242 242 / 0.3)); }
+    .lsec__icon { @apply grid size-9 place-items-center rounded-xl bg-white/80 shadow-sm; }
+    .lsec--easy .lsec__icon { @apply text-emerald-600; }
+    .lsec--hard .lsec__icon { @apply text-rose-600; }
+
+    .clip { @apply relative isolate h-36 overflow-hidden rounded-2xl text-white md:h-40; }
+    .clip .p-ico-pause { display: none; }
+    .clip[data-state='playing'] .p-ico-play { display: none; }
+    .clip[data-state='playing'] .p-ico-pause { display: block; }
+    .clip__bar { @apply h-1.5 overflow-hidden rounded-full bg-white/30; }
+    .clip__bar > i { @apply block h-full w-0 rounded-full bg-white; transition: width 0.2s linear; }
+    .clip button:disabled { @apply opacity-40; }
+
+    .lx { @apply overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300; }
+    .lx[data-state='correct'] { @apply border-emerald-300; }
+    .lx[data-state='revealed'] { @apply border-amber-300; }
+    .lx[data-state='wrong'] { @apply border-rose-200; }
+    .lx.is-shake { animation: nudge 0.35s ease-in-out; }
+    .lx__body { @apply p-4 md:p-5; }
+    .lx-text { @apply text-base font-bold leading-[2.6] text-slate-800 md:text-lg md:leading-[2.6]; }
+    .lx-input {
+        @apply mx-1 rounded-lg border-0 border-b-2 border-slate-300 bg-slate-50 px-2 py-0.5 text-center font-extrabold text-brand-800 outline-none transition duration-200;
+        font: inherit; font-size: max(16px, 1em); font-weight: 800;
+        width: calc(var(--n, 4) * 0.62em + 1.4em); min-width: 3.6em; max-width: 100%;
+    }
+    .lx-input:focus { @apply border-brand-500 bg-white; box-shadow: 0 0 0 3px rgb(var(--brand-500) / 0.18); }
+    .lx-input.is-bad { @apply border-rose-500 bg-rose-50 text-rose-700; }
+    .lx-input.is-ok { @apply border-emerald-500 bg-emerald-50 text-emerald-700; }
+    .lx[data-state='revealed'] .lx-input.is-ok { @apply border-amber-500 bg-amber-50 text-amber-800; }
+    .lx-msg { @apply mt-1 min-h-[1.5rem] text-sm font-bold; }
+    .lx-msg[data-kind='correct'] { @apply text-emerald-600; }
+    .lx-msg[data-kind='wrong'] { @apply text-rose-600; }
+    .lx-msg[data-kind='revealed'] { @apply text-amber-700; }
+    .lx-summary { @apply flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 md:p-5; animation: rise 0.4s ease both; }
+
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
        کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */

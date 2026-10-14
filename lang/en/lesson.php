@@ -26,7 +26,7 @@ return [
         'play' => ['label' => 'play', 'desc' => 'In this step, listen to the song carefully and with full focus.'],
         'lyrics' => ['label' => 'Lyrics', 'desc' => 'In this step you can see the lyrics while listening to the song.'],
         'words' => ['label' => 'words', 'desc' => 'In this step you read the lyrics. See the meaning of the difficult words and phrases, tap any other hard word yourself, and save the ones you want to review.'],
-        'listening' => ['label' => 'listening', 'desc' => 'In this step, listen carefully and practice your listening skills.'],
+        'listening' => ['label' => 'listening', 'desc' => 'In this step a part of the song plays and you type what you hear; the system checks what you wrote.'],
         'shadowing' => ['label' => 'shadowing', 'desc' => 'In this step, repeat along with the singer.'],
         'karaoke' => ['label' => 'Karaoke', 'desc' => 'In this step, sing along with the lyrics, karaoke style.'],
         'repeat' => ['label' => 'repeat', 'desc' => 'In this step, listen to the song again and see how much more you understand now.'],
@@ -123,5 +123,23 @@ return [
         'loading' => 'Loading…',
         'nodata' => 'We do not have details for this word yet. You can save it or look it up in the dictionary.',
         'dict' => 'Search in dictionary',
+    ],
+
+    // Step 4 (listening): easy = one missing word, hard = a missing phrase
+    'listening' => [
+        'easy' => 'Easy',
+        'hard' => 'Hard',
+        'easy_hint' => 'One word is missing. Listen and type it.',
+        'hard_hint' => 'A whole phrase is missing. Listen and type every word.',
+        'part' => 'Part :n',
+        'gap' => 'Word :i of :n',
+        'check' => 'Check',
+        'show' => 'Show answer',
+        'correct' => 'Well done! That is correct.',
+        'wrong' => 'Not quite yet. Listen again and try once more.',
+        'fill' => 'Fill in the blank first.',
+        'revealed' => 'Here is the right answer. You will catch it next time!',
+        'summary' => 'You got :ok of :total exercises right without seeing the answer.',
+        'empty' => 'There are no listening exercises for this song yet.',
     ],
 ];

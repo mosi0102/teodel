@@ -44,3 +44,7 @@ header
 {
     font-family: 'Funnel Display';
 }
+.lsec
+{
+    background: linear-gradient(to left,#70C5BE20,#D9AB2E20);
+}

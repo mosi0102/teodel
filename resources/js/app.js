@@ -14,4 +14,6 @@ import './modules/player';
 import './modules/rating';
 import './modules/lyrics';
 import './modules/words';
+import './modules/clip';
+import './modules/listening';
 import './modules/progress-sync';
