@@ -61,6 +61,28 @@ export function demoEngine(duration, hooks) {
 }
 
 /**
+ * iOS مقدار element.volume را نادیده می‌گیرد؛ آنجا (و فقط آنجا) صدا از GainNode رد می‌شود.
+ * اگر فایل از دامنه‌ی دیگری باشد و CORS نداشته باشد، WebAudio آن را بی‌صدا می‌کند؛ پس در آن حالت استفاده نمی‌شود.
+ */
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let audioCtx = null;
+function webAudioGain(el, src) {
+    if (!isIOS) return null;
+    try {
+        if (new URL(src, location.href).origin !== location.origin) return null;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        audioCtx = audioCtx || new AC();
+        const g = audioCtx.createGain();
+        audioCtx.createMediaElementSource(el).connect(g);
+        g.connect(audioCtx.destination);
+        return g;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
  * موتور واقعی: <audio> (فقط هنگام اولین پخش ساخته می‌شود تا صفحه سبک بماند)
  *
  * نکته: بعضی سرورها (مثل php artisan serve) «Range request» را پشتیبانی نمی‌کنند و در آن‌ها پرش
@@ -70,6 +92,8 @@ export function demoEngine(duration, hooks) {
 export function audioEngine(src, fallbackDuration, hooks) {
     const a = new Audio();
     let blobbed = false;
+    let vol = 1;
+    let gain; // undefined = هنوز ساخته نشده | null = لازم نیست | GainNode (فقط iOS)
     let want = null; // مقصد آخرین پرش
 
     a.preload = 'metadata';
@@ -127,7 +151,17 @@ export function audioEngine(src, fallbackDuration, hooks) {
         get duration() { return Number.isFinite(a.duration) && a.duration > 0 ? a.duration : fallbackDuration; },
         get playing() { return !a.paused && !a.ended; },
         set rate(v) { a.playbackRate = v; },
+        set volume(v) {
+            vol = Math.min(Math.max(v, 0), 1);
+            if (gain) gain.gain.value = vol;
+            else a.volume = vol;
+        },
         play() {
+            if (gain === undefined) {
+                gain = webAudioGain(a, src);
+                if (gain) gain.gain.value = vol;
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
             const p = a.play();
             if (p && p.catch) p.catch((err) => {
                 if (err && err.name === 'AbortError') return; // پخش با عوض‌شدن منبع (blob) قطع شد؛ خطا نیست
@@ -143,10 +177,52 @@ export function audioEngine(src, fallbackDuration, hooks) {
     };
 }
 
+/**
+ * موتور دو‌ترکه (کارائوکه): صدای خواننده و موزیک (بدون خواننده) دو فایل جدا هستند و هم‌زمان پخش می‌شوند.
+ * زمان‌بندی از ترک موزیک (backing) خوانده می‌شود و اگر ترک خواننده بیشتر از ۰٫۲۵ ثانیه عقب/جلو افتاد، دوباره هم‌زمان می‌شود.
+ */
+export function stemEngine(srcVocal, srcBacking, fallbackDuration, hooks) {
+    const back = audioEngine(srcBacking, fallbackDuration, hooks);
+    const voc = audioEngine(srcVocal, fallbackDuration, { tick() {}, state() {}, meta() {}, ended() {}, error: hooks.error });
+    let timer = null;
+    const sync = () => {
+        if (back.playing && Math.abs(voc.time - back.time) > 0.25) voc.seek(back.time);
+    };
+    const stop = () => {
+        clearInterval(timer);
+        timer = null;
+    };
+    return {
+        get time() { return back.time; },
+        get duration() { return back.duration; },
+        get playing() { return back.playing; },
+        set rate(v) { back.rate = v; voc.rate = v; },
+        setGain(kind, v) { (kind === 'vocal' ? voc : back).volume = v; },
+        play() {
+            voc.seek(back.time);
+            back.play();
+            voc.play();
+            if (!timer) timer = setInterval(sync, 500);
+        },
+        pause() {
+            stop();
+            back.pause();
+            voc.pause();
+        },
+        seek(v) {
+            back.seek(v);
+            voc.seek(v);
+        },
+    };
+}
+
 function init(el) {
     const $p = $(el);
     const song = Number($p.attr('data-song'));
     const src = $p.attr('data-src') || '';
+    const srcVocal = $p.attr('data-src-vocal') || '';
+    const srcBacking = $p.attr('data-src-backing') || '';
+    const stems = !!(srcVocal && srcBacking); // کارائوکه: دو ترکِ جدا
     const baseDuration = Number($p.attr('data-duration')) || 180;
     const $seek = $p.find('[data-p-seek]');
 
@@ -158,7 +234,7 @@ function init(el) {
     let lastPct = -1;
 
     const hooks = { tick, state, ended: onEnded, error: onError, meta: drawMarks };
-    const engine = src ? null : demoEngine(baseDuration, hooks);
+    const engine = src || stems ? null : demoEngine(baseDuration, hooks);
     let eng = engine; // موتور واقعی هنگام اولین پخش ساخته می‌شود
 
     const dur = () => (eng ? eng.duration : baseDuration);
@@ -235,8 +311,9 @@ function init(el) {
 
     function ensure() {
         if (!eng) {
-            eng = audioEngine(src, baseDuration, hooks);
+            eng = stems ? stemEngine(srcVocal, srcBacking, baseDuration, hooks) : audioEngine(src, baseDuration, hooks);
             eng.rate = SPEEDS[rateIdx];
+            applyMix();
         }
         return eng;
     }
@@ -256,6 +333,82 @@ function init(el) {
         $p.find('[data-p-slower]').prop('disabled', rateIdx === 0);
         $p.find('[data-p-faster]').prop('disabled', rateIdx === SPEEDS.length - 1);
     }
+
+    // ---------- میکسر (مرحله‌ی کارائوکه): صدای خواننده / موزیک ----------
+    // ترک‌های جدا (data-src-vocal و data-src-backing) → دو اسلایدر مستقل
+    // فقط یک فایل کامل → فقط «صدای موزیک» (= بلندی کل) کار می‌کند و خواننده قابل‌حذف نیست
+    // بدون فایل (دمو) → اسلایدرها کار می‌کنند ولی صدایی نیست
+    const $mix = $p.find('[data-mix]');
+    const MIX_KEY = 'teodel:mixer';
+    const mix = { vocal: 1, backing: 1 };
+    const muted = { vocal: false, backing: false };
+    const canVocal = stems || !src;
+    try {
+        const m = JSON.parse(localStorage.getItem(MIX_KEY) || '{}');
+        ['vocal', 'backing'].forEach((k) => {
+            if (typeof m[k] === 'number') mix[k] = Math.min(Math.max(m[k], 0), 1);
+            if (m['mute_' + k] === true) muted[k] = true;
+        });
+    } catch (e) { /* ignore */ }
+    if (!canVocal) muted.vocal = false;
+
+    function applyMix() {
+        if (!eng || !$mix.length) return;
+        const v = (k) => (muted[k] ? 0 : mix[k]);
+        if (stems && eng.setGain) {
+            eng.setGain('vocal', v('vocal'));
+            eng.setGain('backing', v('backing'));
+        } else if (src && 'volume' in eng) {
+            eng.volume = v('backing');
+        }
+    }
+
+    function renderMix() {
+        $mix.each(function () {
+            const $r = $(this);
+            const k = $r.attr('data-mix');
+            const off = muted[k] || mix[k] === 0;
+            const pct = Math.round((muted[k] ? 0 : mix[k]) * 100);
+            const dead = k === 'vocal' && !canVocal;
+            $r.attr('data-muted', off ? 'true' : 'false').attr('data-disabled', dead ? 'true' : 'false');
+            $r.find('[data-mix-range]').val(muted[k] ? 0 : Math.round(mix[k] * 100)).css('--v', pct + '%').prop('disabled', dead)
+                .attr('aria-valuetext', digits(pct) + '%');
+            $r.find('[data-mix-mute]').attr('aria-pressed', off ? 'true' : 'false').prop('disabled', dead);
+        });
+        $p.find('[data-mix-karaoke]').attr('aria-pressed', muted.vocal ? 'true' : 'false').prop('disabled', !canVocal);
+        $p.find('[data-mix-note]').prop('hidden', canVocal);
+        $p.attr('data-vocal-off', muted.vocal || mix.vocal === 0 ? 'true' : 'false');
+    }
+
+    function saveMix() {
+        applyMix();
+        renderMix();
+        try {
+            localStorage.setItem(MIX_KEY, JSON.stringify({ vocal: mix.vocal, backing: mix.backing, mute_vocal: muted.vocal, mute_backing: muted.backing }));
+        } catch (e) { /* ignore */ }
+    }
+
+    $p.on('input', '[data-mix-range]', function () {
+        const k = $(this).closest('[data-mix]').attr('data-mix');
+        mix[k] = Number(this.value) / 100;
+        muted[k] = false;
+        saveMix();
+    });
+    $p.on('click', '[data-mix-mute]', function () {
+        const k = $(this).closest('[data-mix]').attr('data-mix');
+        const off = muted[k] || mix[k] === 0;
+        if (off) {
+            muted[k] = false;
+            if (mix[k] === 0) mix[k] = 1;
+        } else muted[k] = true;
+        saveMix();
+    });
+    $p.on('click', '[data-mix-karaoke]', () => {
+        muted.vocal = !muted.vocal;
+        if (!muted.vocal && mix.vocal === 0) mix.vocal = 1;
+        saveMix();
+    });
+    renderMix();
 
     $p.on('click', '[data-p-toggle]', toggle);
     $p.on('click', '[data-p-back]', () => { const e = ensure(); e.seek(e.time - 10); lastT = e.time; render(); });

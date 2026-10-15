@@ -27,10 +27,10 @@ return [
         'lyrics' => ['label' => 'Lyrics', 'desc' => 'In this step you can see the lyrics while listening to the song.'],
         'words' => ['label' => 'words', 'desc' => 'In this step you read the lyrics. See the meaning of the difficult words and phrases, tap any other hard word yourself, and save the ones you want to review.'],
         'listening' => ['label' => 'listening', 'desc' => 'In this step a part of the song plays and you type what you hear; the system checks what you wrote.'],
-        'shadowing' => ['label' => 'shadowing', 'desc' => 'In this step, repeat along with the singer.'],
-        'karaoke' => ['label' => 'Karaoke', 'desc' => 'In this step, sing along with the lyrics, karaoke style.'],
+        'shadowing' => ['label' => 'shadowing', 'desc' => 'In this step you hear a part of the song and then repeat it. This method is called “shadowing”; for better learning we recommend at least 3 repeats.'],
+        'karaoke' => ['label' => 'Karaoke', 'desc' => 'In this step the full song plays and the lyrics follow the singer word by word. Sing in the singer\'s place! You can turn the vocals or the music up or down, or even mute the singer and sing along with the music only.'],
         'repeat' => ['label' => 'repeat', 'desc' => 'In this step, listen to the song again and see how much more you understand now.'],
-        'details' => ['label' => 'details', 'desc' => 'In this step you review the details and overall result of the lesson.'],
+        'details' => ['label' => 'details', 'desc' => 'Here you see everything about the song you have practised and learned. If you worked through all the steps, you have mastered this song.'],
     ],
 
     'locked' => [
@@ -141,5 +141,41 @@ return [
         'revealed' => 'Here is the right answer. You will catch it next time!',
         'summary' => 'You got :ok of :total exercises right without seeing the answer.',
         'empty' => 'There are no listening exercises for this song yet.',
+    ],
+
+    // Step 5 (shadowing)
+    'shadowing' => [
+        'how_listen' => 'Listen to the part',
+        'how_repeat' => 'Your turn: repeat out loud',
+        'how_again' => 'Do it at least :n times',
+        'turn' => 'Your turn! Repeat it',
+        'skip' => 'I repeated it',
+        'count' => 'Repeat :n of :total',
+        'count_done' => ':n repeats done',
+        'show' => 'Show text',
+        'hide' => 'Hide text',
+        'summary' => 'Well done! You repeated every part at least :n times.',
+        'empty' => 'There are no shadowing parts for this song yet.',
+    ],
+    // Step 6 (karaoke)
+    'karaoke' => [
+        'idle' => 'Press play and sing along with the singer',
+        'ready' => 'Get ready…',
+        'instrumental' => '♪ Instrumental part',
+        'end' => 'That’s it! Well done 👏',
+        'vocal' => 'Vocal track',
+        'backing' => 'Backing track',
+        'mute_vocal' => 'Mute the vocal track',
+        'mute_backing' => 'Mute the backing track',
+        'vocal_off' => 'Remove the singer — I will sing',
+        'vocal_on' => 'Singer removed — your turn! (tap to bring back)',
+        'no_stems' => 'The vocals are not separated for this song yet; you can only change the overall volume.',
+    ],
+    // Step 8 (details)
+    'details' => [
+        'unknown' => 'Unknown',
+        'interpretation' => 'Song interpretation',
+        'notes' => 'Notes',
+        'empty' => 'There are no notes for this song yet.',
     ],
 ];

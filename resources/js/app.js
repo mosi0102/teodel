@@ -16,4 +16,7 @@ import './modules/lyrics';
 import './modules/words';
 import './modules/clip';
 import './modules/listening';
+import './modules/shadowing';
+import './modules/karaoke';
+import './modules/details';
 import './modules/progress-sync';

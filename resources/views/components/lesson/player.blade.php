@@ -8,15 +8,28 @@
     🔌 hook بک‌اند: $song['vocals'] = [[شروع، پایان], ...] به ثانیه؛ بخش‌هایی که خواننده می‌خواند.
        روی نوار زمان با نشانه‌ی کوچک دیده می‌شود (خالی = نشانه‌ای نمی‌آید).
     مدت زمان از $song['duration'] (mm:ss) خوانده می‌شود.
+
+    kind="karaoke" (مرحله‌ی ۶): پخش‌کننده‌ی عریض با میکسر «صدای خواننده / صدای موزیک».
+    🔌 hook بک‌اند: $song['audio_vocal'] (فقط صدای خواننده) و $song['audio_backing'] (موزیک بدون خواننده)
+       دو فایل هم‌طول و هم‌زمان. اگر هر دو بیایند، دو اسلایدر مستقل کار می‌کنند.
+       اگر فقط $song['audio'] باشد، فقط «صدای موزیک» (= بلندی کل) کار می‌کند و حذف خواننده غیرفعال است.
 --}}
 @php
     [$mm, $ss] = array_pad(array_map('intval', explode(':', (string) ($song['duration'] ?? '03:00'))), 2, 0);
     $seconds = max($mm * 60 + $ss, 1);
     $hue = ($song['id'] * 47) % 360;
+    // آدرس صوت: کامل (https://… یا /…) همان‌طور که هست؛ نسبی (مثلاً music/a.mp3) از public ساخته می‌شود
+    $src = (string) ($song['audio'] ?? '');
+    $abs = fn (string $u) => $u !== '' && ! preg_match('#^(https?:)?//|^/#i', $u) ? asset($u) : $u;
+    $src = $abs($src);
+    $karaoke = $kind === 'karaoke';
+    $srcVocal = $karaoke ? $abs((string) ($song['audio_vocal'] ?? '')) : '';
+    $srcBacking = $karaoke ? $abs((string) ($song['audio_backing'] ?? '')) : '';
+    $stems = $srcVocal !== '' && $srcBacking !== '';
 @endphp
 
-<div class="player group relative isolate aspect-square w-full overflow-hidden rounded-2xl bg-slate-900 text-white shadow-card md:aspect-[5/4] lg:aspect-square"
-    data-player data-song="{{ $song['id'] }}" data-src="{{ $song['audio'] ?? '' }}" data-duration="{{ $seconds }}" data-vocals="{{ json_encode($song['vocals'] ?? []) }}"
+<div class="player group relative isolate flex w-full flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 text-white shadow-card {{ $karaoke ? 'min-h-[15rem] rounded-t-none' : 'aspect-square md:aspect-[5/4] lg:aspect-square' }}"
+    data-player data-song="{{ $song['id'] }}" data-src="{{ $src }}" @if ($stems) data-src-vocal="{{ $srcVocal }}" data-src-backing="{{ $srcBacking }}" @endif data-duration="{{ $seconds }}" data-vocals="{{ json_encode($song['vocals'] ?? []) }}"
     data-state="paused" role="group" aria-label="{{ __('lesson.player.label') }}">
 
     {{-- کاور (تصویر واقعی یا گرادیان جایگزین) --}}
@@ -29,14 +42,16 @@
     <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent"></div>
 
     {{-- اکولایزر کوچک (فقط وقتی پخش می‌شود حرکت می‌کند؛ CSS خالص) --}}
+    @unless ($karaoke)
     <div class="player__eq absolute end-4 top-4 flex h-6 items-end gap-[3px] rounded-full bg-black/30 px-3 py-1.5 backdrop-blur-sm" aria-hidden="true">
         <i></i><i></i><i></i><i></i>
     </div>
+    @endunless
 
     <p data-p-error hidden class="absolute inset-x-4 top-4 rounded-xl bg-rose-600/90 px-4 py-2.5 text-center text-sm font-bold">{{ __('lesson.player.error') }}</p>
 
     {{-- کنترل‌ها --}}
-    <div class="absolute inset-x-0 bottom-0 p-4 md:p-5">
+    <div class="{{ $karaoke ? 'relative pt-14' : 'absolute inset-x-0 bottom-0' }} p-4 md:p-5">
         {{-- نوار زمان (همیشه چپ‌به‌راست، مثل همه‌ی پخش‌کننده‌ها) --}}
         <div dir="ltr">
             <div class="p-seek relative h-7">
@@ -80,5 +95,29 @@
                 </div>
             </div>
         </div>
+
+        @if ($karaoke)
+            {{-- میکسر: صدای خواننده / صدای موزیک --}}
+            <button type="button" class="kchip" data-mix-karaoke aria-pressed="false">
+                <x-icon name="mic" class="size-4" />
+                <span class="kchip__off">{{ __('lesson.karaoke.vocal_off') }}</span>
+                <span class="kchip__on">{{ __('lesson.karaoke.vocal_on') }}</span>
+            </button>
+            <div class="kmix" data-p-mix>
+                @foreach (['vocal', 'backing'] as $m)
+                    <div class="kmix__row" data-mix="{{ $m }}" data-muted="false">
+                        <button type="button" class="kmix__btn" data-mix-mute aria-pressed="false" aria-label="{{ __('lesson.karaoke.mute_' . $m) }}" title="{{ __('lesson.karaoke.mute_' . $m) }}">
+                            <x-icon name="volume" class="kmix__on size-5" />
+                            <x-icon name="volume-x" class="kmix__off size-5" />
+                        </button>
+                        <div class="min-w-0 flex-1">
+                            <p class="kmix__name">{{ __('lesson.karaoke.' . $m) }}</p>
+                            <input type="range" min="0" max="100" step="1" value="100" data-mix-range class="kslider" dir="ltr" aria-label="{{ __('lesson.karaoke.' . $m) }}">
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <p data-p-mix-note data-mix-note hidden class="mt-2 text-xs font-bold leading-6 text-white/80">{{ __('lesson.karaoke.no_stems') }}</p>
+        @endif
     </div>
 </div>

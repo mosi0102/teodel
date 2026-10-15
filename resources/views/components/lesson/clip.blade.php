@@ -1,4 +1,4 @@
-@props(['song', 'start', 'end', 'n' => 1, 'src' => ''])
+@props(['song', 'start', 'end', 'n' => 1, 'src' => '', 'turn' => false])
 
 {{--
     پخش‌کننده‌ی کوچکِ یک «بخش» از موزیک (مرحله‌ی ۴) — رفتار در resources/js/modules/clip.js
@@ -9,7 +9,7 @@
     $len = max($end - $start, 0.5);
 @endphp
 
-<div class="clip" data-clip data-start="{{ $start }}" data-end="{{ $end }}" data-state="paused" role="group" aria-label="{{ __('lesson.listening.part', ['n' => num($n)]) }}">
+<div class="clip" data-clip data-start="{{ $start }}" data-end="{{ $end }}" @if ($turn) data-turn @endif data-state="paused" role="group" aria-label="{{ __('lesson.listening.part', ['n' => num($n)]) }}">
     @if (! empty($song['cover']))
         <img src="{{ $song['cover'] }}" alt="" class="absolute inset-0 -z-10 size-full scale-110 object-cover blur-[2px]" loading="lazy" decoding="async">
     @else
@@ -36,12 +36,19 @@
                 <x-icon name="pause" class="p-ico-pause size-5 fill-current md:size-6" />
             </button>
 
-            <div class="min-w-0 flex-1" dir="ltr">
+            <div class="clip__info min-w-0 flex-1" dir="ltr">
                 <p class="truncate text-sm font-extrabold md:text-base"><bdi>{{ $song['title'] }}</bdi> <span class="font-bold text-white/80">· {{ __('lesson.listening.part', ['n' => $n]) }}</span></p>
                 <p class="truncate text-xs text-white/75 md:text-sm"><bdi>{{ $song['artist'] }}</bdi></p>
             </div>
+            @if ($turn)
+                {{-- نوبت کاربر (shadowing): بعد از پخش، نوار به‌اندازه‌ی بخش پر می‌شود و کاربر تکرار می‌کند --}}
+                <div class="clip__turn min-w-0 flex-1">
+                    <p class="flex items-center gap-1.5 text-sm font-extrabold md:text-base"><x-icon name="mic" class="size-4 shrink-0 animate-pulse" /> {{ __('lesson.shadowing.turn') }}</p>
+                    <button type="button" data-clip-skip class="mt-1 rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur-sm transition active:scale-95">{{ __('lesson.shadowing.skip') }}</button>
+                </div>
+            @endif
 
-            <div class="flex shrink-0 items-center rounded-full bg-white/15 backdrop-blur-sm" role="group" aria-label="{{ __('lesson.player.speed') }}">
+            <div class="clip__speed flex shrink-0 items-center rounded-full bg-white/15 backdrop-blur-sm" role="group" aria-label="{{ __('lesson.player.speed') }}">
                 <button type="button" data-clip-slower class="p-btn !bg-transparent" aria-label="{{ __('lesson.player.slower') }}"><x-icon name="minus" class="size-4" /></button>
                 <span data-clip-speed dir="ltr" class="w-9 text-center text-xs font-bold tabular-nums md:text-sm" aria-live="polite">1x</span>
                 <button type="button" data-clip-faster class="p-btn !bg-transparent" aria-label="{{ __('lesson.player.faster') }}"><x-icon name="plus" class="size-4" /></button>

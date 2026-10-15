@@ -297,6 +297,125 @@ html.sidebar-closed { --rail: 0px; }
     .lx-msg[data-kind='revealed'] { @apply text-amber-700; }
     .lx-summary { @apply flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 md:p-5; animation: rise 0.4s ease both; }
 
+    /* ---------- مرحله‌ی ۵: shadowing ----------
+       .sx = کارت یک بخش؛ data-state: idle | doing | done. کلیپ در حالت turn (نوبت کاربر) رنگ نوار و متنش عوض می‌شود */
+    .clip .clip__turn { display: none; }
+    .clip[data-state='turn'] .clip__turn { display: block; animation: rise 0.25s ease both; }
+    .clip[data-state='turn'] .clip__info { display: none; }
+    .clip[data-state='turn'] .clip__bar { @apply bg-amber-200/30; }
+    .clip[data-state='turn'] .clip__bar > i { @apply bg-amber-300; transition: none; }
+    .clip[data-state='turn'] .clip__speed { @apply pointer-events-none opacity-40; }
+
+    .sx { @apply flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-2.5 shadow-card transition duration-300 md:p-3; }
+    .sx[data-state='done'] { @apply border-emerald-300; }
+    .sx__rounds { @apply flex items-center gap-3 px-2; }
+    .sx__rounds > p { @apply flex-1 text-slate-600; }
+    .sx__dot { @apply block size-3 rounded-full bg-slate-200 transition duration-300; }
+    .sx__dot.is-on { @apply scale-110 bg-brand-600; }
+    .sx[data-state='done'] .sx__dot.is-on { @apply bg-emerald-500; }
+    .sx[data-state='done'] .sx__rounds > p { @apply text-emerald-700; }
+    .sx__tick { opacity: 0; transform: scale(0.6); transition: opacity 0.3s, transform 0.3s; }
+    .sx[data-state='done'] .sx__tick { opacity: 1; transform: none; }
+
+    .sx-lyrics { @apply relative block w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-4 text-center transition duration-200; }
+    .sx-lyrics__text { @apply block select-none text-sm font-bold leading-8 text-brand-900 md:text-base md:leading-9; filter: blur(7px); transition: filter 0.3s ease; }
+    .sx-lyrics__veil { @apply absolute inset-0 flex items-center justify-center gap-2 bg-white/40 text-sm font-extrabold text-slate-700 transition-opacity duration-200; }
+    .sx-lyrics .sx-on { display: none; }
+    .sx-lyrics[aria-pressed='true'] .sx-lyrics__text { filter: none; @apply select-text; }
+    .sx-lyrics[aria-pressed='true'] .sx-lyrics__veil { @apply pointer-events-none opacity-0; }
+    @media (hover: hover) { .sx-lyrics[aria-pressed='false']:hover { @apply border-brand-200 bg-brand-50/60; } }
+    .sx-lyrics:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+
+    /* ---------- مرحله‌ی ۶: karaoke ----------
+       .kstage = صحنه‌ی لیریک (data-phase: idle | line | ready | instr | end) | .kmix = میکسر داخل پخش‌کننده */
+    .kx { @apply overflow-hidden rounded-3xl bg-white p-1.5 shadow-card md:p-2; }
+    .kstage {
+        @apply relative flex min-h-[12rem] flex-col items-center justify-center gap-3 overflow-hidden rounded-t-2xl px-4 py-6 text-center text-white md:min-h-[15rem] md:px-10 md:py-8;
+        background: radial-gradient(90% 120% at 50% 0%, rgb(var(--brand-600)), rgb(var(--brand-800)) 70%);
+    }
+    .kstage__status { @apply flex min-h-[1.75rem] items-center justify-center gap-3 text-sm font-extrabold text-white/80 md:text-base; }
+    .kstage__status:has([data-k-msg]:empty):not(:has(.kcount:not([hidden]))) { display: none; }
+    .kcount { @apply flex items-center gap-1.5; }
+    .kcount i { @apply block size-3 rounded-full bg-white/25 transition duration-300; }
+    .kcount i.is-on { @apply scale-125 bg-amber-300; }
+    .kline { @apply max-w-3xl text-balance font-extrabold leading-[1.7]; }
+    .kline--cur { @apply text-2xl text-white md:text-4xl md:leading-[1.6]; }
+    .kline--next { @apply text-base text-white/50 md:text-xl; }
+    .kline--cur.is-swap { animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .kline--cur.is-upcoming { @apply text-white/60; }
+    .kw { border-radius: 0.4rem; padding: 0.05rem 0.2rem; margin: 0 -0.2rem; transition: background-color 0.2s ease, color 0.2s ease; }
+    .kw.is-sung { background-color: #fff; color: rgb(var(--brand-800)); }
+    .kstage[data-phase='end'] .kline { display: none; }
+
+    .kchip {
+        @apply mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/15 px-4 py-2.5 text-sm font-extrabold text-white backdrop-blur-sm transition duration-200 active:scale-[.98] md:w-auto;
+    }
+    .kchip:disabled { @apply opacity-40; }
+    .kchip[aria-pressed='true'] { @apply bg-amber-300 text-brand-900; }
+    .kchip .kchip__on { display: none; }
+    .kchip[aria-pressed='true'] .kchip__on { display: inline; }
+    .kchip[aria-pressed='true'] .kchip__off { display: none; }
+    @media (hover: hover) { .kchip:not(:disabled):hover { @apply bg-white/25; } .kchip[aria-pressed='true']:not(:disabled):hover { @apply bg-amber-200; } }
+
+    .kmix { @apply mt-3 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:gap-5; }
+    .kmix__row { @apply flex items-center gap-2.5 rounded-2xl bg-black/20 px-3 py-2 backdrop-blur-sm transition duration-200; }
+    .kmix__row[data-disabled='true'] { @apply opacity-40; }
+    .kmix__btn { @apply grid size-9 shrink-0 place-items-center rounded-full bg-white/15 text-white transition duration-200 active:scale-90; }
+    .kmix__btn:disabled { @apply pointer-events-none; }
+    .kmix__off { display: none; }
+    .kmix__row[data-muted='true'] .kmix__on { display: none; }
+    .kmix__row[data-muted='true'] .kmix__off { display: block; }
+    .kmix__row[data-muted='true'] .kmix__btn { @apply bg-rose-500/80; }
+    @media (hover: hover) { .kmix__btn:not(:disabled):hover { @apply bg-white/30; } }
+    .kmix__name { @apply truncate text-xs font-bold text-white/90 md:text-sm; }
+
+    /* اسلایدر: پر شدن با --v (js) */
+    .kslider {
+        @apply block h-6 w-full cursor-pointer appearance-none bg-transparent;
+        --v: 100%;
+    }
+    .kslider:disabled { @apply cursor-not-allowed; }
+    .kslider::-webkit-slider-runnable-track { height: 6px; border-radius: 9999px; background: linear-gradient(to right, #fff var(--v), rgb(255 255 255 / 0.3) var(--v)); }
+    .kslider::-moz-range-track { height: 6px; border-radius: 9999px; background: rgb(255 255 255 / 0.3); }
+    .kslider::-moz-range-progress { height: 6px; border-radius: 9999px; background: #fff; }
+    .kslider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; margin-top: -5px; border-radius: 9999px; background: #fff; box-shadow: 0 1px 4px rgb(0 0 0 / 0.4); transition: transform 0.15s; }
+    .kslider::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 9999px; background: #fff; box-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
+    .kslider:not(:disabled):active::-webkit-slider-thumb { transform: scale(1.25); }
+    .kslider:focus-visible { outline: none; }
+    .kslider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgb(255 255 255 / 0.4); }
+    .kslider:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgb(255 255 255 / 0.4); }
+    /* ورودی‌های صدا روی لمسی‌ها: ناحیه‌ی لمس بزرگ‌تر */
+    @media (pointer: coarse) { .kslider { @apply h-8; } }
+
+    /* ---------- مرحله‌ی ۸: details ---------- */
+    .det-hero { @apply flex flex-col items-center gap-5 rounded-3xl bg-white p-4 shadow-card md:flex-row md:items-start md:gap-8 md:p-7; }
+    .det-cover { @apply aspect-square w-full max-w-[17rem] shrink-0 overflow-hidden rounded-3xl bg-slate-100 shadow-lift md:w-64 md:max-w-none lg:w-72; }
+    .det-facts { @apply mt-5 grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2 md:mt-6; }
+    .det-fact { @apply flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2.5 transition duration-200; }
+    .det-fact__icon { @apply grid size-9 shrink-0 place-items-center rounded-xl bg-white text-brand-700 shadow-sm; }
+    .det-fact dt { @apply text-xs font-bold text-slate-500; }
+    .det-fact dd { @apply truncate text-sm font-extrabold text-brand-900 md:text-base; }
+    .det-fact dd.is-unknown { @apply font-bold text-slate-400; }
+    .det-fact[data-level='a'] .det-fact__icon { @apply bg-emerald-50 text-emerald-600; }
+    .det-fact[data-level='b'] .det-fact__icon { @apply bg-amber-50 text-amber-600; }
+    .det-fact[data-level='c'] .det-fact__icon { @apply bg-rose-50 text-rose-600; }
+    @media (hover: hover) { .det-fact:hover { @apply bg-brand-50/70; } }
+
+    .det-card { @apply rounded-3xl bg-white p-5 shadow-card md:p-7; }
+    .det-h { @apply flex items-center gap-3 text-lg font-extrabold text-brand-900 md:text-xl; }
+    .det-h__icon { @apply grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700; }
+    .det-h--literary .det-h__icon { @apply bg-amber-50 text-amber-600; }
+    .det-h--language .det-h__icon { @apply bg-sky-50 text-sky-600; }
+    .det-prose { @apply mt-4 max-w-3xl space-y-4 text-sm leading-8 text-slate-600 md:text-base md:leading-9; }
+
+    .det-note { @apply flex flex-col gap-2.5 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 transition duration-200; }
+    .det-note__term { @apply text-sm font-extrabold text-brand-900 md:text-base; }
+    .det-note__ex { @apply rounded-xl border-s-4 bg-white px-3.5 py-2.5 text-start text-sm font-bold leading-7 text-slate-800 md:text-base; }
+    .det-note--literary .det-note__ex { @apply border-amber-400; }
+    .det-note--language .det-note__ex { @apply border-sky-400; }
+    .det-note__text { @apply text-sm leading-7 text-slate-600; }
+    @media (hover: hover) { .det-note:hover { @apply border-brand-200 bg-white shadow-card; } }
+
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
        کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */

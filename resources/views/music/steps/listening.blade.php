@@ -14,7 +14,7 @@
     $demoDuration = (int) ceil(collect($all)->max('end') ?? 60) + 5;
 @endphp
 
-<div class="space-y-7" data-listening-step data-song="{{ $song['id'] }}" data-src="{{ $src }}" data-duration="{{ $demoDuration }}" data-total="{{ count($all) }}"
+<div class="space-y-7" data-clips data-listening-step data-song="{{ $song['id'] }}" data-src="{{ $src }}" data-duration="{{ $demoDuration }}" data-total="{{ count($all) }}"
     data-msg-correct="{{ __('lesson.listening.correct') }}" data-msg-wrong="{{ __('lesson.listening.wrong') }}" data-msg-fill="{{ __('lesson.listening.fill') }}" data-msg-revealed="{{ __('lesson.listening.revealed') }}">
     @foreach (['easy', 'hard'] as $mode)
         @if (count($sets[$mode]))
@@ -59,7 +59,6 @@
                     @endforeach
                 </div>
             </section>
-
         @endif
     @endforeach
 
