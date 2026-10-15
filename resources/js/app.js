@@ -19,4 +19,5 @@ import './modules/listening';
 import './modules/shadowing';
 import './modules/karaoke';
 import './modules/details';
+import './modules/saved-words';
 import './modules/progress-sync';

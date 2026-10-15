@@ -416,6 +416,80 @@ html.sidebar-closed { --rail: 0px; }
     .det-note__text { @apply text-sm leading-7 text-slate-600; }
     @media (hover: hover) { .det-note:hover { @apply border-brand-200 bg-white shadow-card; } }
 
+    /* ---------- لغات و عبارت‌های هایلایت‌شده (/words) ---------- */
+    .sw-tab { @apply min-w-[5.5rem] gap-2 whitespace-nowrap px-3; }
+    .sw-tab__n { @apply rounded-full bg-slate-100 px-2 py-0.5 text-xs tabular-nums text-slate-500; }
+    .sw-tab[aria-current='page'] .sw-tab__n { @apply bg-white/20 text-white; }
+    .sw-tab.is-empty { @apply opacity-50; }
+
+    .sw-card { @apply flex flex-col gap-3.5 rounded-2xl bg-white p-3.5 shadow-card transition duration-200 md:p-4; animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    @media (hover: hover) { .sw-card:hover { @apply shadow-lift; } }
+    .sw-thumb { @apply relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl bg-slate-100 md:size-24; }
+    .sw-thumb__ch { @apply font-extrabold text-white/95; font-size: 2rem; line-height: 1; }
+    .sw-card__word { @apply break-words text-lg font-extrabold leading-7 text-brand-900 md:text-xl; }
+    .sw-type { @apply text-sm font-medium text-slate-500; }
+    .sw-ipa { @apply mt-0.5 flex items-center gap-1.5 text-sm text-slate-500; }
+    .sw-speak { @apply grid size-7 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 active:scale-90; }
+    @media (hover: hover) { .sw-speak:hover { @apply bg-brand-100; } }
+    .sw-meaning { @apply mt-1.5 line-clamp-2 text-sm leading-6 text-slate-500; }
+    .sw-card__foot { @apply flex items-center gap-2; }
+    .sw-bm { @apply grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 active:scale-90; }
+    @media (hover: hover) { .sw-bm:hover { @apply bg-rose-50 text-rose-600; } }
+    .sw-badge { @apply rounded-full px-2.5 py-1 text-xs font-bold; }
+    .sw-card[data-status='learned'] .sw-badge { @apply bg-emerald-50 text-emerald-700; }
+    .sw-card[data-status='learning'] .sw-badge { @apply bg-amber-50 text-amber-700; }
+    .sw-level { @apply rounded-md bg-brand-50 px-1.5 py-0.5 text-[11px] font-extrabold tracking-wide text-brand-700; }
+    .sw-more { @apply !min-h-10 !px-4; }
+
+    .sw-cta { @apply pointer-events-none sticky z-20 mt-6 flex justify-center; bottom: 5.25rem; }
+    .sw-cta__btn { @apply pointer-events-auto rounded-full px-8 shadow-lift; }
+    @media (min-width: 768px) { .sw-cta { bottom: 1.5rem; } }
+
+    .sw-toast { @apply fixed inset-x-4 z-[70] mx-auto flex w-fit max-w-[calc(100%-2rem)] items-center gap-4 rounded-full bg-slate-900 py-2.5 pe-2 ps-5 text-sm font-bold text-white shadow-lift; bottom: 6rem; }
+    .sw-toast.is-in { animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .sw-toast button { @apply rounded-full px-3 py-1.5 font-extrabold text-amber-300 transition active:scale-95; }
+    @media (hover: hover) { .sw-toast button:hover { @apply bg-white/10; } }
+    @media (min-width: 768px) { .sw-toast { bottom: 1.5rem; } }
+
+    /* دیالوگ لغت: مودال کمی عریض‌تر؛ نوار پایین چسبیده */
+    .sw-dialog .dialog-panel { @apply md:max-w-xl; }
+    .sw-dialog [data-sw-body].is-swap { animation: rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .sw-x { @apply grid size-10 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600; }
+    .sw-pic { @apply size-20 shrink-0 overflow-hidden rounded-2xl bg-slate-100 md:size-24; }
+    .sw-foot {
+        @apply sticky bottom-0 z-[2] border-t border-slate-100 bg-white px-5 pt-3 md:px-6;
+        margin: 1.25rem -1.25rem -1.25rem;
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
+    @media (min-width: 768px) { .sw-foot { margin: 1.25rem -1.5rem -1.5rem; } }
+    .sw-foot__close { @apply !min-h-12; }
+    .sw-round { @apply grid size-12 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-40; }
+    .sw-round--bm { @apply bg-brand-700 text-white; }
+    @media (hover: hover) { .sw-round:not(:disabled):hover { @apply bg-brand-100; } .sw-round--bm:hover { @apply !bg-rose-600; } }
+
+    .sw-rhead { @apply mb-4 hidden items-center gap-3; }
+    .sw-dialog[data-mode='review'] .sw-rhead { display: flex; }
+    .sw-rbar { @apply h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100; }
+    .sw-rbar > i { @apply block h-full w-0 rounded-full bg-brand-700; transition: width 0.3s ease; }
+    .sw-done { @apply flex flex-col items-center px-4 py-10 text-center; animation: rise 0.3s ease both; }
+
+    /* بخش‌های تار (ترجمه، مثال، و در حالت مرور: تعریف و تصویر) — کلیک = نمایش */
+    .sw-b { @apply relative inline-flex max-w-full rounded-xl text-start; }
+    .sw-b--block { @apply flex w-full; }
+    .sw-b--block .sw-b__content { @apply w-full; }
+    .sw-b--text .sw-b__content { @apply inline-block min-w-[6rem]; }
+    .sw-b__content { display: block; transition: filter 0.3s ease; }
+    .sw-b__veil { @apply absolute inset-0 flex items-center justify-center gap-1.5 rounded-xl bg-white/45 text-xs font-extrabold text-slate-700 transition-opacity duration-200; }
+    .sw-b .sw-on { display: none; }
+    .sw-b[aria-pressed='false'] .sw-b__content { filter: blur(7px); @apply select-none; }
+    .sw-b[aria-pressed='true'] .sw-b__veil { @apply pointer-events-none opacity-0; }
+    @media (hover: hover) { .sw-b[aria-pressed='false']:hover .sw-b__content { filter: blur(5px); } }
+    .sw-b:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+    /* موارد «فقط در مرور تار»: در حالت دیدن همیشه آشکارند */
+    .sw-dialog[data-mode='view'] .sw-b[data-b-review] { pointer-events: none; }
+    .sw-dialog[data-mode='view'] .sw-b[data-b-review] .sw-b__content { filter: none; }
+    .sw-dialog[data-mode='view'] .sw-b[data-b-review] .sw-b__veil { display: none; }
+
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
        کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */

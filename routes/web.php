@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\MusicController;
+use App\Http\Controllers\WordsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +20,13 @@ Route::get('/lang/{locale}', function (string $locale) {
     }
     return redirect()->back();
 });
-Route::get('/music', [\App\Http\Controllers\MusicController::class, 'index'])->name('music.index');
-Route::get('/music/{id}', [\App\Http\Controllers\MusicController::class, 'show'])->whereNumber('id')->name('music.show');
-Route::get('/music/{id}/step/{step}', [\App\Http\Controllers\MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
+Route::middleware(['web'])->group(function () {
+    Route::get('/music', [MusicController::class, 'index'])->name('music.index');
+
+    // لغات و عبارت‌های هایلایت‌شده‌ی کاربر
+    Route::get('/words', [WordsController::class, 'index'])->name('words.index');
+
+    // صفحه‌ی آموزش: /music/5 به مرحله‌ی فعلی کاربر می‌رود؛ /music/5/step/2 مرحله‌ی دوم
+    Route::get('/music/{id}', [MusicController::class, 'show'])->whereNumber('id')->name('music.show');
+    Route::get('/music/{id}/step/{step}', [MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
+});

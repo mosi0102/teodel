@@ -251,7 +251,7 @@ function init(root) {
 
         if (LOCAL_SAVE) {
             const all = store.get(SAVED_KEY, {});
-            if (on) all[cur.key] = { key: cur.key, text: cur.text, song, line: cur.line };
+            if (on) all[cur.key] = { key: cur.key, text: cur.text, song, line: cur.line, at: Math.floor(Date.now() / 1000), info: cur.data || null }; // info: برای نمایش در صفحه‌ی /words (فقط دمو)
             else delete all[cur.key];
             store.set(SAVED_KEY, all);
         }
