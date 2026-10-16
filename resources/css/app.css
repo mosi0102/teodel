@@ -137,6 +137,22 @@ html.sidebar-closed { --rail: 0px; }
     .dialog.is-open .dialog-panel { @apply translate-y-0 md:scale-100; }
     .dialog-handle { @apply mx-auto mb-4 h-1.5 w-10 rounded-full bg-slate-200; }
 
+    /* ---------- offcanvas: کشوی کناری تمام‌قد (سمت «پایان»: در فارسی چپ، در انگلیسی راست) ----------
+       برای دیالوگ‌هایی که محتوایشان اسکرول می‌خورد. داخل پنل: یک ناحیه‌ی اسکرول (.oc-scroll) + نوار ثابت پایین. */
+    .dialog--offcanvas { @apply items-stretch justify-end p-0 md:items-stretch md:p-0; }
+    .dialog--offcanvas .dialog-panel {
+        @apply flex h-full max-h-none w-full max-w-[26rem] flex-col overflow-hidden rounded-none p-0 md:max-h-none md:max-w-[28rem] md:scale-100 md:rounded-none md:p-0;
+        padding-bottom: 0;
+        transform: translateX(100%);
+    }
+    [dir='rtl'] .dialog--offcanvas .dialog-panel { transform: translateX(-100%); }
+    .dialog--offcanvas.is-open .dialog-panel,
+    [dir='rtl'] .dialog--offcanvas.is-open .dialog-panel { transform: none; }
+    @media (min-width: 768px) {
+        .dialog--offcanvas .dialog-panel { @apply rounded-s-3xl; }
+    }
+    @media (max-width: 480px) { .dialog--offcanvas .dialog-panel { max-width: 100%; } }
+
     /* ---------- فیلتر: موبایل = Bottom Sheet | md به بالا = inline در ردیف ابزار ---------- */
     .filter-dialog {
         @apply invisible fixed inset-0 z-50 flex items-end opacity-0 transition-[opacity,visibility] duration-200;
@@ -451,17 +467,23 @@ html.sidebar-closed { --rail: 0px; }
     @media (hover: hover) { .sw-toast button:hover { @apply bg-white/10; } }
     @media (min-width: 768px) { .sw-toast { bottom: 1.5rem; } }
 
-    /* دیالوگ لغت: مودال کمی عریض‌تر؛ نوار پایین چسبیده */
-    .sw-dialog .dialog-panel { @apply md:max-w-xl; }
+    /* دیالوگ لغت = offcanvas؛ ناحیه‌ی اسکرول + نوار پایین ثابت */
     .sw-dialog [data-sw-body].is-swap { animation: rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .sw-scroll { @apply min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 md:p-6; }
     .sw-x { @apply grid size-10 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-600; }
     .sw-pic { @apply size-20 shrink-0 overflow-hidden rounded-2xl bg-slate-100 md:size-24; }
     .sw-foot {
-        @apply sticky bottom-0 z-[2] border-t border-slate-100 bg-white px-5 pt-3 md:px-6;
-        margin: 1.25rem -1.25rem -1.25rem;
+        @apply shrink-0 border-t border-slate-100 bg-white px-4 pt-3 md:px-6;
         padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
-    @media (min-width: 768px) { .sw-foot { margin: 1.25rem -1.5rem -1.5rem; } }
+    .sw-ans { @apply !min-h-12 gap-1.5 !px-2 text-sm; }
+    .sw-ans--no { @apply !bg-rose-50 !text-rose-700; }
+    .sw-ans--yes { @apply !bg-emerald-600; }
+    @media (hover: hover) { .sw-ans--no:hover { @apply !bg-rose-100; } .sw-ans--yes:hover { @apply !bg-emerald-700; } }
+    /* جوابِ ثبت‌شده‌ی همین لغت (هنگام برگشتن با «قبلی») */
+    .sw-ans[data-picked] { @apply ring-2 ring-offset-2; }
+    .sw-ans--no[data-picked] { @apply ring-rose-400; }
+    .sw-ans--yes[data-picked] { @apply ring-emerald-400; }
     .sw-foot__close { @apply !min-h-12; }
     .sw-round { @apply grid size-12 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 active:scale-95 disabled:pointer-events-none disabled:opacity-40; }
     .sw-round--bm { @apply bg-brand-700 text-white; }
@@ -473,7 +495,7 @@ html.sidebar-closed { --rail: 0px; }
     .sw-rbar > i { @apply block h-full w-0 rounded-full bg-brand-700; transition: width 0.3s ease; }
     .sw-done { @apply flex flex-col items-center px-4 py-10 text-center; animation: rise 0.3s ease both; }
 
-    /* بخش‌های تار (ترجمه، مثال، و در حالت مرور: تعریف و تصویر) — کلیک = نمایش */
+    /* بخش‌های تار: فقط متن‌های ترجمه‌شده به فارسی (ترجمه‌ی لغت و ترجمه‌ی مثال) — کلیک = نمایش */
     .sw-b { @apply relative inline-flex max-w-full rounded-xl text-start; }
     .sw-b--block { @apply flex w-full; }
     .sw-b--block .sw-b__content { @apply w-full; }
@@ -485,10 +507,6 @@ html.sidebar-closed { --rail: 0px; }
     .sw-b[aria-pressed='true'] .sw-b__veil { @apply pointer-events-none opacity-0; }
     @media (hover: hover) { .sw-b[aria-pressed='false']:hover .sw-b__content { filter: blur(5px); } }
     .sw-b:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
-    /* موارد «فقط در مرور تار»: در حالت دیدن همیشه آشکارند */
-    .sw-dialog[data-mode='view'] .sw-b[data-b-review] { pointer-events: none; }
-    .sw-dialog[data-mode='view'] .sw-b[data-b-review] .sw-b__content { filter: none; }
-    .sw-dialog[data-mode='view'] .sw-b[data-b-review] .sw-b__veil { display: none; }
 
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)

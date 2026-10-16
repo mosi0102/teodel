@@ -7,9 +7,9 @@ import { digits } from './digits';
  *
  * - لیست در مرورگر فیلتر، جست‌وجو و مرتب می‌شود (بدون رفرش)؛ تب‌های سطح شمارنده دارند.
  * - بوکمارک روی کارت = حذف از لیست؛ بلافاصله حذف می‌شود و یک پیام «بازگردانی» (۶ ثانیه) می‌آید.
- * - «اطلاعات بیشتر» دیالوگ جزئیات را باز می‌کند (قبلی/بعدی، کلید ←/→، کشیدن انگشت). ترجمه‌ها پیش‌فرض تارند و با کلیک نمایش داده می‌شوند.
- * - «شروع مرور»: لغت‌ها یکی‌یکی می‌آیند؛ تعریف، ترجمه و تصویر تارند تا کاربر اول خودش یادآوری کند،
- *   بعد «نمایش جواب» و «یاد گرفتم / هنوز نه».
+ * - «اطلاعات بیشتر» یک offcanvas باز می‌کند (قبلی/بعدی، کلید ←/→، کشیدن انگشت). فقط ترجمه‌های فارسی تارند و با کلیک نمایش داده می‌شوند.
+ * - «شروع مرور»: ترجمه‌ها تارند تا کاربر اول خودش یادآوری کند، بعد «نمایش جواب» و «یاد گرفتم / هنوز نه».
+ *   دکمه‌های قبلی/بعدی هم هست و جواب هر لغت جدا نگه داشته و قابل‌تغییر است.
  *
  * ── برای بک‌اند ─────────────────────────────────────────────────────────
  *   لیست: app/Support/SavedWords.php (data-words).
@@ -290,7 +290,7 @@ function init(root) {
     });
 
     // ---------- دیالوگ ----------
-    const d = { mode: 'view', list: [], i: 0, known: 0, unknown: [], total: 0 };
+    const d = { mode: 'view', list: [], i: 0, total: 0, answers: {}, done: false, unknown: [] };
     const $b = $dlg.find('.sw-b');
     const cur = () => d.list[d.i];
 
@@ -336,8 +336,7 @@ function init(root) {
             $s.find('[data-d="song"]').text(w.song.title || '#' + w.song.id);
         }
         setBlur(true); // ترجمه‌ها همیشه تار شروع می‌شوند
-        $dlg.find('[data-sw-body]')[0].scrollTop = 0;
-        $dlg.find('[data-sw-panel]')[0].scrollTop = 0;
+        $dlg.find('[data-sw-scroll]')[0].scrollTop = 0;
         const body = $dlg.find('[data-sw-body]')[0];
         body.classList.remove('is-swap');
         void body.offsetWidth;
@@ -359,6 +358,7 @@ function init(root) {
 
     function openView(w) {
         d.mode = 'view';
+        d.done = false;
         d.list = view();
         d.i = Math.max(d.list.indexOf(w), 0);
         $dlg.attr('data-mode', 'view');
@@ -382,6 +382,11 @@ function init(root) {
         d.i = n;
         paintView();
     }
+    // قبلی/بعدی: در دیدن همان لیست، در مرور بدون ثبت جواب هم می‌شود جابه‌جا شد
+    function move(step) {
+        if (d.mode === 'review') goReview(step);
+        else go(step);
+    }
     $dlg.on('click', '[data-d-prev]', () => go(-1));
     $dlg.on('click', '[data-d-next]', () => go(1));
     $dlg.on('click', '[data-d-speak]', function () {
@@ -399,14 +404,14 @@ function init(root) {
         else paintView();
     });
 
-    // کلید ←/→ (جهتِ فلش‌ها در راست‌به‌چپ برعکس است) و کشیدن انگشت
+    // کلید ←/→ (جهتِ فلش‌ها در راست‌به‌چپ برعکس است) و کشیدن انگشت؛ در هر دو حالتِ دیدن و مرور
     $(document).on('keydown', (e) => {
-        if (!$dlg.hasClass('is-open') || d.mode !== 'view' || e.target.matches('input,textarea,select')) return;
+        if (!$dlg.hasClass('is-open') || d.done || e.target.matches('input,textarea,select')) return;
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
         e.preventDefault();
         // «قبلی» سمتِ شروع است: در راست‌به‌چپ سمت راست، در چپ‌به‌راست سمت چپ
         const toStart = rtl() ? e.key === 'ArrowRight' : e.key === 'ArrowLeft';
-        go(toStart ? -1 : 1);
+        move(toStart ? -1 : 1);
     });
     let tx = 0;
     let ty = 0;
@@ -414,23 +419,37 @@ function init(root) {
         tx = e.originalEvent.touches[0].clientX;
         ty = e.originalEvent.touches[0].clientY;
     }).on('touchend', (e) => {
-        if (d.mode !== 'view') return;
+        if (d.done) return;
         const t = e.originalEvent.changedTouches[0];
         const dx = t.clientX - tx;
         if (Math.abs(dx) > 70 && Math.abs(t.clientY - ty) < 40) {
             const next = rtl() ? dx > 0 : dx < 0; // مثل ورق‌زدن کتاب: در راست‌به‌چپ «بعدی» سمت چپ است
-            go(next ? 1 : -1);
+            move(next ? 1 : -1);
         }
     });
 
     // ---------- مرور ----------
+    // d.answers: کلیدِ هر لغت ← true (بلد بودم) | false (هنوز نه). با «قبلی» می‌شود جواب را عوض کرد.
+    const keyOf = (w) => String(w.id);
+    const counts = () => {
+        let known = 0;
+        let answered = 0;
+        d.list.forEach((w) => {
+            const a = d.answers[keyOf(w)];
+            if (a === undefined) return;
+            answered++;
+            if (a) known++;
+        });
+        return { known, answered };
+    };
+
     function startReview(list) {
         d.mode = 'review';
         d.list = list;
         d.i = 0;
-        d.known = 0;
-        d.unknown = [];
         d.total = list.length;
+        d.answers = {};
+        d.done = false;
         $dlg.attr('data-mode', 'review');
         $dlg.find('[data-sw-body]').prop('hidden', false);
         $dlg.find('[data-sw-done]').prop('hidden', true);
@@ -440,11 +459,32 @@ function init(root) {
 
     function paintReview() {
         const w = cur();
-        showWord(w);
-        $dlg.find('[data-sw-rbar]').css('width', (d.i / d.total) * 100 + '%');
+        showWord(w); // ترجمه‌ها تار
+        const a = d.answers[keyOf(w)];
+        const answered = a !== undefined;
+        if (answered) setBlur(false); // لغتِ جواب‌داده: ترجمه باز
+        $dlg.find('[data-r-reveal-wrap]').prop('hidden', answered);
+        $dlg.find('[data-r-answer-wrap]').prop('hidden', !answered);
+        $dlg.find('[data-r-answer]').each(function () {
+            const yes = this.getAttribute('data-r-answer') === 'yes';
+            if (answered && yes === a) this.setAttribute('data-picked', '');
+            else this.removeAttribute('data-picked');
+        });
+        $dlg.find('[data-sw-rbar]').css('width', (counts().answered / d.total) * 100 + '%');
         $dlg.find('[data-sw-rcount]').text(fill(T('review-count'), { n: digits(d.i + 1), total: digits(d.total) }));
-        foot('reveal');
+        $dlg.find('[data-r-prev]').prop('disabled', d.i === 0);
+        $dlg.find('[data-r-next]').prop('disabled', d.i >= d.list.length - 1);
+        foot('review');
     }
+
+    function goReview(step) {
+        const n = d.i + step;
+        if (n < 0 || n >= d.list.length) return;
+        d.i = n;
+        paintReview();
+    }
+    $dlg.on('click', '[data-r-prev]', () => goReview(-1));
+    $dlg.on('click', '[data-r-next]', () => goReview(1));
 
     $root.on('click', '[data-sw-review]', () => {
         const list = view();
@@ -452,14 +492,14 @@ function init(root) {
     });
     $dlg.on('click', '[data-r-reveal]', () => {
         setBlur(false);
-        foot('answer');
+        $dlg.find('[data-r-reveal-wrap]').prop('hidden', true);
+        $dlg.find('[data-r-answer-wrap]').prop('hidden', false);
     });
     $dlg.on('click', '[data-r-answer]', function () {
         const w = cur();
         const known = this.getAttribute('data-r-answer') === 'yes';
+        d.answers[keyOf(w)] = known;
         w.status = known ? 'learned' : 'learning';
-        if (known) d.known++;
-        else d.unknown.push(w);
         if (LOCAL) {
             const r = store.get(REVIEW_KEY, {});
             r[w.id] = w.status;
@@ -467,21 +507,32 @@ function init(root) {
         }
         $(document).trigger('words:review', [{ id: w.id, key: w.key, known }]);
 
-        if (d.i < d.list.length - 1) {
-            d.i++;
-            paintReview();
-        } else finishReview();
+        // برو به اولین لغتِ بی‌جواب بعدی (دورانی)؛ اگر همه جواب داده شد ← پایان
+        for (let k = 1; k <= d.list.length; k++) {
+            const idx = (d.i + k) % d.list.length;
+            if (d.answers[keyOf(d.list[idx])] === undefined) {
+                d.i = idx;
+                paintReview();
+                return;
+            }
+        }
+        finishReview();
     });
 
     function finishReview() {
+        const { known } = counts();
+        const unknown = d.list.filter((w) => d.answers[keyOf(w)] === false);
+        d.done = true;
+        d.unknown = unknown;
         $dlg.find('[data-sw-body]').prop('hidden', true);
         $dlg.find('[data-sw-done]').prop('hidden', false);
         $dlg.find('[data-sw-rbar]').css('width', '100%');
-        $dlg.find('[data-sw-done-text]').text(fill(T('done-text'), { known: digits(d.known), total: digits(d.total) }));
+        $dlg.find('[data-sw-done-text]').text(fill(T('done-text'), { known: digits(known), total: digits(d.total) }));
         const $again = $dlg.find('[data-r-again]');
-        $again.prop('hidden', !d.unknown.length).text(d.unknown.length ? fill($root.attr('data-t-again') || '', { n: digits(d.unknown.length) }) : '');
+        $again.prop('hidden', !unknown.length).text(unknown.length ? fill($root.attr('data-t-again') || '', { n: digits(unknown.length) }) : '');
+        $dlg.find('[data-sw-scroll]')[0].scrollTop = 0;
         foot('done');
-        $(document).trigger('words:review-done', [{ total: d.total, known: d.known }]);
+        $(document).trigger('words:review-done', [{ total: d.total, known }]);
     }
     $dlg.on('click', '[data-r-again]', () => startReview(d.unknown.slice()));
 

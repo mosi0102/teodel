@@ -141,13 +141,12 @@
 @endsection
 
 @push('modals')
-{{-- اطلاعات لغت (حالت دیدن) و مرور (حالت review): ترجمه‌ها پیش‌فرض تارند --}}
-<div id="sw-dialog" class="dialog sw-dialog" data-dialog data-sw-dialog data-mode="view" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sw-phrase">
+{{-- اطلاعات لغت (حالت دیدن) و مرور (حالت review): کشوی کناری (offcanvas)؛ فقط ترجمه‌های فارسی پیش‌فرض تارند --}}
+<div id="sw-dialog" class="dialog dialog--offcanvas sw-dialog" data-dialog data-sw-dialog data-mode="view" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sw-phrase">
     <div class="dialog-backdrop" data-dialog-close></div>
 
     <div class="dialog-panel sw-panel" data-sw-panel>
-        <div class="dialog-handle md:hidden"></div>
-
+        <div class="sw-scroll" data-sw-scroll>
         {{-- بالای حالت مرور: پیشرفت --}}
         <div class="sw-rhead" data-sw-rhead>
             <div class="sw-rbar"><i data-sw-rbar></i></div>
@@ -156,11 +155,8 @@
 
         <div data-sw-body>
             <div class="flex items-start gap-4">
-                {{-- تصویر لغت (در مرور تار است تا جواب را لو ندهد) --}}
-                <button type="button" class="sw-b sw-pic" data-b="image" data-b-review aria-pressed="false" aria-label="{{ __('words.see') }}">
-                    <span class="sw-b__content size-full" data-d-img></span>
-                    <span class="sw-b__veil"><x-icon name="eye-off" class="size-5 sw-off" /><x-icon name="eye" class="size-5 sw-on" /></span>
-                </button>
+                {{-- تصویر لغت (تار نمی‌شود) --}}
+                <div class="sw-pic"><span class="block size-full" data-d-img></span></div>
 
                 <div class="min-w-0 flex-1" dir="ltr" lang="en">
                     <h2 id="sw-phrase" class="break-words text-xl font-extrabold leading-8 text-brand-900 md:text-2xl"><bdi data-d="phrase"></bdi></h2>
@@ -191,11 +187,8 @@
                 </button>
             </div>
 
-            {{-- تعریف انگلیسی (در مرور تار است) --}}
-            <button type="button" class="sw-b sw-b--block mt-4" data-b="meaning" data-b-review aria-pressed="false" aria-label="{{ __('words.see') }}">
-                <span class="sw-b__content text-left text-[0.95rem] leading-7 text-slate-700" dir="ltr" lang="en" data-d="meaning"></span>
-                <span class="sw-b__veil"><x-icon name="eye-off" class="size-5 sw-off" /><x-icon name="eye" class="size-5 sw-on" /><span data-sw-see>{{ __('words.see') }}</span></span>
-            </button>
+            {{-- تعریف انگلیسی (تار نمی‌شود) --}}
+            <p class="mt-4 text-left text-[0.95rem] leading-7 text-slate-700" dir="ltr" lang="en" data-d="meaning"></p>
 
             {{-- مثال + ترجمه‌ی مثال (تار) --}}
             <div class="mt-4 rounded-2xl bg-slate-50 p-3.5" data-d-ex-wrap>
@@ -224,6 +217,7 @@
             <h3 class="mt-4 text-lg font-extrabold text-brand-900">{{ __('words.review.done_title') }}</h3>
             <p class="mt-1.5 text-sm font-bold leading-7 text-slate-600" data-sw-done-text></p>
         </div>
+        </div>{{-- /sw-scroll --}}
 
         {{-- پایین دیالوگ --}}
         <div class="sw-foot" data-sw-foot>
@@ -232,17 +226,28 @@
                 <button type="button" class="btn-ghost sw-foot__close" data-dialog-close>{{ __('ui.close') }}</button>
                 <button type="button" class="sw-round sw-round--bm" data-d-remove aria-label="{{ __('words.remove') }}" title="{{ __('words.remove') }}"><x-icon name="bookmark" class="size-5 fill-current" /></button>
                 <span class="flex-1 text-center text-xs font-extrabold tabular-nums text-slate-400" data-d-pos aria-live="polite"></span>
-                <button type="button" class="sw-round" data-d-prev aria-label="{{ __('words.prev') }}"><x-icon name="chevron-start" class="size-5" /></button>
                 <button type="button" class="sw-round" data-d-next aria-label="{{ __('words.next') }}"><x-icon name="chevron-end" class="size-5" /></button>
+
+                <button type="button" class="sw-round" data-d-prev aria-label="{{ __('words.prev') }}"><x-icon name="chevron-start" class="size-5" /></button>
+
+
             </div>
 
-            {{-- مرور: اول نمایش جواب، بعد می‌دانستم / نمی‌دانستم --}}
-            <div data-foot="reveal" hidden>
-                <button type="button" class="btn-primary w-full" data-r-reveal><x-icon name="eye" class="size-5" />{{ __('words.review.reveal') }}</button>
-            </div>
-            <div class="grid grid-cols-2 gap-2.5" data-foot="answer" hidden>
-                <button type="button" class="btn-ghost !bg-rose-50 !text-rose-700 hover:!bg-rose-100" data-r-answer="no"><x-icon name="x" class="size-5" />{{ __('words.review.no') }}</button>
-                <button type="button" class="btn-primary !bg-emerald-600 hover:!bg-emerald-700" data-r-answer="yes"><x-icon name="check" class="size-5" />{{ __('words.review.yes') }}</button>
+            {{-- مرور: قبلی / (نمایش ترجمه ← بلد بودم یا نه) / بعدی --}}
+            <div class="flex items-center gap-2" data-foot="review" hidden>
+                <button type="button" class="sw-round" data-r-next aria-label="{{ __('words.next') }}"><x-icon name="chevron-end" class="size-5" /></button>
+
+                <div class="min-w-0 flex-1">
+                    <div data-r-reveal-wrap>
+                        <button type="button" class="btn-primary w-full" data-r-reveal><x-icon name="eye" class="size-5" />{{ __('words.review.reveal') }}</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 " data-r-answer-wrap hidden>
+                        <button type="button" class="btn-ghost sw-ans sw-ans--no" data-r-answer="no"><x-icon name="x" class="size-4" />{{ __('words.review.no') }}</button>
+                        <button type="button" class="btn-primary sw-ans sw-ans--yes" data-r-answer="yes"><x-icon name="check" class="size-4" />{{ __('words.review.yes') }}</button>
+                    </div>
+                </div>
+                <button type="button" class="sw-round" data-r-prev aria-label="{{ __('words.prev') }}"><x-icon name="chevron-start" class="size-5" /></button>
+
             </div>
             <div class="grid gap-2.5" data-foot="done" hidden>
                 <button type="button" class="btn-primary" data-r-again hidden></button>
