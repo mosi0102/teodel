@@ -508,6 +508,127 @@ html.sidebar-closed { --rail: 0px; }
     @media (hover: hover) { .sw-b[aria-pressed='false']:hover .sw-b__content { filter: blur(5px); } }
     .sw-b:focus-visible { @apply outline outline-2 outline-offset-2 outline-brand-600; }
 
+    /* ---------- پروفایل (/profile) ---------- */
+    .pf-label { @apply mb-2 block text-xs font-bold text-slate-600; }
+    .pf-req { @apply text-rose-500 no-underline; }
+    .pf-err { @apply mt-1.5 text-xs font-semibold leading-5 text-rose-600 empty:hidden; }
+    .field[aria-invalid='true'] { @apply border-rose-400 focus:border-rose-500 focus:ring-rose-100; }
+    select.field { @apply cursor-pointer; }
+
+    .pf-meter { @apply rounded-2xl bg-brand-50 px-4 py-3; }
+    .pf-meter__bar { @apply mt-2.5 h-1.5 overflow-hidden rounded-full bg-white; }
+    .pf-meter__bar > i { @apply block h-full w-0 rounded-full bg-brand-700; transition: width 0.4s ease; }
+    .pf-meter.is-done { @apply bg-emerald-50; }
+    .pf-meter.is-done p { @apply text-emerald-700; }
+    .pf-meter.is-done .pf-meter__bar > i { @apply bg-emerald-500; }
+
+    .pf-eye { @apply absolute end-1.5 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition duration-200 active:scale-90; }
+    @media (hover: hover) { .pf-eye:hover { @apply bg-slate-100 text-slate-600; } }
+    .pf-eye .pf-eye__off { display: none; }
+    .pf-eye[aria-pressed='true'] .pf-eye__on { display: none; }
+    .pf-eye[aria-pressed='true'] .pf-eye__off { display: block; }
+
+    /* کارت کاربر */
+    .pf-side { @apply overflow-hidden rounded-3xl bg-white shadow-card; }
+    .pf-side__top {
+        @apply flex flex-col items-center px-5 pb-5 pt-7 text-center;
+        background:
+            radial-gradient(120% 70% at 50% -10%, rgb(255 255 255 / 0.16), transparent 60%),
+            repeating-radial-gradient(circle at 50% 120%, transparent 0 14px, rgb(255 255 255 / 0.05) 14px 15px),
+            rgb(var(--brand-700));
+    }
+    .pf-avatar { @apply relative size-24 rounded-full bg-white ring-4 ring-white/30 transition duration-300 active:scale-95; }
+    .pf-avatar img { @apply size-full rounded-full object-cover transition duration-300; }
+    .pf-avatar__edit { @apply absolute -bottom-1 end-0 grid size-8 place-items-center rounded-full bg-white text-brand-700 shadow-card transition duration-300; }
+    @media (hover: hover) {
+        .pf-avatar:hover img { transform: scale(1.04); }
+        .pf-avatar:hover .pf-avatar__edit { @apply bg-brand-50; transform: rotate(-8deg) scale(1.08); }
+    }
+    .pf-avatar:focus-visible { @apply outline-white; }
+    .pf-buy { @apply mt-4 inline-flex min-h-10 items-center justify-center rounded-full bg-white/15 px-8 text-sm font-bold text-white transition duration-200 active:scale-[.97]; }
+    @media (hover: hover) { .pf-buy:hover { @apply bg-white/25; } }
+    .pf-code { @apply mt-5 flex w-full items-center gap-2 rounded-2xl border border-dashed border-white/35 bg-white/5 px-2 py-2.5; }
+    .pf-copy { @apply inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-bold text-white transition duration-200 active:scale-95; }
+    @media (hover: hover) { .pf-copy:hover { @apply bg-white/15; } }
+    .pf-copy.is-ok { @apply bg-emerald-500/30; }
+    .pf-skills { @apply grid grid-cols-2 gap-2.5 p-4; }
+    .pf-skill { @apply flex flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-brand-200 bg-brand-50/60 px-2 py-3; }
+    .pf-skill b { @apply text-2xl font-extrabold leading-8 text-brand-700; }
+    .pf-skill span { @apply text-xs font-bold tracking-wide text-slate-500; }
+
+    /* بنر معرفی */
+    .pf-banner { @apply flex flex-col items-start gap-4 rounded-3xl bg-white p-5 shadow-card sm:flex-row sm:items-center sm:justify-between md:p-6; }
+    .pf-ticket {
+        @apply relative shrink-0 rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 px-8 py-3.5 text-xl font-extrabold text-brand-700 transition duration-200 active:scale-95;
+    }
+    .pf-ticket::before, .pf-ticket::after { content: ''; @apply absolute top-1/2 size-4 -translate-y-1/2 rounded-full bg-white; }
+    .pf-ticket::before { @apply -start-2.5; }
+    .pf-ticket::after { @apply -end-2.5; }
+    @media (hover: hover) { .pf-ticket:hover { @apply -rotate-1 bg-brand-100; } }
+
+    .pf-toast { @apply fixed inset-x-4 z-[70] mx-auto w-fit max-w-[calc(100%-2rem)] rounded-full bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lift; bottom: 6rem; }
+    .pf-toast.is-bad { @apply bg-rose-600; }
+    .pf-toast.is-in { animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    @media (min-width: 768px) { .pf-toast { bottom: 1.5rem; } }
+
+    /* انتخاب آواتار */
+    .pf-avatars { @apply mt-5 grid grid-cols-5 gap-2.5 sm:gap-3.5; }
+    .pf-av { @apply relative block cursor-pointer rounded-full; }
+    .pf-av__img { @apply aspect-square w-full rounded-full bg-slate-100 object-cover ring-2 ring-transparent ring-offset-2 transition duration-200; }
+    @media (hover: hover) { .pf-av:hover .pf-av__img { transform: translateY(-2px) scale(1.04); } }
+    .pf-av input:checked + .pf-av__img { @apply ring-brand-700; }
+    .pf-av input:focus-visible + .pf-av__img { @apply ring-brand-500; }
+    .pf-av input:disabled + .pf-av__img { @apply opacity-40 grayscale; }
+    .pf-av:has(input:disabled) { @apply cursor-not-allowed; }
+    .pf-av__lock { @apply pointer-events-none absolute inset-0 grid place-items-center rounded-full text-slate-700; }
+
+    /* ---------- دیکشنری (/dictionary): جمع‌وجور، بدون سطح‌بندی ---------- */
+    .dd-bar { @apply sticky z-20 -mx-4 mb-3 space-y-2 bg-[#f4f5fa]/90 px-4 pb-2 pt-2 backdrop-blur md:mx-0 md:rounded-2xl md:px-3; top: var(--topbar-h); }
+    .dd-tools { @apply flex flex-wrap items-center gap-2; }
+    .dd-search { @apply relative block min-w-0 basis-full md:flex-1 md:basis-60; }
+    .dd-clear { @apply absolute end-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition active:scale-90; }
+    @media (hover: hover) { .dd-clear:hover { @apply bg-slate-100 text-slate-600; } }
+    .dd-search input[type='search']::-webkit-search-cancel-button { display: none; }
+    .dd-sel { @apply !min-h-10 !w-auto min-w-0 flex-1 cursor-pointer !py-0 !text-[13px] md:flex-none; }
+    .dd-chip { @apply !min-h-10 shrink-0 gap-1.5 !px-3 !text-[13px]; }
+
+    .dd-letters { @apply flex gap-1 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0; scrollbar-width: none; }
+    .dd-letters::-webkit-scrollbar { display: none; }
+    .dd-letter-btn { @apply grid h-8 min-w-8 shrink-0 place-items-center rounded-lg px-1.5 text-[13px] font-extrabold text-slate-500 transition duration-150 active:scale-90 disabled:pointer-events-none disabled:opacity-30; }
+    .dd-letter-btn--all { @apply px-3; }
+    @media (hover: hover) { .dd-letter-btn:not(:disabled):hover { @apply bg-brand-50 text-brand-700; } }
+    .dd-letter-btn[aria-pressed='true'] { @apply bg-brand-700 text-white; }
+
+    .dd-summary { @apply mb-2 px-1 text-xs font-bold text-slate-400 empty:hidden; }
+    .dd-list { @apply grid gap-x-3 gap-y-1.5 transition-opacity duration-200 sm:grid-cols-2 xl:grid-cols-3; }
+    .dd-list.is-loading { @apply opacity-60; }
+    .dd-head { @apply col-span-full mt-3 flex items-center gap-3 px-1 text-sm font-extrabold text-brand-700 first:mt-0; }
+    .dd-head::after { content: ''; @apply h-px flex-1 bg-slate-200; }
+
+    .dd-row {
+        @apply flex items-center gap-1 rounded-xl bg-white py-1.5 ps-3.5 pe-1.5 shadow-card transition duration-150 cursor-pointer;
+        content-visibility: auto;
+        contain-intrinsic-size: auto 3.6rem;
+    }
+    @media (hover: hover) { .dd-row:hover { @apply shadow-lift; } }
+    .dd-main { @apply flex max-w-full items-baseline gap-1.5 text-start; }
+    .dd-word { @apply truncate text-[15px] font-extrabold leading-6 text-brand-900; }
+    .dd-type { @apply shrink-0 text-[11px] font-medium text-slate-400; }
+    .dd-tr { @apply mt-0.5 block max-w-full rounded-md text-start text-[13px] font-semibold leading-5 text-slate-600; }
+    .dd-tr > span { @apply block truncate transition duration-300; }
+    .dd-tr[aria-pressed='false'] > span { filter: blur(5px); @apply select-none; }
+    .dd-list.is-revealed .dd-tr > span { filter: none; }
+    @media (hover: hover) { .dd-tr[aria-pressed='false']:hover > span { filter: blur(3.5px); } }
+    .dd-ic { @apply grid size-9 shrink-0 place-items-center rounded-full text-slate-400 transition duration-150 active:scale-90; }
+    @media (hover: hover) { .dd-ic:hover { @apply bg-brand-50 text-brand-700; } }
+    .dd-ic--bm svg, .dd-bm-big svg { fill: none; }
+    .dd-ic--bm[aria-pressed='true'] { @apply text-brand-700; }
+    .dd-ic--bm[aria-pressed='true'] svg, .dd-bm-big[aria-pressed='true'] svg { fill: currentColor; }
+    .dd-bm-big[aria-pressed='false'] { @apply bg-brand-50 text-brand-700; }
+    @media (hover: hover) { .dd-bm-big[aria-pressed='false']:hover { @apply !bg-brand-100; } .dd-bm-big[aria-pressed='true']:hover { @apply !bg-brand-800; } }
+    .dd-toast__a { @apply ms-3 font-extrabold text-amber-300 underline-offset-4 hover:underline; }
+    [data-dd-body].is-swap { animation: rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
        کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */

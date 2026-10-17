@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WordsController;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,6 +23,12 @@ Route::get('/lang/{locale}', function (string $locale) {
 });
 Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
+
+    // پروفایل کاربر (مشاهده / تکمیل / ویرایش + انتخاب آواتار)
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+
+    // دیکشنری (بدون سطح‌بندی، الفبایی، جمع‌وجور)
+    Route::get('/dictionary', [DictionaryController::class, 'index'])->name('dictionary.index');
 
     // لغات و عبارت‌های هایلایت‌شده‌ی کاربر
     Route::get('/words', [WordsController::class, 'index'])->name('words.index');

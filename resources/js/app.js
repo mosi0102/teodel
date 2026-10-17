@@ -20,4 +20,6 @@ import './modules/shadowing';
 import './modules/karaoke';
 import './modules/details';
 import './modules/saved-words';
+import './modules/profile';
+import './modules/dictionary';
 import './modules/progress-sync';
