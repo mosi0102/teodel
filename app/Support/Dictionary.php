@@ -14,7 +14,8 @@ namespace App\Support;
  *
  * هر لغت (همه‌ی کلیدها اختیاری‌اند جز id و phrase):
  *   id, phrase, type (noun|verb|adjective|adverb|conjunction|phrasal verb|idiom …), ipa{uk,us}, audio{uk,us},
- *   meaning (تعریف انگلیسی), example, example_tr, translate (فارسی), synonyms[], antonyms[]
+ *   meaning (تعریف انگلیسی), example, example_tr, translate (فارسی), synonyms[], antonyms[],
+ *   image (آدرس تصویر لغت، اختیاری؛ فقط در offcanvas جزئیات نشان داده می‌شود و در لیست نیست — بدون آن کاشی رنگی با حرف اول می‌آید)
  *
  * $savedKeys = کلیدهای (حروف کوچک) لغت‌هایی که کاربر قبلاً ذخیره کرده؛ بوکمارک همان لیست «لغات و عبارت‌های هایلایت‌شده» است.
  */
@@ -40,6 +41,7 @@ class Dictionary
                 'example' => (string) ($r['example'] ?? ''),
                 'example_tr' => (string) ($r['example_tr'] ?? ''),
                 'translate' => (string) ($r['translate'] ?? ''),
+                'image' => $r['image'] ?? null,
                 'synonyms' => array_values((array) ($r['synonyms'] ?? [])),
                 'antonyms' => array_values((array) ($r['antonyms'] ?? [])),
             ];

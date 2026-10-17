@@ -123,12 +123,15 @@
     <div class="dialog-panel">
         <div class="sw-scroll" data-dd-scroll>
             <div data-dd-body>
-                <div class="flex items-start gap-3">
-                    <div class="min-w-0 flex-1" dir="ltr" lang="en">
-                        <h2 id="dd-phrase" class="break-words text-2xl font-extrabold leading-9 text-brand-900"><bdi data-d="phrase"></bdi></h2>
-                        <p class="text-sm text-slate-500" data-d="type"></p>
-                    </div>
-                    <button type="button" data-dialog-close class="sw-x -me-2 -mt-1" aria-label="{{ __('ui.close') }}"><x-icon name="x" class="size-5" /></button>
+                {{-- تصویر لغت (فقط اینجا؛ در لیست تصویر نیست). اگر تصویری نباشد، کاشی رنگی با حرف اول نشان داده می‌شود --}}
+                <div class="dd-pic">
+                    <div class="size-full" data-dd-pic aria-hidden="true"></div>
+                    <button type="button" data-dialog-close class="dd-close" aria-label="{{ __('ui.close') }}"><x-icon name="x" class="size-5" /></button>
+                </div>
+
+                <div class="min-w-0" dir="ltr" lang="en">
+                    <h2 id="dd-phrase" class="break-words text-2xl font-extrabold leading-9 text-brand-900"><bdi data-d="phrase"></bdi></h2>
+                    <p class="text-sm text-slate-500" data-d="type"></p>
                 </div>
 
                 <div class="mt-3 space-y-1.5" dir="ltr" lang="en">

@@ -95,7 +95,7 @@ function init(root) {
                 ipa: info.ipa || { uk: '', us: '' }, audio: info.audio || { uk: '', us: '' },
                 meaning: info.meaning || '', example: info.example || '', example_tr: info.example_tr || '',
                 translate: info.translate || '', synonyms: info.synonyms || [], antonyms: info.antonyms || [],
-                image: null, song: v.song ? { id: v.song, title: '' } : null, saved_at: v.at || 0, status: 'new',
+                image: info.image || null, song: v.song ? { id: v.song, title: '' } : null, saved_at: v.at || 0, status: 'new',
             });
         });
 

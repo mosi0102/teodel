@@ -7,7 +7,7 @@ import { digits } from './digits';
  *
  * - جست‌وجو (لغت، ترجمه، تعریف)، نوار الفبا (حروفِ بدون لغت غیرفعال)، فیلتر نوع (اسم/فعل/صفت/قید/عبارت)، «ذخیره‌شده‌ها» و مرتب‌سازی A–Z / Z–A.
  * - ترجمه‌ی فارسی هر ردیف تار است و با کلیک باز می‌شود؛ دکمه‌ی «نمایش ترجمه‌ها» همه را یکجا باز می‌کند (انتخاب در مرورگر می‌ماند).
- * - کلیک روی ردیف ← offcanvas جزئیات (تلفظ UK/US، ترجمه و ترجمه‌ی مثال تار، مترادف/متضاد، قبلی/بعدی، کلید ←/→، کشیدن انگشت).
+ * - کلیک روی ردیف ← offcanvas جزئیات (تصویر لغت بالای آن؛ در لیست تصویر نیست؛ تلفظ UK/US، ترجمه و ترجمه‌ی مثال تار، مترادف/متضاد، قبلی/بعدی، کلید ←/→، کشیدن انگشت).
  * - بوکمارک = ذخیره در «لغات و عبارت‌های هایلایت‌شده» (همان صفحه‌ی /words).
  * - بارگذاری: ۶۰تا۶۰تا با اسکرول (IntersectionObserver) و دکمه‌ی «نمایش بیشتر».
  *
@@ -43,6 +43,7 @@ const rtl = () => document.documentElement.dir === 'rtl';
 // ی/ک عربی و فارسی یکی حساب شوند تا جست‌وجوی فارسی دقیق باشد
 const norm = (s) => String(s || '').toLowerCase().replace(/ي/g, 'ی').replace(/ك/g, 'ک').replace(/[ً-ٟ‌]/g, '');
 const typeGroup = (t) => (['noun', 'verb', 'adjective', 'adverb'].includes(String(t).toLowerCase()) ? String(t).toLowerCase() : 'other');
+const hueOf = (s) => [...String(s)].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 7);
 const firstLetter = (p) => {
     const c = String(p).trim().charAt(0).toLowerCase();
     return /[a-z]/.test(c) ? c : '#';
@@ -66,9 +67,33 @@ function speak(item, acc) {
     }
 }
 
+
+/** تصویر لغت در offcanvas؛ بدون تصویر (یا اگر نیامد) کاشی رنگی با حرف اول */
+function paintPic(el, w) {
+    el.textContent = '';
+    const tile = () => {
+        el.textContent = '';
+        const h = hueOf(w.phrase);
+        el.style.background = 'linear-gradient(135deg, hsl(' + h + ' 70% 56%), hsl(' + ((h + 50) % 360) + ' 65% 38%))';
+        const s = document.createElement('span');
+        s.textContent = w.phrase.charAt(0).toUpperCase();
+        s.className = 'dd-pic__ch';
+        el.appendChild(s);
+    };
+    if (!w.image) { tile(); return; }
+    el.style.background = '';
+    const img = new Image();
+    img.alt = '';
+    img.decoding = 'async';
+    img.className = 'size-full object-cover';
+    img.onerror = tile;
+    img.src = w.image;
+    el.appendChild(img);
+}
+
 function clean(w) {
     return Object.assign({
-        type: '', meaning: '', example: '', example_tr: '', translate: '', synonyms: [], antonyms: [],
+        image: null, type: '', meaning: '', example: '', example_tr: '', translate: '', synonyms: [], antonyms: [],
     }, w, {
         key: w.key || String(w.phrase).toLowerCase(),
         ipa: Object.assign({ uk: '', us: '' }, w.ipa),
@@ -327,7 +352,7 @@ function init(root) {
             if (on) {
                 m[w.key] = {
                     key: w.key, text: w.phrase, song: 0, line: 0, at: Math.floor(Date.now() / 1000),
-                    info: { phrase: w.phrase, type: w.type, ipa: w.ipa, audio: w.audio, meaning: w.meaning, example: w.example, example_tr: w.example_tr, translate: w.translate, synonyms: w.synonyms, antonyms: w.antonyms },
+                    info: { phrase: w.phrase, type: w.type, image: w.image, ipa: w.ipa, audio: w.audio, meaning: w.meaning, example: w.example, example_tr: w.example_tr, translate: w.translate, synonyms: w.synonyms, antonyms: w.antonyms },
                 };
             } else delete m[w.key];
             store.set(SAVED_KEY, m);
@@ -386,6 +411,7 @@ function init(root) {
         const w = cur();
         if (!w) { closeDialog($dlg); return; }
         const $d = (k) => $dlg.find('[data-d="' + k + '"]');
+        paintPic($dlg.find('[data-dd-pic]')[0], w);
         $d('phrase').text(w.phrase);
         $d('type').text(w.type);
         ['uk', 'us'].forEach((a) => {
