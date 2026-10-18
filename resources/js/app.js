@@ -23,4 +23,5 @@ import './modules/saved-words';
 import './modules/profile';
 import './modules/dictionary';
 import './modules/level-test';
+import './modules/tickets';
 import './modules/progress-sync';

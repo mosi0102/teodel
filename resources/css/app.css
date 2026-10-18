@@ -289,6 +289,8 @@ html.sidebar-closed { --rail: 0px; }
     .lsec--hard .lsec__icon { @apply text-rose-600; }
 
     .clip { @apply relative isolate h-36 overflow-hidden rounded-2xl text-white md:h-40; }
+    /* تصویر کاور تار و بزرگ‌شده (blur + scale) در موبایل از گوشه‌های گرد بیرون می‌زد؛ clip-path با هر مرورگری درست می‌برد */
+    .clip { clip-path: inset(0 round 1rem); }
     .clip .p-ico-pause { display: none; }
     .clip[data-state='playing'] .p-ico-play { display: none; }
     .clip[data-state='playing'] .p-ico-pause { display: block; }
@@ -296,7 +298,7 @@ html.sidebar-closed { --rail: 0px; }
     .clip__bar > i { @apply block h-full w-0 rounded-full bg-white; transition: width 0.2s linear; }
     .clip button:disabled { @apply opacity-40; }
 
-    .lx { @apply overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300; }
+    .lx { @apply min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition duration-300; }
     .lx[data-state='correct'] { @apply border-emerald-300; }
     .lx[data-state='revealed'] { @apply border-amber-300; }
     .lx[data-state='wrong'] { @apply border-rose-200; }
@@ -327,7 +329,7 @@ html.sidebar-closed { --rail: 0px; }
     .clip[data-state='turn'] .clip__bar > i { @apply bg-amber-300; transition: none; }
     .clip[data-state='turn'] .clip__speed { @apply pointer-events-none opacity-40; }
 
-    .sx { @apply flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-2.5 shadow-card transition duration-300 md:p-3; }
+    .sx { @apply min-w-0 max-w-full overflow-hidden flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-2.5 shadow-card transition duration-300 md:p-3; }
     .sx[data-state='done'] { @apply border-emerald-300; }
     .sx__rounds { @apply flex items-center gap-3 px-2; }
     .sx__rounds > p { @apply flex-1 text-slate-600; }
@@ -761,6 +763,113 @@ html.sidebar-closed { --rail: 0px; }
     .pt-rv__o.is-mine-wrong em { @apply text-rose-700; }
     .pt-rv__ex { @apply mt-3 rounded-xl bg-slate-50 px-3.5 py-2.5 text-start text-xs leading-6 text-slate-500; }
     .pt-rv__ex b { @apply text-slate-600; }
+
+    /* ---------- تیکت‌ها (/tickets) ---------- */
+    .tk-stats { @apply mb-4 grid grid-cols-3 gap-2.5; }
+    .tk-stat { @apply flex flex-col items-center gap-0.5 rounded-2xl bg-white px-2 py-3 shadow-card transition duration-200 active:scale-[.98] md:flex-row md:justify-center md:gap-3 md:py-3.5; }
+    .tk-stat b { @apply text-xl font-extrabold leading-7 text-brand-900; }
+    .tk-stat span { @apply text-center text-[0.7rem] font-bold leading-4 text-slate-500 md:text-xs; }
+    .tk-stat[aria-pressed='true'] { box-shadow: 0 0 0 2px rgb(var(--brand-600)); }
+    .tk-stat[data-s='open'] b { @apply text-amber-600; }
+    .tk-stat[data-s='answered'] b { @apply text-emerald-600; }
+    .tk-stat[data-s='closed'] b { @apply text-slate-500; }
+    @media (hover: hover) { .tk-stat:hover { @apply -translate-y-0.5 shadow-lift; } }
+
+    .tk-shell { @apply flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)] lg:items-start; }
+    @media (max-width: 1023.98px) {
+        .tk-shell:not([data-view='list']) .tk-list,
+        .tk-shell:not([data-view='list']) .tk-stats { display: none; }
+        .tk-shell[data-view='list'] .tk-pane { display: none; }
+    }
+    html.tk-live nav.fixed.inset-x-0.bottom-0 { @apply max-lg:hidden; }
+    @media (max-width: 1023.98px) {
+        [data-tk][data-tk-view='detail'] .tk-head, [data-tk][data-tk-view='new'] .tk-head,
+        [data-tk][data-tk-view='detail'] .tk-stats, [data-tk][data-tk-view='new'] .tk-stats { display: none; }
+    }
+
+    .tk-list { @apply overflow-hidden rounded-3xl bg-white shadow-card; }
+    .tk-list__bar { @apply border-b border-slate-100 p-3; }
+    .tk-search { @apply flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 transition duration-200 focus-within:border-brand-500 focus-within:bg-white; }
+    .tk-search input { @apply min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-slate-800 outline-none placeholder:text-slate-400; }
+    .tk-search input:focus { box-shadow: none; }
+    .tk-search input::-webkit-search-cancel-button { display: none; }
+    .tk-search button { @apply grid size-7 place-items-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600; }
+    .tk-chips { @apply -mx-1 mt-2.5 flex gap-1.5 overflow-x-auto px-1 pb-0.5; scrollbar-width: none; }
+    .tk-chips::-webkit-scrollbar { display: none; }
+    .tk-chips .chip-btn { @apply shrink-0; }
+    .tk-chip-n { @apply ms-1 text-[0.7rem] font-extrabold opacity-70; }
+    .tk-items { @apply lg:max-h-[calc(100dvh-20rem)] lg:overflow-y-auto; }
+    .tk-item {
+        @apply relative flex w-full gap-3 border-b border-slate-100 px-3.5 py-3.5 text-start transition duration-200 last:border-b-0;
+    }
+    @media (hover: hover) { .tk-item:hover { @apply bg-slate-50; } }
+    .tk-item[aria-current='true'] { @apply bg-brand-50; box-shadow: inset 3px 0 0 rgb(var(--brand-600)); }
+    [dir='rtl'] .tk-item[aria-current='true'] { box-shadow: inset -3px 0 0 rgb(var(--brand-600)); }
+    .tk-item__dot { @apply mt-2 size-2.5 shrink-0 rounded-full bg-transparent; }
+    .tk-item.is-unread .tk-item__dot { @apply bg-brand-600; }
+    .tk-item__top { @apply flex items-center justify-between gap-2 text-[0.7rem] font-medium text-slate-400; }
+    .tk-item__subject { @apply mt-0.5 line-clamp-2 text-sm font-bold leading-6 text-slate-800; }
+    .tk-item.is-unread .tk-item__subject { @apply font-extrabold text-brand-900; }
+    .tk-item__foot { @apply mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-slate-500; }
+
+    .tk-badge { @apply inline-flex shrink-0 items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[0.7rem] font-extrabold leading-4 text-slate-600; }
+    .tk-badge::before { content: ''; @apply size-1.5 rounded-full bg-slate-400; }
+    .tk-badge[data-s='open'] { @apply bg-amber-50 text-amber-700; }
+    .tk-badge[data-s='open']::before { @apply bg-amber-500; }
+    .tk-badge[data-s='answered'] { @apply bg-emerald-50 text-emerald-700; }
+    .tk-badge[data-s='answered']::before { @apply bg-emerald-500; }
+
+    .tk-empty, .tk-placeholder { @apply flex flex-col items-center justify-center px-6 py-12 text-center; }
+    .tk-empty__ic { @apply grid size-14 place-items-center rounded-2xl bg-brand-50 text-brand-700; }
+    .tk-placeholder { @apply min-h-[26rem]; }
+
+    .tk-pane { @apply min-w-0 overflow-hidden rounded-3xl bg-white shadow-card; }
+    .tk-detail { @apply flex flex-col; }
+    .tk-detail__head { @apply border-b border-slate-100 p-4 md:p-5; }
+    .tk-act { @apply min-h-10 gap-1.5 px-4 text-sm; }
+    .tk-thread { @apply flex flex-col gap-4 p-4 md:p-5 lg:max-h-[calc(100dvh-27rem)] lg:min-h-56 lg:overflow-y-auto; scroll-behavior: auto; }
+    .tk-msg { @apply flex max-w-[92%] flex-col gap-1 md:max-w-[80%]; animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .tk-msg--user { @apply items-end self-end; }
+    .tk-msg--support { @apply items-start self-start; }
+    .tk-msg__meta { @apply flex items-center gap-1.5 px-1 text-[0.7rem] font-medium text-slate-400; }
+    .tk-msg__meta b { @apply font-extrabold text-slate-600; }
+    .tk-msg__bubble { @apply whitespace-pre-wrap break-words rounded-2xl px-4 py-2.5 text-sm leading-7; overflow-wrap: anywhere; }
+    .tk-msg--user .tk-msg__bubble { @apply rounded-ee-md bg-brand-700 text-white; }
+    .tk-msg--support .tk-msg__bubble { @apply rounded-es-md bg-slate-100 text-slate-800; }
+    .tk-msg__files { @apply flex flex-wrap gap-2; }
+    .tk-msg__file { @apply block size-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 transition duration-200 active:scale-95; }
+    .tk-msg__file img { @apply size-full object-cover; }
+    .tk-msg__chip { @apply inline-flex max-w-full items-center gap-1.5 truncate rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-600; }
+    @media (hover: hover) { .tk-msg__file:hover { @apply opacity-90; } }
+
+    .tk-loading { @apply flex flex-col items-center px-6 py-12 text-center; }
+    .tk-composer { @apply sticky bottom-0 z-10 border-t border-slate-100 bg-white p-3 md:p-4 lg:static; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    .tk-composer textarea { @apply block max-h-40 min-h-12 w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm leading-6 text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:border-brand-500 focus:bg-white; }
+    .tk-composer__row { @apply mt-2.5 flex items-center gap-3; }
+    .tk-send { @apply ms-auto min-h-10 px-6 text-sm; }
+    .tk-attach { @apply grid size-10 cursor-pointer place-items-center rounded-full bg-slate-100 text-slate-600 transition duration-200 active:scale-95; }
+    @media (hover: hover) { .tk-attach:hover { @apply bg-brand-50 text-brand-700; } }
+    .tk-closed { @apply border-t border-slate-100 bg-slate-50 p-4 text-center; }
+
+    .tk-form { @apply p-5 md:p-7; }
+    .tk-label { @apply mb-1.5 block text-sm font-extrabold text-slate-700; }
+    .tk-input { @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-6 text-slate-800 outline-none transition duration-200 placeholder:text-slate-400 focus:border-brand-500; }
+    .tk-input:focus, .tk-composer textarea:focus { box-shadow: 0 0 0 3px rgb(var(--brand-500) / 0.18); }
+    .tk-input[aria-invalid='true'] { @apply border-rose-400; }
+    .tk-err { @apply mt-1.5 text-xs font-bold text-rose-600; }
+    .tk-depts { @apply flex flex-wrap gap-2; }
+    .tk-dept { @apply min-h-10 rounded-full border-2 border-slate-200 bg-white px-3.5 text-sm font-bold text-slate-600 transition duration-200 active:scale-[.97]; }
+    .tk-dept[aria-checked='true'] { @apply border-brand-600 bg-brand-50 text-brand-800; }
+    @media (hover: hover) { .tk-dept[aria-checked='false']:hover { @apply border-brand-200 bg-brand-50/60; } }
+    .tk-dept:focus-visible { @apply outline-none ring-4 ring-brand-100; }
+    .tk-drop { @apply flex cursor-pointer flex-col items-center gap-1 rounded-2xl border-2 border-dashed border-slate-300 px-4 py-5 text-slate-500 transition duration-200; }
+    @media (hover: hover) { .tk-drop:hover { @apply border-brand-300 bg-brand-50/50 text-brand-700; } }
+    .tk-drop.is-full { @apply pointer-events-none opacity-40; }
+    .tk-files { @apply mb-2 flex flex-wrap gap-2 empty:hidden; }
+    .tk-files li { @apply relative size-16 overflow-hidden rounded-xl border border-slate-200 bg-slate-100; animation: rise 0.25s ease both; }
+    .tk-files img { @apply size-full object-cover; }
+    .tk-files button { @apply absolute end-0.5 top-0.5 grid size-6 place-items-center rounded-full bg-slate-900/70 text-white transition active:scale-90; }
+    .tk-tips { @apply mt-5 rounded-2xl bg-brand-50/60 p-4; }
 
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
