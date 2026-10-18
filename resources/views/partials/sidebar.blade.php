@@ -72,7 +72,7 @@
                             <span class="hidden min-w-0 flex-1 truncate lg:inline">{{ $label }}</span>
                             @if ($item['key'] === 'level_test')
                                 <span class="hidden text-xs font-bold text-brand-700 lg:inline"
-                                      dir="ltr">{{ $u['level'] }}</span>
+                                      dir="ltr" data-user-level>{{ $u['level'] }}</span>
                             @endif
                         </a>
                     @endif
@@ -83,7 +83,7 @@
             <div class="hidden rounded-2xl bg-gradient-to-br from-brand-50 to-indigo-100 p-3.5 lg:block avgSidebar">
                 <p class="mb-3 text-xs font-bold text-brand-800">
                     {{ __('ui.avg_grade') }}: <span dir="ltr"
-                                                    class="inline-block rounded-md bg-brand-700 px-2 py-0.5 text-white">{{ $u['level'] }}</span>
+                                                    class="inline-block rounded-md bg-brand-700 px-2 py-0.5 text-white" data-user-level>{{ $u['level'] }}</span>
                 </p>
                 <dl class="grid grid-cols-2 gap-2 text-center" dir="ltr">
                     @foreach (['listening', 'reading', 'writing', 'speaking'] as $skill)

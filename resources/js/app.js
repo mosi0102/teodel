@@ -22,4 +22,5 @@ import './modules/details';
 import './modules/saved-words';
 import './modules/profile';
 import './modules/dictionary';
+import './modules/level-test';
 import './modules/progress-sync';

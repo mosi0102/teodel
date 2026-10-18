@@ -2,25 +2,16 @@
 
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
+use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WordsController;
 use Illuminate\Support\Facades\Route;
+
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-Route::get('/lang/{locale}', function (string $locale) {
-    if (in_array($locale, ['fa', 'en'], true)) {
-        session(['locale' => $locale]);
-    }
-    return redirect()->back();
-});
+ * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
+ * مسیرهای دیگر (dashboard, words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
+ * Nav.php و لایه‌ها فقط با url() به آن‌ها لینک می‌دهند.
+ */
 Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
 
@@ -29,6 +20,9 @@ Route::middleware(['web'])->group(function () {
 
     // دیکشنری (بدون سطح‌بندی، الفبایی، جمع‌وجور)
     Route::get('/dictionary', [DictionaryController::class, 'index'])->name('dictionary.index');
+
+    // آزمون تعیین سطح (واژگان، گرامر، درک شنیداری)
+    Route::get('/level-test', [PlacementController::class, 'index'])->name('level-test.index');
 
     // لغات و عبارت‌های هایلایت‌شده‌ی کاربر
     Route::get('/words', [WordsController::class, 'index'])->name('words.index');

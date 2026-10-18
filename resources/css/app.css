@@ -638,6 +638,130 @@ html.sidebar-closed { --rail: 0px; }
     @media (hover: hover) { .dd-close:hover { @apply bg-white text-slate-800; } }
     [data-dd-body].is-swap { animation: rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+    /* ---------- آزمون تعیین سطح (/level-test) ---------- */
+    .pt-back { @apply inline-flex min-h-9 items-center gap-1 rounded-full pe-3 text-xs font-bold text-slate-500 transition duration-200 hover:text-brand-700; }
+    .pt-back svg { @apply size-4; }
+
+    /* معرفی */
+    .pt-steps { @apply mt-5 grid gap-4; }
+    .pt-steps li { @apply flex gap-3.5; }
+    .pt-steps__n { @apply grid size-8 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-700; }
+    .pt-scale { @apply mt-3 grid grid-cols-5 gap-1.5 text-center; }
+    .pt-scale li { @apply flex flex-col items-center gap-1 rounded-xl bg-slate-50 px-1 py-2.5 transition duration-200; }
+    .pt-scale b { @apply text-sm font-extrabold text-brand-700; }
+    .pt-scale span { @apply text-[0.62rem] font-medium leading-4 text-slate-500; }
+    .pt-scale li.is-me { @apply bg-brand-700; }
+    .pt-scale li.is-me b, .pt-scale li.is-me span { @apply text-white; }
+
+    /* انتخاب آزمون */
+    .pt-overall { @apply inline-flex shrink-0 items-center gap-2.5 self-start rounded-2xl bg-white px-4 py-2.5 shadow-card md:self-auto; }
+    .pt-overall__lv { @apply grid min-w-10 place-items-center rounded-lg bg-brand-700 px-2 py-0.5 text-sm font-extrabold text-white; }
+    .pt-overall.is-empty .pt-overall__lv { @apply bg-slate-200 text-slate-500; }
+    .pt-card { @apply flex flex-col rounded-3xl bg-white p-5 shadow-card transition duration-300 md:p-6; }
+    .pt-card > .btn-primary { @apply mt-auto; }
+    .pt-card__score { @apply mt-5 mb-4 rounded-2xl bg-slate-50 p-3.5; }
+    .pt-card__ic { @apply grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-700 transition duration-300; }
+    .pt-card__lv { @apply rounded-lg bg-brand-700 px-2.5 py-1 text-xs font-extrabold text-white; }
+    .pt-meter { @apply h-2 overflow-hidden rounded-full bg-slate-200; }
+    .pt-meter i { @apply block h-full w-0 rounded-full bg-brand-600 transition-[width] duration-700; }
+    @media (hover: hover) {
+        .pt-card:hover { @apply -translate-y-0.5 shadow-lift; }
+        .pt-card:hover .pt-card__ic { @apply bg-brand-700 text-white; }
+    }
+
+    /* صفحه‌ی آزمون */
+    .pt-exam { @apply mx-auto w-full max-w-5xl; }
+    .pt-exam__head { @apply flex items-center gap-3; }
+    .pt-progress { @apply mt-2 h-2 overflow-hidden rounded-full bg-slate-200; }
+    .pt-progress i { @apply block h-full w-0 rounded-full bg-brand-600 transition-[width] duration-500; }
+    .pt-exam__body { @apply mt-4 flex flex-col gap-4 md:grid md:grid-cols-[minmax(0,1fr)_16rem] md:items-start; }
+    .pt-q { @apply order-2 p-5 md:order-1 md:p-7; }
+    .pt-side { @apply order-1 p-3 md:order-2 md:sticky md:p-4; top: calc(var(--topbar-h, 4rem) + 1rem); }
+    .pt-q__type { @apply text-xs font-extrabold uppercase tracking-wide text-brand-600; }
+    .pt-q__fa { @apply mt-2 text-sm font-bold leading-7 text-slate-600; }
+    .pt-q__text { @apply mt-4 text-start text-xl font-extrabold leading-9 text-brand-900 md:text-2xl md:leading-10; }
+    .pt-q.is-in { animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+    .pt-opts { @apply mt-5 grid gap-2.5; }
+    .pt-opt {
+        @apply flex min-h-14 w-full items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-3.5 py-2.5 text-start text-base font-medium text-slate-700 transition duration-200
+               active:scale-[.99];
+    }
+    .pt-opt__k { @apply grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-extrabold text-slate-500 transition duration-200; }
+    @media (hover: hover) { .pt-opt:hover { @apply border-brand-200 bg-brand-50/60; } }
+    .pt-opt[aria-checked='true'] { @apply border-brand-600 bg-brand-50 text-brand-900; }
+    .pt-opt[aria-checked='true'] .pt-opt__k { @apply bg-brand-700 text-white; }
+    .pt-opt:focus-visible { @apply outline-none ring-4 ring-brand-100; }
+
+    .pt-stat { @apply flex flex-col items-center rounded-xl bg-slate-50 py-2; }
+    .pt-stat b { @apply text-xl font-extrabold leading-7 text-brand-800; }
+    .pt-stat span { @apply text-[0.7rem] font-bold text-slate-500; }
+    .pt-dots { @apply -mx-1 mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1 md:mx-0 md:mt-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0 md:pb-0; scrollbar-width: none; }
+    .pt-dots::-webkit-scrollbar { display: none; }
+    .pt-dot {
+        @apply grid size-9 min-w-9 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-xs font-extrabold text-slate-500 transition duration-200 md:w-full md:min-w-0 md:rounded-xl;
+    }
+    .pt-dot.is-done { @apply border-brand-200 bg-brand-100 text-brand-800; }
+    .pt-dot.is-current { @apply border-brand-700 bg-brand-700 text-white; }
+    @media (hover: hover) { .pt-dot:hover:not(.is-current) { @apply border-brand-300; } }
+
+    .pt-bar { @apply sticky bottom-0 z-30 -mx-4 mt-4 flex items-center gap-2.5 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:backdrop-blur-none; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+    .pt-bar__prev, .pt-bar__next { @apply min-w-0 flex-1 md:flex-none md:min-w-36; }
+    .pt-bar__fin { @apply min-h-12 shrink-0 px-4; }
+    .pt-bar__next { @apply md:ms-auto; }
+    .pt-bar [disabled] { @apply pointer-events-none opacity-40; }
+    html.pt-live nav.fixed.inset-x-0.bottom-0 { @apply max-md:hidden; }
+
+    /* پخش‌کننده‌ی صوت */
+    .pt-audio { @apply mt-4 rounded-2xl bg-brand-50/70 p-4; }
+    .pt-audio__play { @apply grid size-14 shrink-0 place-items-center rounded-full bg-brand-700 text-white shadow-lift transition duration-200 hover:bg-brand-800 active:scale-95; }
+    .pt-audio__play.is-live { animation: pulse-ring 1.6s ease-out infinite; }
+    .pt-audio__row { @apply mt-3.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3; }
+    .pt-audio__vol { @apply flex min-w-40 flex-1 items-center gap-2 sm:max-w-56; }
+    .pt-audio__mute { @apply grid size-9 shrink-0 place-items-center rounded-full bg-white text-brand-700 transition duration-200 hover:bg-brand-100; }
+    .pt-range { @apply h-6 w-full cursor-pointer; accent-color: rgb(var(--brand-700)); }
+    .pt-speed { @apply inline-flex rounded-full bg-white p-1; }
+    .pt-speed button { @apply min-h-8 rounded-full px-3 text-xs font-extrabold text-slate-500 transition duration-200; }
+    .pt-speed button[aria-checked='true'] { @apply bg-brand-700 text-white; }
+    @media (hover: hover) { .pt-speed button[aria-checked='false']:hover { @apply bg-brand-50 text-brand-700; } }
+
+    /* نتیجه */
+    .pt-ring { @apply relative mx-auto mt-4 size-40; }
+    .pt-ring svg { @apply size-full -rotate-90; }
+    .pt-ring circle { fill: none; stroke-width: 9; }
+    .pt-ring__bg { stroke: rgb(var(--brand-100)); }
+    .pt-ring__fg { stroke: rgb(var(--brand-600)); stroke-linecap: round; stroke-dasharray: var(--p, 0) 100; transition: stroke-dasharray 1s cubic-bezier(0.2, 0.7, 0.2, 1); }
+    .pt-ring__in { @apply absolute inset-0 flex flex-col items-center justify-center; }
+    .pt-ring__in b { @apply text-4xl font-extrabold leading-none text-brand-900; }
+    .pt-ring__in span { @apply mt-1; }
+    .pt-bylevel { @apply mt-3 grid gap-3; }
+    .pt-bylevel li { @apply grid grid-cols-[2.25rem_minmax(0,1fr)_2.75rem] items-center gap-3 text-xs; }
+    .pt-bylevel b { @apply font-extrabold text-brand-700; }
+    .pt-bylevel .pt-meter { @apply h-2.5; }
+    .pt-bylevel .pt-meter i { @apply bg-brand-500; }
+    .pt-bylevel li.is-low .pt-meter i { @apply bg-slate-300; }
+    .pt-bylevel span { @apply text-end font-bold text-slate-500; }
+
+    /* مرور */
+    .pt-rv { @apply rounded-2xl bg-white p-4 shadow-card md:p-5; }
+    .pt-rv.is-wrong { @apply border-s-4 border-rose-400; }
+    .pt-rv.is-right { @apply border-s-4 border-emerald-400; }
+    .pt-rv__head { @apply flex items-center justify-between gap-3 text-xs font-extrabold; }
+    .pt-rv__tag { @apply rounded-full px-2.5 py-0.5; }
+    .pt-rv.is-right .pt-rv__tag { @apply bg-emerald-50 text-emerald-700; }
+    .pt-rv.is-wrong .pt-rv__tag { @apply bg-rose-50 text-rose-700; }
+    .pt-rv.is-skip .pt-rv__tag { @apply bg-slate-100 text-slate-500; }
+    .pt-rv__q { @apply mt-2 text-start text-base font-extrabold leading-8 text-brand-900; }
+    .pt-rv__opts { @apply mt-3 grid gap-2; }
+    .pt-rv__o { @apply flex items-center gap-2.5 rounded-xl border border-slate-200 px-3 py-2 text-start text-sm text-slate-600; }
+    .pt-rv__o em { @apply ms-auto text-[0.68rem] font-bold not-italic; }
+    .pt-rv__o.is-correct { @apply border-emerald-300 bg-emerald-50 text-emerald-900; }
+    .pt-rv__o.is-correct em { @apply text-emerald-700; }
+    .pt-rv__o.is-mine-wrong { @apply border-rose-300 bg-rose-50 text-rose-900; }
+    .pt-rv__o.is-mine-wrong em { @apply text-rose-700; }
+    .pt-rv__ex { @apply mt-3 rounded-xl bg-slate-50 px-3.5 py-2.5 text-start text-xs leading-6 text-slate-500; }
+    .pt-rv__ex b { @apply text-slate-600; }
+
     /* ---------- لیریک هم‌زمان (مرحله‌ی ۲) ----------
        وضعیت هر خط با data-state: next (هنوز نرسیده) | now (در حال خواندن) | past (گذشته یا بخش بی‌کلام)
        کلمه‌های خط جاری با کلاس is-sung رنگ می‌گیرند (js) */

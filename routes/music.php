@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
+use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WordsController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,9 @@ Route::middleware(['web'])->group(function () {
 
     // دیکشنری (بدون سطح‌بندی، الفبایی، جمع‌وجور)
     Route::get('/dictionary', [DictionaryController::class, 'index'])->name('dictionary.index');
+
+    // آزمون تعیین سطح (واژگان، گرامر، درک شنیداری)
+    Route::get('/level-test', [PlacementController::class, 'index'])->name('level-test.index');
 
     // لغات و عبارت‌های هایلایت‌شده‌ی کاربر
     Route::get('/words', [WordsController::class, 'index'])->name('words.index');
