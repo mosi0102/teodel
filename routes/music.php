@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
 use App\Http\Controllers\PlacementController;
@@ -10,11 +11,14 @@ use Illuminate\Support\Facades\Route;
 
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
- * مسیرهای دیگر (dashboard, words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
+ * مسیرهای دیگر (words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
  * Nav.php و لایه‌ها فقط با url() به آن‌ها لینک می‌دهند.
  */
 Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
+
+    // داشبورد کاربر (نمای کلی یادگیری)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // پروفایل کاربر (مشاهده / تکمیل / ویرایش + انتخاب آواتار)
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

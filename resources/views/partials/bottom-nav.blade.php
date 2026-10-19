@@ -78,3 +78,6 @@
         </div>
     </div>
 </div>
+
+{{-- تأیید خروج: برای همه‌ی فرم‌های /logout (مدیریت در logout-confirm.js) --}}
+@include('partials.logout-dialog')

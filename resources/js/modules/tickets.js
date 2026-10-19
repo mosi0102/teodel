@@ -698,4 +698,11 @@ $(function () {
     }
 
     renderList();
+
+    // /tickets?new=1 (از داشبورد): مستقیم فرم تیکت جدید باز شود
+    if (/[?&]new=1\b/.test(location.search)) {
+        resetForm();
+        setView('new', false);
+        history.replaceState({ tk: 'new' }, '');
+    }
 });

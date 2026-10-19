@@ -24,4 +24,6 @@ import './modules/profile';
 import './modules/dictionary';
 import './modules/level-test';
 import './modules/tickets';
+import './modules/dashboard';
+import './modules/logout-confirm';
 import './modules/progress-sync';
