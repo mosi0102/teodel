@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
 use App\Http\Controllers\PlacementController;
@@ -31,6 +32,10 @@ Route::middleware(['web'])->group(function () {
 
     // تیکت‌های پشتیبانی (لیست، تیکت جدید، گفتگو)
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+
+    // خرید اشتراک (لیست پلن‌ها + مودال تأیید) و نتیجه‌ی پرداخت
+    Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription.index');
+    Route::get('/subscription/result', [SubscriptionController::class, 'result'])->name('subscription.result');
 
     // لغات و عبارت‌های هایلایت‌شده‌ی کاربر
     Route::get('/words', [WordsController::class, 'index'])->name('words.index');

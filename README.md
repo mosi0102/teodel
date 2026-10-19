@@ -255,10 +255,27 @@ $(document).on('profile:submit', (e, payload) => {
 **رفتار** (`resources/js/modules/dashboard.js`): سلام بر اساس ساعت، پر شدن حلقه/نوار/نمودار با انیمیشن، شمارنده‌ها، تغییر هدف روزانه (۱۰/۲۰/۳۰/۴۵ دقیقه).
 - ذخیره‌ی هدف: `data-goal-url` (POST، JSON `{minutes}` + CSRF). رویداد `dashboard:goal`.
 - `LOCAL = true` فقط برای دمو (localStorage با کلید `teodel:dashboard:goal`)؛ هنگام وصل شدن بک‌اند خاموشش کنید.
-- لینک «تهیه‌ی اشتراک» به `/subscription` می‌رود (صفحه‌اش هنوز ساخته نشده).
+- لینک «تهیه‌ی اشتراک» به `/subscription` می‌رود (بخش بعد).
 - در `Nav` آیتم داشبورد را به `/dashboard` وصل کنید.
 
 **تأیید خروج**: `resources/js/modules/logout-confirm.js` همه‌ی فرم‌های `/logout` (تاپ‌بار، منوی «بیشتر» موبایل) را قبل از ارسال متوقف می‌کند و دیالوگ `partials/logout-dialog.blade.php` را نشان می‌دهد. «ماندن» = بستن بدون ارسال؛ «خروج» = ارسال فرم. دیالوگ از `bottom-nav` اینکلود می‌شود و به `@stack('modals')` در لایه نیاز دارد؛ اگر نبود، `confirm()` مرورگر جایگزین می‌شود.
+
+## خرید اشتراک (`/subscription`) و نتیجه‌ی پرداخت (`/subscription/result`)
+
+**جریان:** کارت پلن‌ها (رایگان، ۱ ماهه، ۶ ماهه (پیشنهادی)، ۱۲ ماهه) ← «خرید» ← مودال تأیید (خلاصه‌ی سفارش، تخفیف، مبلغ نهایی) ← «پرداخت» ← انتقال به درگاه ← برگشت به صفحه‌ی نتیجه (موفق / ناموفق / لغو).
+
+**قرارداد داده:** `app/Support/Subscription.php` — `plans()` (id, months, price, old_price, recommended, features)، `current()` (پلن فعلی + روز باقی‌مانده)، `demoResult()` (status, plan, amount, ref, bank_ref, paid_at, ends_at, message). متن پلن‌ها و ویژگی‌ها در `lang/*/subscription.php`.
+
+**🔌 بک‌اند — شروع پرداخت** (یکی از سه راه، توضیح کامل بالای `resources/js/modules/subscription.js`):
+1. `data-checkout-url` روی ریشه (با کلید `urls.checkout` از کنترلر): `POST {plan:'6m'}` + CSRF ← `200 {redirect}` یا `4xx {message}` (پیام داخل مودال نشان داده می‌شود).
+2. رویداد لغوشدنی `subscription:checkout` با `{plan, done(url), fail(msg)}`.
+3. جایگزین کردن `Teodel.subscription.api.checkout`.
+بدون هیچ‌کدام، حالت دمو مستقیم به نتیجه‌ی «موفق» می‌رود. مبلغ را همیشه سرور از روی شناسه‌ی پلن حساب کند.
+
+**برگشت از درگاه:** بک‌اند تراکنش را verify کند و `GET /subscription/result` را با `$result` رندر کند (`SubscriptionController::result` فعلاً دمو است: `?status=success|failed|cancelled&plan=6m`).
+- نتیجه‌ی ناموفق: دکمه‌ی «تلاش دوباره» به `/subscription` و «تماس با پشتیبانی» به `/tickets?new=1`.
+- نتیجه‌ی موفق: کد پیگیری با دکمه‌ی کپی، تاریخ شمسی پرداخت و پایان اشتراک.
+- پلن فعلی (`current`): بنر «اشتراک فعال» و دکمه‌ی «تمدید» به‌جای «خرید».
 
 ## پیشرفت داینامیک (۰ تا ۱۰۰)
 
