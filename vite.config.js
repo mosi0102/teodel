@@ -8,8 +8,10 @@ export default defineConfig({
             input: [
                 'resources/css/fonts.css',
                 'resources/css/app.css',
+                'resources/css/admin.css', // فقط پنل مدیریت
                 'resources/css/custom.css', // آخر، تا استایل‌های شخصی شما برنده باشد
                 'resources/js/app.js',
+                'resources/js/admin.js', // فقط پنل مدیریت
             ],
             refresh: true,
         }),

@@ -58,7 +58,7 @@ header
     justify-content: center;
     height: 100%;
 }
-.btn-primary
+.btn-primary, .btn-ghost
 {
     border-radius: 50px;
 }

@@ -9,6 +9,12 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WordsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\SongController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\SongController as AdminSongController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+
 
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
@@ -44,3 +50,14 @@ Route::middleware(['web'])->group(function () {
     Route::get('/music/{id}', [MusicController::class, 'show'])->whereNumber('id')->name('music.show');
     Route::get('/music/{id}/step/{step}', [MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
 });
+
+Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}', [UserController::class, 'show'])->whereNumber('id')->name('users.show');
+    Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
+    Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
+    Route::get('/songs/{id}/edit', [SongController::class, 'edit'])->whereNumber('id')->name('songs.edit');
+    Route::get('/kit', [DashboardController::class, 'kit'])->name('kit');
+});
+
