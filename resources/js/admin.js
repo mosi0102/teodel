@@ -10,3 +10,5 @@ import './admin/dashboard';
 import './admin/ai';
 import './admin/users';
 import './admin/song';
+import './admin/placement';
+import './admin/dictionary';

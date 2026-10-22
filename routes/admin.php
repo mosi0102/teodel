@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\QuestionBankController;
 use App\Http\Controllers\Admin\SongController as AdminSongController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\WordController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,5 +21,13 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/songs', [AdminSongController::class, 'index'])->name('songs.index');
     Route::get('/songs/create', [AdminSongController::class, 'create'])->name('songs.create');
     Route::get('/songs/{id}/edit', [AdminSongController::class, 'edit'])->whereNumber('id')->name('songs.edit');
+    // بانک سؤال آزمون تعیین سطح
+    Route::get('/placement', [QuestionBankController::class, 'index'])->name('placement.index');
+    Route::get('/placement/create', [QuestionBankController::class, 'create'])->name('placement.create');
+    Route::get('/placement/{id}/edit', [QuestionBankController::class, 'edit'])->whereNumber('id')->name('placement.edit');
+    // مدیریت دیکشنری
+    Route::get('/dictionary', [WordController::class, 'index'])->name('dictionary.index');
+    Route::get('/dictionary/create', [WordController::class, 'create'])->name('dictionary.create');
+    Route::get('/dictionary/{id}/edit', [WordController::class, 'edit'])->whereNumber('id')->name('dictionary.edit');
     Route::get('/kit', [AdminDashboardController::class, 'kit'])->name('kit');
 });

@@ -55,6 +55,28 @@ const demoText = {
 const API = (window.Teodel = window.Teodel || {});
 API.admin = API.admin || {};
 API.admin.ai = API.admin.ai || {};
+API.admin.ai.demos = API.admin.ai.demos || {};
+
+/**
+ * درخواست برنامه‌ای (برای بخش‌های لیستی مثل لغت‌ها، تمرین‌ها، ترجمه‌ی لیریک): همان قرارداد بک‌اند را دارد.
+ *   Teodel.admin.ai.request(payload, { url, demo }) ← { fields, missing }
+ * اولویت: رویداد admin:ai-generate ← Teodel.admin.ai.generate ← POST به url ← demo()
+ */
+API.admin.ai.request = async function (payload, opts = {}) {
+    const ev = $.Event('admin:ai-generate');
+    const viaEvent = await new Promise((resolve) => {
+        const done = (r) => resolve({ ok: r });
+        const fail = (m) => resolve({ err: m });
+        $(document).trigger(ev, { kind: payload.kind, payload, done, fail });
+        if (!ev.isDefaultPrevented()) resolve(null);
+    });
+    if (viaEvent) { if (viaEvent.err !== undefined) throw { message: viaEvent.err }; return viaEvent.ok; }
+    if (typeof API.admin.ai.generate === 'function') return API.admin.ai.generate(payload);
+    if (opts.url) return send(opts.url, payload);
+    await new Promise((r) => setTimeout(r, 500));
+    if (typeof API.admin.ai.demos[payload.kind] === 'function') return API.admin.ai.demos[payload.kind](payload);
+    return opts.demo ? opts.demo() : { fields: {}, missing: [] };
+};
 
 $(function () {
     const $dlg = $('#ad-ai');
@@ -102,8 +124,9 @@ $(function () {
         if (viaEvent) { if (viaEvent.err !== undefined) throw { message: viaEvent.err }; return viaEvent.ok; }
         if (typeof API.admin.ai.generate === 'function') return API.admin.ai.generate(payload);
         if (ctx && ctx.url) return send(ctx.url, payload);
-        // حالت دمو
+        // حالت دمو (هر بخش می‌تواند Teodel.admin.ai.demos[kind] = (payload) => ({fields, missing}) ثبت کند)
         await new Promise((r) => setTimeout(r, 650));
+        if (typeof API.admin.ai.demos[ctx && ctx.kind] === 'function') return API.admin.ai.demos[ctx.kind](payload);
         const out = {};
         const missing = [];
         payload.fields.forEach((f) => {
@@ -118,26 +141,6 @@ $(function () {
         });
         return { fields: out, missing };
     }
-
-    /**
-     * درخواست برنامه‌ای (برای بخش‌های لیستی مثل لغت‌ها، تمرین‌ها، ترجمه‌ی لیریک): همان قرارداد بک‌اند را دارد.
-     *   Teodel.admin.ai.request(payload, { url, demo }) ← { fields, missing }
-     * اولویت: رویداد admin:ai-generate ← Teodel.admin.ai.generate ← POST به url ← demo()
-     */
-    API.admin.ai.request = async function (payload, opts = {}) {
-        const ev = $.Event('admin:ai-generate');
-        const viaEvent = await new Promise((resolve) => {
-            const done = (r) => resolve({ ok: r });
-            const fail = (m) => resolve({ err: m });
-            $(document).trigger(ev, { kind: payload.kind, payload, done, fail });
-            if (!ev.isDefaultPrevented()) resolve(null);
-        });
-        if (viaEvent) { if (viaEvent.err !== undefined) throw { message: viaEvent.err }; return viaEvent.ok; }
-        if (typeof API.admin.ai.generate === 'function') return API.admin.ai.generate(payload);
-        if (opts.url) return send(opts.url, payload);
-        await new Promise((r) => setTimeout(r, 500));
-        return opts.demo ? opts.demo() : { fields: {}, missing: [] };
-    };
 
     function renderSeeds() {
         $seeds.empty();
@@ -253,22 +256,29 @@ $(function () {
     // با ویرایش دستی، علامت AI برداشته می‌شود
     $(document).on('input', '[data-ai-form] .is-ai [name]', function () { $(this).closest('.ad-field').removeClass('is-ai'); });
 
-    // ساخت فقط یک فیلد
+    // ساخت فقط یک فیلد (یا چند فیلد: data-ai-one="o1,o2,o3,o4,answer")
     $(document).on('click', '[data-ai-one]', async function () {
         const $b = $(this);
         const $form = $b.closest('[data-ai-form]');
-        const name = $b.attr('data-ai-one');
+        const names = ($b.attr('data-ai-one') || '').split(',').map((x) => x.trim()).filter(Boolean);
         const seedNames = ($b.attr('data-ai-seeds') || $form.find('[data-ai-open]').first().attr('data-ai-seeds') || '').split(',').map((x) => x.trim()).filter(Boolean);
         const seeds = {};
         seedNames.forEach((n) => (seeds[n] = valueOf($form, n)));
         if (!Object.values(seeds).some(Boolean)) { toast(tr('empty_seed'), true); return; }
-        ctx = { $form, kind: $form.attr('data-ai-form'), url: $form.attr('data-ai-url') || '', seeds: seedNames, fields: [name] };
+        ctx = { $form, kind: $form.attr('data-ai-form'), url: $form.attr('data-ai-url') || '', seeds: seedNames, fields: names };
         $b.prop('disabled', true).addClass('is-busy');
         try {
-            const r = await generate({ kind: ctx.kind, seeds, fields: [name], note: '', current: currentOf($form), locale: document.documentElement.lang }, ctx.kind);
-            const v = r && r.fields && r.fields[name];
-            if (v == null || v === '') { $field($form, name).closest('.ad-field').addClass('is-missing'); toast(tr('missing_title'), true); }
-            else { setVal($form, name, v); mark($form, name, true); toast(tr('applied', { n: 1 })); $form.trigger('admin:ai-applied', { kind: ctx.kind, fields: [name] }); }
+            const r = await generate({ kind: ctx.kind, seeds, fields: names, note: '', current: currentOf($form), locale: document.documentElement.lang }, ctx.kind);
+            const done = [];
+            names.forEach((name) => {
+                const v = r && r.fields && r.fields[name];
+                if (v == null || v === '') { $field($form, name).closest('.ad-field').addClass('is-missing'); return; }
+                setVal($form, name, v);
+                mark($form, name, true);
+                done.push(name);
+            });
+            if (!done.length) toast(tr('missing_title'), true);
+            else { toast(tr('applied', { n: done.length })); $form.trigger('admin:ai-applied', { kind: ctx.kind, fields: done }); $(document).trigger('admin:ai-applied', { kind: ctx.kind, fields: done }); }
         } catch (e) {
             toast((e && e.message) || tr('error'), true);
         } finally {
