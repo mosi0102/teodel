@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BillingController;
+use App\Http\Controllers\Admin\BugReportController;
 use App\Http\Controllers\Admin\QuestionBankController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SongController as AdminSongController;
 use App\Http\Controllers\Admin\TicketDeskController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -40,4 +42,9 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     // تیکت‌ها
     Route::get('/tickets', [TicketDeskController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/{id}', [TicketDeskController::class, 'show'])->whereNumber('id')->name('tickets.show');
+    // گزارش خطا
+    Route::get('/reports', [BugReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{id}', [BugReportController::class, 'show'])->whereNumber('id')->name('reports.show');
+    // تنظیمات
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 });

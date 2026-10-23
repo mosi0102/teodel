@@ -14,3 +14,5 @@ import './admin/placement';
 import './admin/dictionary';
 import './admin/billing';
 import './admin/desk';
+import './admin/report';
+import './admin/settings';

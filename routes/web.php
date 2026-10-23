@@ -18,7 +18,8 @@ use App\Http\Controllers\Admin\WordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TicketDeskController;
-
+use App\Http\Controllers\Admin\BugReportController;
+use App\Http\Controllers\Admin\SettingsController;
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
  * مسیرهای دیگر (words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
@@ -53,7 +54,6 @@ Route::middleware(['web'])->group(function () {
     Route::get('/music/{id}', [MusicController::class, 'show'])->whereNumber('id')->name('music.show');
     Route::get('/music/{id}/step/{step}', [MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
 });
-
 Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
@@ -78,5 +78,9 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     // تیکت‌ها
     Route::get('/tickets', [TicketDeskController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/{id}', [TicketDeskController::class, 'show'])->whereNumber('id')->name('tickets.show');
+    // گزارش خطا
+    Route::get('/reports', [BugReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{id}', [BugReportController::class, 'show'])->whereNumber('id')->name('reports.show');
+    // تنظیمات
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 });
-
