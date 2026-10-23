@@ -486,12 +486,12 @@ a.ad-user:hover b { @apply text-brand-700; }
 .is-busy [data-bt-spin] { @apply inline-flex; }
 
 /* ═════ مدیریت دیکشنری (dc-*) ═════ */
-.dc-stats { @apply grid grid-cols-2 gap-3 lg:grid-cols-4; }
-.dc-stat { @apply block rounded-2xl border border-slate-100 bg-white p-4 text-start shadow-sm; }
-.dc-stat.is-link { @apply cursor-pointer transition duration-200 hover:border-brand-200 hover:bg-brand-50/30; }
-.dc-stat__l { @apply block text-xs font-extrabold text-slate-400; }
-.dc-stat__v { @apply mt-1 block text-2xl font-extrabold tabular-nums text-brand-900; }
-.dc-stat__s { @apply mt-0.5 block text-xs font-bold text-slate-400; }
+.dc-stats, .ad-stats { @apply grid grid-cols-2 gap-3 lg:grid-cols-4; }
+.dc-stat, .ad-stat { @apply block rounded-2xl border border-slate-100 bg-white p-4 text-start shadow-sm; }
+.dc-stat.is-link, .ad-stat.is-link { @apply cursor-pointer transition duration-200 hover:border-brand-200 hover:bg-brand-50/30; }
+.dc-stat__l, .ad-stat__l { @apply block text-xs font-extrabold text-slate-400; }
+.dc-stat__v, .ad-stat__v { @apply mt-1 block text-2xl font-extrabold tabular-nums text-brand-900; }
+.dc-stat__s, .ad-stat__s { @apply mt-0.5 block text-xs font-bold text-slate-400; }
 .dc-bar { @apply relative mt-3 block h-1.5 overflow-hidden rounded-full bg-slate-100; }
 .dc-bar::after { content: ''; width: var(--p, 0%); transition: width 0.5s ease; @apply absolute inset-y-0 start-0 rounded-full bg-brand-600; }
 @media (prefers-reduced-motion: reduce) { .dc-bar::after { transition: none; } }
@@ -533,3 +533,49 @@ a.ad-user:hover b { @apply text-brand-700; }
 .dc-pv__chips li { @apply rounded-full bg-emerald-50 px-2.5 py-0.5 font-bold text-emerald-700; }
 .dc-pv__chips.is-ant li { @apply bg-rose-50 text-rose-600; }
 .dc-pv [hidden], .dc-pv__ipa[hidden], .dc-pv__chips[hidden] { display: none; }
+
+/* ═════ زبانه‌های بخش (ad-tabs) ═════ */
+.ad-tabs { @apply flex gap-1 overflow-x-auto border-b border-slate-100; scrollbar-width: none; }
+.ad-tabs::-webkit-scrollbar { display: none; }
+.ad-tabs a { @apply relative shrink-0 px-4 py-2.5 text-sm font-extrabold text-slate-400 transition-colors duration-200 hover:text-brand-700; }
+.ad-tabs a[aria-current='page'] { @apply text-brand-700; }
+.ad-tabs a[aria-current='page']::after { content: ''; @apply absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-brand-700; }
+
+/* ═════ اشتراک و پرداخت‌ها (bl-*) ═════ */
+.bl-tl { @apply mt-2 space-y-0; }
+.bl-tl li { @apply relative flex flex-col gap-0.5 border-s-2 border-slate-100 pb-3 ps-4 text-sm last:pb-0; }
+.bl-tl li::before { content: ''; @apply absolute -start-[0.4rem] top-1 size-3 rounded-full border-2 border-white bg-slate-300; }
+.bl-tl li[data-k='verified']::before { @apply bg-emerald-500; }
+.bl-tl li[data-k='failed']::before, .bl-tl li[data-k='refunded']::before { @apply bg-rose-500; }
+.bl-tl li[data-k='cancelled']::before { @apply bg-amber-400; }
+.bl-tl b { @apply font-extrabold text-slate-700; }
+.bl-tl small { @apply text-xs text-slate-400; }
+.bl-confirm { @apply mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5; }
+.bl-confirm[hidden], [data-bl-acts][hidden], [data-bl-close-row][hidden] { display: none; }
+.bl-plans { @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4; }
+.bl-plan { @apply transition-opacity duration-200; }
+.bl-plan.is-free { @apply bg-slate-50/60; }
+.bl-plan.is-off { @apply opacity-60; }
+.bl-plan__calc { @apply mt-2 min-h-5 text-xs font-bold text-emerald-700; }
+
+/* ═════ تیکت‌ها (td-*) ═════ */
+.td-thread { @apply space-y-3; }
+.td-msg { @apply max-w-[92%] rounded-2xl rounded-ss-md border border-slate-100 bg-slate-50 px-4 py-3 md:max-w-[82%]; }
+.td-msg[data-from='support'] { @apply ms-auto rounded-ss-2xl rounded-se-md border-brand-100 bg-brand-50/70; }
+.td-msg[data-from='note'] { @apply ms-auto rounded-ss-2xl border-dashed border-amber-300 bg-amber-50/70; }
+.td-msg__h { @apply mb-1 flex flex-wrap items-center gap-2 text-xs; }
+.td-msg__h b { @apply font-extrabold text-brand-900; }
+.td-msg__h time { @apply ms-auto text-slate-400; }
+.td-msg__t { @apply whitespace-pre-line break-words text-sm leading-7 text-slate-700; }
+.td-files { @apply mt-2 flex flex-wrap gap-1.5; }
+.td-files a { @apply inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-bold text-brand-700 ring-1 ring-slate-200 transition duration-200 hover:ring-brand-300; }
+.td-composer { @apply mt-5 border-t border-slate-100 pt-4; }
+.td-composer.is-note .field { @apply border-amber-300 bg-amber-50/50; }
+.td-composer[hidden], .td-closed[hidden] { display: none; }
+.td-composer__bar { @apply mt-3 flex flex-wrap items-center justify-between gap-3; }
+.td-chips { @apply mt-2 flex flex-wrap gap-1.5; }
+.td-chip { @apply inline-flex max-w-full items-center gap-2 rounded-full bg-slate-100 py-1 pe-1 ps-3 text-xs font-bold text-slate-600; }
+.td-chip small { @apply text-slate-400; }
+.td-chip button { @apply grid size-5 place-items-center rounded-full bg-white text-sm leading-none text-slate-500 transition duration-200 hover:bg-rose-50 hover:text-rose-600; }
+.td-closed { @apply mt-5 rounded-2xl bg-slate-50 px-4 py-3 text-center text-sm font-bold text-slate-500; }
+.td-other { @apply flex items-center justify-between gap-2 rounded-xl px-2 py-2 text-sm font-bold text-slate-600 transition-colors duration-200 hover:bg-slate-50; }

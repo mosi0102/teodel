@@ -12,3 +12,5 @@ import './admin/users';
 import './admin/song';
 import './admin/placement';
 import './admin/dictionary';
+import './admin/billing';
+import './admin/desk';

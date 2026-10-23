@@ -16,7 +16,8 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\QuestionBankController;
 use App\Http\Controllers\Admin\WordController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Admin\BillingController;
+use App\Http\Controllers\Admin\TicketDeskController;
 
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
@@ -69,5 +70,13 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dictionary/create', [WordController::class, 'create'])->name('dictionary.create');
     Route::get('/dictionary/{id}/edit', [WordController::class, 'edit'])->whereNumber('id')->name('dictionary.edit');
     Route::get('/kit', [AdminDashboardController::class, 'kit'])->name('kit');
+
+    // اشتراک و پرداخت‌ها
+    Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');
+    Route::get('/billing/plans', [BillingController::class, 'plans'])->name('billing.plans');
+
+    // تیکت‌ها
+    Route::get('/tickets', [TicketDeskController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{id}', [TicketDeskController::class, 'show'])->whereNumber('id')->name('tickets.show');
 });
 
