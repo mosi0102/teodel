@@ -18,13 +18,19 @@ use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TicketDeskController;
 use App\Http\Controllers\Admin\BugReportController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\AuthPageController;
+use App\Http\Controllers\SitePageController;
 
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
  * مسیرهای دیگر (words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
  * Nav.php و لایه‌ها فقط با url() به آن‌ها لینک می‌دهند.
  */
+Route::middleware(['web'])->group(function () {
+    Route::get('/', [SitePageController::class, 'home'])->name('home');
+    Route::get('/faq', [SitePageController::class, 'faq'])->name('faq');
+    Route::get('/terms', [SitePageController::class, 'terms'])->name('terms');
+});
+
 Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
 
@@ -86,8 +92,7 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
 });
 
 // ورود و ثبت‌نام (/login و /register) — با میدل‌ور guest داخل خود فایل
-require __DIR__ . '/auth.php';
-Route::middleware(['web', 'guest'])->group(function () {
-    Route::get('/login', [AuthPageController::class, 'show'])->defaults('mode', 'login')->name('login');
-    Route::get('/register', [AuthPageController::class, 'show'])->defaults('mode', 'register')->name('register');
-});
+require __DIR__.'/auth.php';
+
+// صفحه‌های عمومی: نخست (/)، سوالات متداول (/faq)
+require __DIR__.'/site.php';

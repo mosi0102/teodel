@@ -1,0 +1,202 @@
+/* صفحه‌های عمومی (st-*): نخست، سوالات متداول، قوانین. فقط با layouts/site لود می‌شود.
+   مثل admin.css/auth.css با @apply نوشته شده؛ رنگ‌ها از brand-* (قابل تغییر در custom.css).
+   حرکت‌ها فقط transform/opacity و با prefers-reduced-motion خاموش می‌شوند.
+   ⚠️ نام کلاس‌های ابزاری تیلویند (grid، flex …) را در انتخابگر قاعده‌ی دیگری که @apply دارد نیاورید (خطای circular dependency). */
+
+.st-body { @apply min-h-dvh bg-[#f4f5fa] text-slate-700 antialiased; }
+.st-skip { @apply sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-brand-700 focus:shadow-lift; }
+.st-main { @apply outline-none; }
+.st-wrap { @apply mx-auto w-full max-w-6xl px-4 md:px-6; }
+.st-sec { @apply py-8 md:py-12; scroll-margin-top: 5.5rem; }
+.st-sec--tight { @apply py-4 md:py-6; }
+.st-page { @apply pb-12 pt-8 md:pt-12; }
+
+/* ───────── هدر ───────── */
+.st-head { @apply sticky top-0 z-40 px-3 pt-3 md:px-6 md:pt-4; }
+.st-head__bar { @apply mx-auto flex max-w-6xl items-center gap-2 rounded-2xl bg-white/90 px-3 py-2 shadow-card backdrop-blur-md md:gap-4 md:px-5; }
+.st-head.is-stuck .st-head__bar { @apply shadow-lift; }
+.st-logo { @apply inline-flex shrink-0 items-center rounded-xl outline-offset-4; }
+.st-wordmark { @apply inline-flex items-center gap-2.5; }
+.st-wordmark__ic { @apply grid size-9 place-items-center rounded-xl bg-brand-700 text-white; }
+.st-wordmark__t { @apply flex flex-col leading-none; }
+.st-wordmark__t b { @apply text-lg font-extrabold text-brand-900; }
+.st-wordmark__t small { @apply mt-1 hidden text-[0.6rem] font-bold tracking-wide text-slate-400 sm:block; }
+.st-nav { @apply hidden flex-1 items-center justify-center gap-0.5 lg:flex; }
+.st-nav__a { @apply rounded-full px-3 py-2 text-sm font-bold text-slate-500 transition-colors duration-200 hover:bg-brand-50 hover:text-brand-700; }
+.st-nav__a[aria-current='page'], .st-nav__a.is-on { @apply bg-brand-50 text-brand-700; }
+.st-head__acts { @apply ms-auto flex items-center gap-2 lg:ms-0; }
+.st-lang { @apply inline-flex min-h-10 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-600 transition duration-200 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-95; }
+.st-lang--wide { @apply w-full justify-center text-sm; }
+.st-login { @apply hidden min-h-10 items-center rounded-full px-3 text-sm font-bold text-slate-600 transition-colors duration-200 hover:text-brand-700 md:inline-flex; }
+.st-cta { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-extrabold text-white shadow-card transition duration-200 hover:-translate-y-0.5 hover:bg-brand-800 hover:shadow-lift active:translate-y-0 active:scale-[.98]; }
+.st-cta--head { @apply hidden min-h-10 px-5 md:inline-flex; }
+.st-cta--lg { @apply min-h-12 px-7 text-base; }
+.st-ghost { @apply inline-flex min-h-12 items-center rounded-full px-5 text-sm font-bold text-brand-700 transition duration-200 hover:bg-white active:scale-[.98]; }
+.st-burger { @apply grid size-10 place-items-center rounded-full bg-slate-100 text-slate-600 transition duration-200 hover:bg-brand-50 hover:text-brand-700 active:scale-95 lg:hidden; }
+
+/* منوی موبایل */
+.st-sheet { @apply fixed inset-0 z-50; }
+.st-sheet[hidden] { display: none; }
+.st-sheet__bg { @apply absolute inset-0 bg-brand-900/40 backdrop-blur-[2px]; animation: st-fade 0.2s ease-out both; }
+.st-sheet__panel { @apply absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-lift; animation: st-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.st-sheet__top { @apply mb-3 flex items-center justify-between; }
+.st-sheet__nav { @apply flex flex-col; }
+.st-sheet__nav a { @apply flex min-h-12 items-center rounded-xl px-3 text-base font-bold text-slate-600 transition-colors duration-200 hover:bg-brand-50 hover:text-brand-700; }
+.st-sheet__nav a[aria-current='page'] { @apply bg-brand-50 text-brand-700; }
+.st-sheet__acts { @apply mt-4 flex flex-col gap-2.5 border-t border-slate-100 pt-4; }
+html.st-sheet-open { overflow: hidden; }
+@keyframes st-fade { from { opacity: 0; } }
+@keyframes st-up { from { transform: translateY(100%); } }
+
+/* ───────── تیترها ───────── */
+.st-sec__h { @apply mb-6 md:mb-8; }
+.st-h2 { @apply flex items-center gap-2.5 text-xl font-extrabold leading-9 text-brand-900 md:text-2xl; }
+.st-h2__dots { @apply block size-4 shrink-0; background:
+    linear-gradient(rgb(var(--brand-700)) 0 0) 0 0 / 46% 46% no-repeat,
+    linear-gradient(rgb(var(--brand-700)) 0 0) 100% 0 / 46% 46% no-repeat,
+    linear-gradient(rgb(var(--brand-700)) 0 0) 0 100% / 46% 46% no-repeat,
+    linear-gradient(rgb(var(--brand-300)) 0 0) 100% 100% / 46% 46% no-repeat; }
+.st-lead { @apply mt-2 max-w-2xl text-sm leading-7 text-slate-500 md:text-base md:leading-8; }
+.st-eyebrow { @apply inline-flex items-center gap-2 text-xs font-bold text-slate-500 md:text-sm; }
+
+/* ───────── هیرو ───────── */
+.st-hero { @apply grid items-center gap-6 pb-6 pt-8 md:pt-10 lg:grid-cols-2 lg:gap-10 lg:pb-12 lg:pt-14; }
+.st-hero__txt { @apply flex flex-col items-start; }
+.st-hero__t { @apply mt-3 text-4xl font-extrabold leading-[1.45] text-brand-900 md:text-5xl md:leading-[1.4]; }
+.st-hero__p { @apply mt-4 max-w-md text-sm leading-8 text-slate-500 md:text-base; }
+.st-hero__acts { @apply mt-6 flex flex-wrap items-center gap-2; }
+.st-chips { @apply mt-6 flex flex-wrap gap-2; }
+.st-chips li { @apply inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm; }
+.st-chips svg { @apply text-emerald-500; }
+.st-hero__art { @apply relative mx-auto w-full max-w-md lg:max-w-none; }
+.st-hero__glow { @apply pointer-events-none absolute inset-6 rounded-full bg-gradient-to-br from-brand-200/70 to-violet-200/60 blur-3xl; }
+.st-hero__art > img, .st-hero__art > svg { @apply relative mx-auto block h-auto w-full max-w-md; }
+.st-float { animation: st-float 6s ease-in-out infinite; }
+@keyframes st-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* جایگزین موقت هیرو (وقتی تصویر اصلی نیست): چهار شخصیت */
+.st-cluster { @apply relative mx-auto aspect-[6/5] w-full max-w-md; }
+.st-cluster > svg { @apply absolute h-auto; animation: st-float 6s ease-in-out infinite; }
+.st-cluster > svg:nth-child(1) { inset-inline-start: 4%; top: 20%; width: 34%; animation-delay: -1s; }
+.st-cluster > svg:nth-child(2) { inset-inline-start: 33%; top: 0; width: 36%; animation-delay: -2.5s; }
+.st-cluster > svg:nth-child(3) { inset-inline-end: 4%; top: 22%; width: 34%; animation-delay: -4s; }
+.st-cluster > svg:nth-child(4) { inset-inline-start: 31%; bottom: 0; width: 38%; animation-delay: -5s; }
+
+/* ───────── تئودل چیست؟ ───────── */
+.st-about { @apply grid gap-6 rounded-3xl bg-white p-5 shadow-card md:grid-cols-2 md:gap-10 md:p-8; }
+.st-about__p { @apply mt-3 text-sm leading-8 text-slate-600 md:text-base md:leading-9; }
+.st-about__sub { @apply mb-3 text-base font-extrabold text-brand-900; }
+.st-about__grid { @apply grid grid-cols-1 gap-2.5 sm:grid-cols-2; }
+.st-about__grid li { @apply flex items-start gap-3 rounded-2xl bg-slate-50 p-3.5; }
+.st-about__ic { @apply grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700; }
+.st-about__grid b { @apply block text-sm font-extrabold text-brand-900; }
+.st-about__grid small { @apply mt-0.5 block text-xs leading-6 text-slate-500; }
+
+/* ───────── ویژگی‌ها ───────── */
+.st-feats { @apply grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5; }
+.st-feat { @apply flex flex-col items-center rounded-3xl bg-white p-4 text-center shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-lift md:p-6; }
+.st-feat__art { @apply grid size-24 place-items-center md:size-28; }
+.st-feat__art > img, .st-feat__art > svg { @apply h-full w-auto max-w-full object-contain; }
+.st-feat h3 { @apply mt-3 text-sm font-extrabold leading-7 text-brand-900 md:text-base; }
+.st-feat p { @apply mt-1.5 text-xs leading-6 text-slate-500 md:text-sm md:leading-7; }
+
+/* ───────── راهنما ───────── */
+.st-steps { @apply grid gap-3 md:grid-cols-4 md:gap-5; }
+.st-step { @apply relative grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 rounded-3xl bg-white p-4 shadow-card md:flex md:flex-col md:bg-transparent md:p-0 md:text-center md:shadow-none; }
+.st-step__art { @apply relative row-span-2 grid size-[4.5rem] place-items-center md:size-28; }
+.st-step__art > img, .st-step__art > svg { @apply h-full w-auto max-w-full object-contain; }
+.st-step__n { @apply absolute -end-1 -top-1 grid size-6 place-items-center rounded-full bg-brand-700 text-[0.7rem] font-extrabold text-white ring-2 ring-[#f4f5fa]; }
+.st-step h3 { @apply self-end text-sm font-extrabold text-brand-900 md:mt-3 md:text-base; }
+.st-step p { @apply text-xs leading-6 text-slate-500 md:mt-1.5 md:text-sm md:leading-7; }
+.st-step:not(:last-child)::after { content: ''; @apply pointer-events-none absolute hidden border-t-2 border-dashed border-brand-200 md:block; top: 3rem; inset-inline-start: calc(50% + 3.5rem); width: calc(100% - 7rem + 1.25rem); }
+
+/* ───────── نظرات ───────── */
+.st-revs { @apply grid items-start gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-4; }
+.st-rev { @apply rounded-3xl bg-white p-4 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-lift md:p-5; }
+.st-rev__top { @apply flex items-center gap-3; }
+.st-rev__av { @apply size-11 shrink-0 rounded-full bg-brand-50 object-cover; }
+.st-rev__top b { @apply block truncate text-sm font-extrabold text-brand-900; }
+.st-rev__top small { @apply block text-xs font-medium text-slate-400; }
+.st-rev p { @apply mt-3 text-sm leading-7 text-slate-600; }
+
+/* بخش جمع‌شونده (نظرات و متن سئو): بدون JS کامل باز است؛ با JS تا ارتفاع مشخص جمع می‌شود */
+.st-fold { @apply relative; }
+.st-js .st-fold:not(.is-open) .st-revs { @apply max-h-[21rem] overflow-hidden md:max-h-[19rem]; }
+.st-js .st-fold:not(.is-open) .st-seo__body { @apply max-h-36 overflow-hidden; }
+.st-fold__more { @apply flex justify-center; }
+.st-js .st-fold.is-fit .st-fold__more { display: none; }
+.st-js .st-fold:not(.is-open):not(.is-fit) .st-fold__more { @apply relative z-10 -mt-20 items-end pb-1 pt-16; background: linear-gradient(to top, var(--st-fade, #f4f5fa) 45%, transparent); }
+.st-seo { --st-fade: #fff; }
+.st-more { @apply inline-flex min-h-10 items-center gap-1.5 rounded-full bg-white px-4 text-xs font-extrabold text-brand-700 shadow-card transition duration-200 hover:shadow-lift active:scale-95; }
+.st-more svg { @apply transition-transform duration-200; }
+.st-more[aria-expanded='true'] svg { @apply rotate-180; }
+
+/* ───────── اینستاگرام ───────── */
+.st-insta { @apply flex flex-col items-center gap-4 rounded-3xl bg-gradient-to-r from-brand-700 via-violet-600 to-fuchsia-600 p-6 text-center text-white shadow-card md:flex-row md:justify-between md:p-8 md:text-start; }
+.st-insta p { @apply max-w-xl text-base font-extrabold leading-8 md:text-lg; }
+.st-insta__btn { @apply inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-extrabold text-brand-700 transition duration-200 hover:-translate-y-0.5 hover:shadow-lift active:scale-[.98]; }
+
+/* ───────── سوالات ───────── */
+.st-faq { @apply flex flex-col gap-2.5; }
+.st-q { @apply rounded-2xl bg-white shadow-card transition-shadow duration-200 hover:shadow-lift; }
+.st-q summary { @apply flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-extrabold leading-7 text-brand-900 md:px-5 md:text-base; }
+.st-q summary::-webkit-details-marker { display: none; }
+.st-q__ic { @apply grid size-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 transition duration-200; }
+.st-q[open] .st-q__ic { @apply rotate-180 bg-brand-50 text-brand-700; }
+.st-q__a { @apply px-4 pb-4 md:px-5; animation: st-fade 0.25s ease-out both; }
+.st-q__a p { @apply text-sm leading-8 text-slate-600 md:text-base md:leading-9; }
+.st-faq__foot { @apply mt-6 flex flex-wrap items-center justify-center gap-3 text-center; }
+.st-faq__foot p { @apply w-full text-sm font-bold text-slate-500; }
+.st-link { @apply inline-flex min-h-10 items-center text-sm font-bold text-brand-700 hover:underline; }
+
+/* ───────── متن سئو ───────── */
+.st-seo { @apply rounded-3xl bg-white p-5 shadow-card md:p-8; }
+.st-seo__body { @apply mt-4 space-y-3 text-sm leading-8 text-slate-500 md:text-base md:leading-9; }
+
+/* ───────── قوانین و مقررات ───────── */
+.st-upd { @apply mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-500 shadow-sm; }
+.st-terms { @apply grid items-start gap-4 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-8; }
+.st-toc { @apply lg:sticky lg:top-24; }
+.st-toc__box { @apply rounded-3xl bg-white p-3 shadow-card; }
+.st-toc__box summary { @apply flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 px-2 text-sm font-extrabold text-brand-900 lg:pointer-events-none; }
+.st-toc__box summary::-webkit-details-marker { display: none; }
+.st-toc__box summary svg { @apply text-slate-400 transition-transform duration-200 lg:hidden; }
+.st-toc__box[open] summary svg { @apply rotate-180; }
+.st-toc ol { @apply mt-1 max-h-[60dvh] space-y-0.5 overflow-y-auto lg:max-h-[calc(100dvh-14rem)]; }
+.st-toc a { @apply flex min-h-9 items-center gap-2.5 rounded-xl px-2 text-sm font-medium text-slate-500 transition-colors duration-200 hover:bg-brand-50 hover:text-brand-700; }
+.st-toc a b { @apply grid size-6 shrink-0 place-items-center rounded-full bg-slate-100 text-[0.7rem] font-extrabold text-slate-500; }
+.st-toc a.is-on { @apply bg-brand-50 font-bold text-brand-700; }
+.st-toc a.is-on b { @apply bg-brand-700 text-white; }
+.st-doc { @apply flex flex-col gap-3; }
+.st-doc__s { @apply rounded-3xl bg-white p-5 shadow-card md:p-7; scroll-margin-top: 6rem; }
+.st-doc__s h2 { @apply mb-3 flex items-center gap-3 text-base font-extrabold leading-8 text-brand-900 md:text-lg; }
+.st-doc__s h2 b { @apply grid size-8 shrink-0 place-items-center rounded-full bg-brand-50 text-sm text-brand-700; }
+.st-doc__s p { @apply text-sm leading-8 text-slate-600 md:text-base md:leading-9; }
+.st-doc__s p + p, .st-doc__s p + ul { @apply mt-2.5; }
+.st-doc__s ul { @apply space-y-1.5 ps-1; }
+.st-doc__s li { @apply relative ps-5 text-sm leading-8 text-slate-600 md:text-base md:leading-9; }
+.st-doc__s li::before { content: ''; @apply absolute start-0 top-[0.8rem] size-2 rounded-full bg-brand-300 md:top-[0.95rem]; }
+.st-doc .st-faq__foot { @apply mt-4; }
+
+/* ───────── فوتر ───────── */
+.st-foot { @apply mt-10 rounded-t-3xl bg-white pb-6 pt-10 shadow-card md:mt-16 md:pt-12; scroll-margin-top: 1rem; }
+.st-foot__grid { @apply grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]; }
+.st-foot__about p { @apply mt-3 max-w-sm text-sm leading-8 text-slate-500; }
+.st-foot__about .st-foot__t { @apply mt-5; }
+.st-foot__t { @apply text-sm font-extrabold text-brand-900; }
+.st-foot__ls { @apply mt-3 flex flex-col gap-1; }
+.st-foot__ls a { @apply inline-flex min-h-9 items-center text-sm font-medium text-slate-500 transition-colors duration-200 hover:text-brand-700; }
+.st-foot__ct li { @apply flex items-center gap-2.5 text-slate-400; }
+.st-foot__copy { @apply mt-8 border-t border-slate-100 pt-5 text-center text-xs leading-6 text-slate-400; }
+
+/* ───────── ورود آرام (با JS) ───────── */
+.st-js [data-st-in]:not(.is-in) { opacity: 0; transform: translateY(14px); }
+[data-st-in] { transition: opacity 0.5s ease-out, transform 0.5s ease-out; transition-delay: var(--d, 0ms); }
+.st-js .st-feat[data-st-in].is-in, .st-js .st-rev[data-st-in].is-in { transition: opacity 0.5s ease-out, transform 0.3s, box-shadow 0.3s; transition-delay: var(--d, 0ms), 0ms, 0ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    .st-float, .st-cluster > svg, .st-sheet__bg, .st-sheet__panel, .st-q__a { animation: none !important; }
+    .st-js [data-st-in]:not(.is-in) { opacity: 1; transform: none; }
+    [data-st-in], .st-cta, .st-feat, .st-rev { transition: none !important; }
+    .st-cta:hover, .st-feat:hover, .st-rev:hover, .st-insta__btn:hover { transform: none; }
+}

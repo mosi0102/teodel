@@ -10,10 +10,12 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/css/admin.css', // فقط پنل مدیریت
                 'resources/css/auth.css', // فقط ورود و ثبت‌نام
+                'resources/css/site.css', // فقط صفحه‌های عمومی (نخست، سوالات، قوانین)
                 'resources/css/custom.css', // آخر، تا استایل‌های شخصی شما برنده باشد
                 'resources/js/app.js',
                 'resources/js/admin.js', // فقط پنل مدیریت
                 'resources/js/auth.js', // فقط ورود و ثبت‌نام
+                'resources/js/site.js', // فقط صفحه‌های عمومی
             ],
             refresh: true,
         }),
