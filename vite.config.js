@@ -9,9 +9,11 @@ export default defineConfig({
                 'resources/css/fonts.css',
                 'resources/css/app.css',
                 'resources/css/admin.css', // فقط پنل مدیریت
+                'resources/css/auth.css', // فقط ورود و ثبت‌نام
                 'resources/css/custom.css', // آخر، تا استایل‌های شخصی شما برنده باشد
                 'resources/js/app.js',
                 'resources/js/admin.js', // فقط پنل مدیریت
+                'resources/js/auth.js', // فقط ورود و ثبت‌نام
             ],
             refresh: true,
         }),

@@ -454,3 +454,21 @@ Teodel.lesson.completeStep();       // مرحله‌ی جاری تمام شد
 
 PHP با `php -l` و JS با `node --check` بررسی شده. **بیلد Vite و نمایش در مرورگر انجام نشده** (در محیط ساخت، رجیستری npm در دسترس نبود)؛
 پیش از استفاده یک بار `npm run build` و بازبینی چشمی در موبایل/دسکتاپ، هر دو زبان لازم است.
+
+## ورود و ثبت‌نام
+
+صفحهٔ `/login` و `/register` یک ویو است (`views/auth/index.blade.php`، لی‌اوت `guest`) با دو تب. استایل: `resources/css/auth.css`، رفتار: `resources/js/auth.js` (هر دو در ورودی‌های `vite.config.js`). روت‌ها در `routes/auth.php` است؛ آن را در `web.php` require کنید و میدلور `guest` بگذارید.
+
+**جریان:** شماره ← کد پیامکی (پیش‌فرض) ← ورود. اگر پیامک نرسید، «ورود با رمز عبور». شمارهٔ ناشناخته ← بعد از تأیید کد، نام، نام‌خانوادگی و رمز جدید ← ثبت‌نام. شمارهٔ موجود در تب ثبت‌نام ← اعلان و رفتن به ورود. «فراموشی رمز» ← ورود با کد (purpose=`reset`) و تغییر رمز در پروفایل.
+
+**چهار endpoint (`data-{op}-url`):**
+- `send` ← `{exists, has_password, sent, cooldown}`
+- `verify` ← `{status:'logged_in', redirect}` یا `{status:'needs_profile', ticket}`
+- `password` ← `{redirect}`
+- `register` با `{phone, ticket, first_name, last_name, password, ref?, terms:true}` ← `{redirect}`
+
+خطا: ۴۲۲ با `{errors}`، ۴۲۹ با `{retry_in}`. رویدادهای لغوشدنی `auth:{op}` و جایگزین `Teodel.auth.api.{op}`.
+
+**پارامترها:** `?redirect=` مقصد بعد از ورود، `?ref=` کد معرف. کد ۵ رقمی، ارسال مجدد ۶۰ ثانیه، رمز حداقل ۸ با حرف و عدد، پر شدن خودکار کد با WebOTP.
+
+**حالت دمو (بدون بک‌اند):** شمارهٔ پایان ۰–۴ حساب موجود، ۵–۹ حساب جدید؛ کد `12345`، رمز `demo1234`. با اتصال بک‌اند، فلگ دمو را خاموش کنید. لینک قوانین به `/terms` اشاره می‌کند.

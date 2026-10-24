@@ -8,8 +8,6 @@ use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WordsController;
-use App\Http\Controllers\Admin\SongController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SongController as AdminSongController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -20,6 +18,8 @@ use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TicketDeskController;
 use App\Http\Controllers\Admin\BugReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\AuthPageController;
+
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
  * مسیرهای دیگر (words, logout, lang ...) در پروژه‌ی خودتان موجود است؛
@@ -83,4 +83,11 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/reports/{id}', [BugReportController::class, 'show'])->whereNumber('id')->name('reports.show');
     // تنظیمات
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+});
+
+// ورود و ثبت‌نام (/login و /register) — با میدل‌ور guest داخل خود فایل
+require __DIR__ . '/auth.php';
+Route::middleware(['web', 'guest'])->group(function () {
+    Route::get('/login', [AuthPageController::class, 'show'])->defaults('mode', 'login')->name('login');
+    Route::get('/register', [AuthPageController::class, 'show'])->defaults('mode', 'register')->name('register');
 });
