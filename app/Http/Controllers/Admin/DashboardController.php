@@ -21,10 +21,4 @@ class DashboardController extends Controller
             'adminBadges' => $d['badges'],
         ]);
     }
-
-    /** صفحه‌ی راهنمای اجزای پنل (برای توسعه؛ در محیط production می‌توانید حذفش کنید) */
-    public function kit()
-    {
-        return view('admin.kit', ['adminActive' => 'kit']);
-    }
 }

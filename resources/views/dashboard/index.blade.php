@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/dashboard.js')
+@endpush
+
 @section('title', __('dashboard.title'))
 
 {{--

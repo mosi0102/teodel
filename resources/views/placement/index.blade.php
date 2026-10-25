@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/placement.js')
+@endpush
+
 @section('title', __('placement.title'))
 
 {{--

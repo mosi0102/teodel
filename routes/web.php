@@ -18,7 +18,7 @@ use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\TicketDeskController;
 use App\Http\Controllers\Admin\BugReportController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\SitePageController;
+use App\Http\Controllers\LocaleController;
 
 /*
  * این خطوط را در routes/web.php خودتان اضافه کنید (یا این فایل را require کنید).
@@ -26,12 +26,9 @@ use App\Http\Controllers\SitePageController;
  * Nav.php و لایه‌ها فقط با url() به آن‌ها لینک می‌دهند.
  */
 Route::middleware(['web'])->group(function () {
-    Route::get('/', [SitePageController::class, 'home'])->name('home');
-    Route::get('/faq', [SitePageController::class, 'faq'])->name('faq');
-    Route::get('/terms', [SitePageController::class, 'terms'])->name('terms');
-});
+    // تغییر زبان (fa | en): دکمه‌ی En/فا در هدر همه‌ی صفحه‌ها به این آدرس می‌آید
+    Route::get('/lang/{locale}', LocaleController::class)->whereIn('locale', ['fa', 'en'])->name('lang');
 
-Route::middleware(['web'])->group(function () {
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
 
     // داشبورد کاربر (نمای کلی یادگیری)
@@ -75,7 +72,6 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dictionary', [WordController::class, 'index'])->name('dictionary.index');
     Route::get('/dictionary/create', [WordController::class, 'create'])->name('dictionary.create');
     Route::get('/dictionary/{id}/edit', [WordController::class, 'edit'])->whereNumber('id')->name('dictionary.edit');
-    Route::get('/kit', [AdminDashboardController::class, 'kit'])->name('kit');
 
     // اشتراک و پرداخت‌ها
     Route::get('/billing', [BillingController::class, 'index'])->name('billing.index');

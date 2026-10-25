@@ -69,7 +69,6 @@ return [
     'pricing' => [
         'title' => 'Our plans',
         'lead' => 'Start with 3 free songs. Unlock every step whenever you are ready.',
-        'more' => 'See everything included',
     ],
 
     'reviews' => [
@@ -134,9 +133,6 @@ return [
         'music' => 'Learn with music',
         'level' => 'Level test',
         'dictionary' => 'Dictionary',
-        'email' => 'Email',
-        'telegram' => 'Telegram',
-        'instagram' => 'Instagram',
         'rights' => 'All rights of this site belong to Teodel.',
     ],
 
@@ -149,5 +145,4 @@ return [
     'open_menu' => 'Open menu',
     'home_link' => 'Teodel home',
     'faq_page' => ['lead' => "Can't find your answer? Ask support.", 'back' => 'Back to home'],
-    'reviews_alt' => 'User photo',
 ];

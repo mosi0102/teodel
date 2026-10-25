@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/music.js')
+@endpush
+
 @section('title', __('music.title'))
 
 @php

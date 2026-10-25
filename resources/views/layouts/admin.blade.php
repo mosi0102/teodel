@@ -12,6 +12,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
     <title>@yield('title', __('admin.title')) · {{ __('admin.brand') }}</title>
+    @include('partials.font-preload')
     @vite(['resources/css/fonts.css', 'resources/css/app.css', 'resources/css/admin.css', 'resources/css/custom.css', 'resources/js/admin.js'])
 </head>
 <body class="min-h-full bg-slate-50 text-slate-700 antialiased">

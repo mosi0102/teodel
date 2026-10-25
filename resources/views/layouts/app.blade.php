@@ -19,21 +19,13 @@
         } catch (e) {
         }</script>
 
-    {{-- فونت‌های اصلی از قبل لود می‌شوند تا هنگام رفرش، متن اول با فونت دیگر دیده نشود و بعد عوض نشود.
-         (اسم فایل‌ها باید با resources/css/fonts.css یکی باشد؛ فایل نبود، فقط یک هشدار در کنسول می‌آید.) --}}
-    @if ($locale === 'fa')
-        <link rel="preload" href="{{ asset('fonts/Fa3/Yekan Bakh FA 04 Regular.woff2') }}" as="font" type="font/woff2"
-              crossorigin>
-        <link rel="preload" href="{{ asset('fonts/Fa3/Yekan Bakh FA 06 Bold.woff2') }}" as="font" type="font/woff2"
-              crossorigin>
-    @else
-        <link rel="preload" href="{{ asset('fonts/enFont/FunnelDisplay-Medium.woff2') }}" as="font" type="font/woff2"
-              crossorigin>
-    @endif
+    @include('partials.font-preload')
 
     {{-- ترتیب مهم است: custom.css آخرِ CSS ها تا برنده باشد. CSS ها باید با <link> بیایند (نه از داخل js)،
          وگرنه هنگام لود، صفحه یک لحظه بدون استایل دیده می‌شود (فلش). --}}
     @vite(['resources/css/fonts.css', 'resources/css/app.css', 'resources/css/custom.css', 'resources/js/app.js'])
+    {{-- کد جاوااسکریپتِ خودِ هر صفحه (resources/js/pages/*.js) فقط در همان صفحه لود می‌شود --}}
+    @stack('scripts')
 </head>
 <body>
 <a href="#main"

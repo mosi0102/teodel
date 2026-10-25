@@ -36,7 +36,7 @@
     <aside class="au-aside">
         <div class="au-aside__in">
             <a href="{{ url('/') }}" class="au-brand" aria-label="{{ __('auth.home') }}">
-                <img src="{{asset('images/logolight.png')}}" style="height: 80px" />
+                <img src="{{ asset('images/logolight.png') }}" alt="{{ __('auth.brand') }}" width="190" height="80" style="height: 80px" />
             </a>
             <div class="au-aside__txt">
                 <h2 class="au-aside__t">{{ __('auth.aside.title') }}</h2>

@@ -4,27 +4,10 @@ import $ from 'jquery';
 // جی‌کوئری سراسری: صفحات بعدی (مراحل ۱ تا ۸) هم از همین نمونه استفاده می‌کنند
 window.$ = window.jQuery = $;
 
+// فقط بخش‌های مشترک همه‌ی صفحه‌های کاربر اینجاست (دیالوگ‌ها، سایدبار، حالت تمرکز، گزارش خرابی، تأیید خروج).
+// کد هر صفحه در resources/js/pages/*.js است و همان صفحه با @push('scripts') آن را لود می‌کند.
 import './modules/dialogs';
 import './modules/focus-mode';
 import './modules/sidebar';
-import './modules/music-list';
 import './modules/report';
-import './modules/lesson';
-import './modules/player';
-import './modules/rating';
-import './modules/lyrics';
-import './modules/words';
-import './modules/clip';
-import './modules/listening';
-import './modules/shadowing';
-import './modules/karaoke';
-import './modules/details';
-import './modules/saved-words';
-import './modules/profile';
-import './modules/dictionary';
-import './modules/level-test';
-import './modules/tickets';
-import './modules/dashboard';
-import './modules/subscription';
 import './modules/logout-confirm';
-import './modules/progress-sync';

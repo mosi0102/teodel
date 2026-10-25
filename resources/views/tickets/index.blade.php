@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/tickets.js')
+@endpush
+
 @section('title', __('tickets.title'))
 
 {{--

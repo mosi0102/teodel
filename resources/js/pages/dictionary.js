@@ -1,0 +1,2 @@
+// /dictionary
+import '../modules/dictionary';

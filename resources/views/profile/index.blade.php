@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/profile.js')
+@endpush
+
 @section('title', __('profile.title'))
 
 {{--

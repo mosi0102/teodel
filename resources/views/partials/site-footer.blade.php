@@ -6,7 +6,7 @@
     <div class="st-wrap">
         <div class="st-foot__grid">
             <div class="st-foot__about">
-                <a href="{{ $home }}" class="st-logo" aria-label="{{ __('site.home_link') }}">          <img src="{{asset('images/logo.png')}}" style="height: 40px"></a>
+                <a href="{{ $home }}" class="st-logo" aria-label="{{ __('site.home_link') }}">          <img src="{{ asset('images/logo.png') }}" alt="{{ __('site.brand') }}" width="104" height="40" style="height: 40px" loading="lazy"></a>
                 <h2 class="st-foot__t">{{ __('site.footer.about_t') }}</h2>
                 <p>{{ __('site.footer.about') }}</p>
             </div>

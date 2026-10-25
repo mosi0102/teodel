@@ -1,5 +1,5 @@
 /* =====================================================================
-   فونت‌ها
+   فونت‌ها (فقط woff2 و woff؛ مرورگرهای امروزی فقط همین‌ها را لازم دارند، پس eot/ttf حذف شد تا build سبک‌تر شود)
    فایل‌های فونت را داخل پوشه‌ی  public/fonts  بگذارید و اگر اسم فایل‌هایتان
    فرق دارد، فقط اسم داخل url(...) را همین‌جا عوض کنید.
 
@@ -10,10 +10,7 @@
 /* ---------- یکان بخ ---------- */
 @font-face {
     font-family: 'yekan Bakh';
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 04 Regular.eot');
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 04 Regular.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 04 Regular.woff') format('woff'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 04 Regular.ttf') format('truetype');
+    src: url('/public/fonts/Fa3/Yekan Bakh FA 04 Regular.woff') format('woff');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -21,10 +18,7 @@
 
 @font-face {
     font-family: 'yekan Bakh';
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 05 Medium.eot');
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 05 Medium.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 05 Medium.woff') format('woff'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 05 Medium.ttf') format('truetype');
+    src: url('/public/fonts/Fa3/Yekan Bakh FA 05 Medium.woff') format('woff');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -32,10 +26,7 @@
 
 @font-face {
     font-family: 'yekan Bakh';
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 06 Bold.eot');
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 06 Bold.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 06 Bold.woff') format('woff'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 06 Bold.ttf') format('truetype');
+    src: url('/public/fonts/Fa3/Yekan Bakh FA 06 Bold.woff') format('woff');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -43,10 +34,7 @@
 
 @font-face {
     font-family: 'yekan Bakh';
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 07 Heavy.eot');
-    src: url('/public/fonts/Fa3/Yekan Bakh FA 07 Heavy.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 07 Heavy.woff') format('woff'),
-    url('/public/fonts/Fa3/Yekan Bakh FA 07 Heavy.ttf') format('truetype');
+    src: url('/public/fonts/Fa3/Yekan Bakh FA 07 Heavy.woff') format('woff');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -55,9 +43,7 @@
 /* ---------- Funnel Display (فونت متغیر: همه‌ی وزن‌ها در یک فایل) ---------- */
 @font-face {
     font-family: 'Funnel Display';
-    src: url('/public/fonts/enFont/FunnelDisplay-Bold.eot');
-    src: url('/public/fonts/enFont/FunnelDisplay-Bold.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/enFont/FunnelDisplay-Bold.woff2') format('woff2'),
+    src: url('/public/fonts/enFont/FunnelDisplay-Bold.woff2') format('woff2'),
     url('/public/fonts/enFont/FunnelDisplay-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
@@ -66,9 +52,7 @@
 
 @font-face {
     font-family: 'Funnel Display';
-    src: url('/public/fonts/enFont/FunnelDisplay-Medium.eot');
-    src: url('/public/fonts/enFont/FunnelDisplay-Medium.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/enFont/FunnelDisplay-Medium.woff2') format('woff2'),
+    src: url('/public/fonts/enFont/FunnelDisplay-Medium.woff2') format('woff2'),
     url('/public/fonts/enFont/FunnelDisplay-Medium.woff') format('woff');
     font-weight: 500;
     font-style: normal;
@@ -77,9 +61,7 @@
 
 @font-face {
     font-family: 'Funnel Display';
-    src: url('/public/fonts/enFont/FunnelDisplay-SemiBold.eot');
-    src: url('/public/fonts/enFont/FunnelDisplay-SemiBold.eot?#iefix') format('embedded-opentype'),
-    url('/public/fonts/enFont/FunnelDisplay-SemiBold.woff2') format('woff2'),
+    src: url('/public/fonts/enFont/FunnelDisplay-SemiBold.woff2') format('woff2'),
     url('/public/fonts/enFont/FunnelDisplay-SemiBold.woff') format('woff');
     font-weight: 600;
     font-style: normal;

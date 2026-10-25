@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/lesson.js')
+@endpush
+
 @section('title', __('lesson.title'))
 
 @php

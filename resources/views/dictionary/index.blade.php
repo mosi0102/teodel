@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/dictionary.js')
+@endpush
+
 @section('title', __('dictionary.title'))
 
 {{--

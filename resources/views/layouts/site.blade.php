@@ -20,6 +20,7 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <script>document.documentElement.classList.add('st-js')</script>
     @stack('head')
+    @include('partials.font-preload')
     @vite(['resources/css/fonts.css', 'resources/css/app.css', 'resources/css/site.css', 'resources/css/custom.css', 'resources/js/site.js'])
 </head>
 <body class="st-body" data-st-page="@yield('page', 'inner')">

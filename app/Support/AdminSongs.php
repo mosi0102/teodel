@@ -47,11 +47,6 @@ class AdminSongs
         [82.7, "No need to race what we can't control", 'لازم نیست با چیزی که کنترلش نداریم مسابقه بدهیم'],
     ];
 
-    public static function levelLabel(string $l): string
-    {
-        return strtoupper($l);
-    }
-
     /** موزیک خالی برای «موزیک جدید» */
     public static function blank(): array
     {

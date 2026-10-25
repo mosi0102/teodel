@@ -178,6 +178,23 @@ html.st-sheet-open { overflow: hidden; }
 .st-doc__s li::before { content: ''; @apply absolute start-0 top-[0.8rem] size-2 rounded-full bg-brand-300 md:top-[0.95rem]; }
 .st-doc .st-faq__foot { @apply mt-4; }
 
+/* ───────── صفحه‌های خطا (404، 500 و …) ───────── */
+.er { @apply mx-auto flex min-h-dvh w-full max-w-xl flex-col items-center px-4 pb-8 pt-6; }
+.er__logo { @apply inline-flex rounded-xl; }
+.er__card { @apply my-auto flex w-full flex-col items-center rounded-3xl bg-white px-5 py-8 text-center shadow-card md:px-10 md:py-12; animation: er-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.er__art { @apply relative mb-4 grid h-44 w-full place-items-center md:h-52; }
+.er__code { @apply pointer-events-none absolute inset-0 grid select-none place-items-center text-[7.5rem] font-extrabold leading-none text-brand-100 md:text-[9rem]; }
+.er__mascot { @apply relative h-40 w-auto md:h-48; animation: st-float 6s ease-in-out infinite; }
+.er__t { @apply text-xl font-extrabold leading-9 text-brand-900 md:text-2xl; }
+.er__d { @apply mt-2 max-w-md text-sm leading-8 text-slate-500 md:text-base; }
+.er__acts { @apply mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row; }
+.er__acts a { @apply min-h-12; }
+.er__card .st-link { @apply mt-3; }
+.er__foot { @apply mt-6 flex items-center gap-4 text-xs font-bold text-slate-400; }
+.er__foot a { @apply rounded-full px-2 py-1 text-slate-500 transition-colors duration-200 hover:text-brand-700; }
+@keyframes er-in { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .er__card, .er__mascot { animation: none !important; } }
+
 /* ───────── فوتر ───────── */
 .st-foot { @apply mt-10 rounded-t-3xl bg-white pb-6 pt-10 shadow-card md:mt-16 md:pt-12; scroll-margin-top: 1rem; }
 .st-foot__grid { @apply grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]; }

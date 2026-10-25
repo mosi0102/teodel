@@ -12,6 +12,6 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        'locale', // زبان سایت (fa|en): رمزنگاری نمی‌شود تا صفحه‌های خطا هم بتوانند بخوانندش
     ];
 }

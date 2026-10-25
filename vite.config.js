@@ -13,6 +13,15 @@ export default defineConfig({
                 'resources/css/site.css', // فقط صفحه‌های عمومی (نخست، سوالات، قوانین)
                 'resources/css/custom.css', // آخر، تا استایل‌های شخصی شما برنده باشد
                 'resources/js/app.js',
+                'resources/js/pages/music.js',
+                'resources/js/pages/lesson.js',
+                'resources/js/pages/dashboard.js',
+                'resources/js/pages/profile.js',
+                'resources/js/pages/dictionary.js',
+                'resources/js/pages/placement.js',
+                'resources/js/pages/tickets.js',
+                'resources/js/pages/subscription.js',
+                'resources/js/pages/words.js',
                 'resources/js/admin.js', // فقط پنل مدیریت
                 'resources/js/auth.js', // فقط ورود و ثبت‌نام
                 'resources/js/site.js', // فقط صفحه‌های عمومی

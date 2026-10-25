@@ -11,6 +11,7 @@
     <meta name="robots" content="noindex, follow">
     <meta name="theme-color" content="#ffffff">
     <title>@yield('title') · {{ __('auth.brand') }}</title>
+    @include('partials.font-preload')
     @vite(['resources/css/fonts.css', 'resources/css/app.css', 'resources/css/auth.css', 'resources/css/custom.css', 'resources/js/auth.js'])
 </head>
 <body class="min-h-full bg-white text-slate-700 antialiased">

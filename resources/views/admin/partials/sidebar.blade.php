@@ -7,7 +7,7 @@
 <aside id="ad-side" class="ad-side" aria-label="{{ __('admin.menu') }}">
     <div class="ad-side__brand">
         <a href="{{ url('/admin') }}" class="ad-side__logo" aria-label="{{ __('admin.brand') }}">
-            <img src="{{asset('images/adminUser.png')}}" height="50"/>
+            <img src="{{ asset('images/adminUser.png') }}" alt="{{ __('admin.brand') }}" width="50" height="50"/>
         </a>
         <div class="ad-side__name ad-lbl">
             <b>Teodel</b>

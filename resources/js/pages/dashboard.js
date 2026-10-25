@@ -1,0 +1,2 @@
+// /dashboard
+import '../modules/dashboard';

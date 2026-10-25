@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('scripts')
+    @vite('resources/js/pages/subscription.js')
+@endpush
+
 @section('title', __('subscription.title'))
 
 {{--

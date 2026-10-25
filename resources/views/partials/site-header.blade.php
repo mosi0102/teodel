@@ -21,7 +21,7 @@
 <header class="st-head" data-st-head>
     <div class="st-head__bar" style="padding: 20px">
         <a href="{{ $home }}" class="st-logo" aria-label="{{ __('site.home_link') }}">
-            <img src="{{asset('images/logo.png')}}" style="height: 40px">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ __('site.brand') }}" width="104" height="40" style="height: 40px">
         </a>
 
         <nav class="st-nav" aria-label="{{ __('site.menu') }}">
@@ -55,7 +55,7 @@
     <div class="st-sheet__bg" data-st-close></div>
     <div class="st-sheet__panel" role="dialog" aria-modal="true" aria-label="{{ __('site.menu') }}">
         <div class="st-sheet__top">
-            <x-site.logo class="h-10 w-auto"/>
+            <img src="{{ asset('images/logo.png') }}" alt="{{ __('site.brand') }}" width="104" height="40" style="height: 40px" loading="lazy">
             <button type="button" class="st-burger" data-st-close aria-label="{{ __('site.close') }}">
                 <x-icon name="x" class="size-5"/>
             </button>

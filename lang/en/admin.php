@@ -30,7 +30,6 @@ return [
         'tickets' => 'Tickets',
         'reports' => 'Error reports',
         'settings' => 'Settings',
-        'kit' => 'Component kit',
     ],
 
     'common' => [
@@ -179,25 +178,6 @@ return [
         ],
     ],
 
-    'kit' => [
-        'title' => 'Panel component kit',
-        'lead' => 'A developer reference page: the building blocks the rest of the panel is made from.',
-        'table' => 'Table (mobile: cards)',
-        'form' => 'Form & AI button',
-        'badges' => 'Badges',
-        'f_title' => 'Title',
-        'f_artist' => 'Artist',
-        'f_level' => 'Level',
-        'f_desc' => 'Persian description',
-        'f_desc_en' => 'English description',
-        'f_cover' => 'Image',
-        'name' => 'Name',
-        'level' => 'Level',
-        'state' => 'Status',
-        'updated' => 'Updated',
-        'ai_seed_title' => 'Song title',
-        'ai_seed_artist' => 'Artist',
-    ],
     'users' => [
         'title' => 'Users',
         'sub' => 'Search, plan status and level-test scores for every user',
