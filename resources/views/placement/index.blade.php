@@ -12,7 +12,7 @@
     ترجمه‌ی فارسی ندارد که تار شود؛ خط فارسیِ بالای سؤال دستور آزمون است (نه ترجمه) و همیشه دیده می‌شود.
 --}}
 @php
-    $levels = \App\Support\PlacementTest::LEVELS;
+    $levels = \App\Support\PlacementTest::ALL_LEVELS;
     $icons = [
         'vocab' => '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M9 8h7M9 12h5"/>',
         'grammar' => '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
@@ -26,6 +26,11 @@
     data-bank='@json($bank ?? [], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)'
     data-results='@json($results ?? [], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)'
     data-count="{{ $count ?? 15 }}"
+    data-advanced="{{ ! empty($canAdvanced) ? 1 : 0 }}"
+    data-lock-days="{{ $lockDays ?? 15 }}" data-lock-scope="{{ $lockScope ?? 'all' }}"
+    @if (! empty($nextAt)) data-next-at="{{ (int) $nextAt }}" @endif
+    @if (! empty($level)) data-level="{{ $level }}" @endif
+    @isset($levelUrl) data-level-url="{{ $levelUrl }}" @endisset
     @isset($startUrl) data-start-url="{{ $startUrl }}" @endisset
     @isset($finishUrl) data-finish-url="{{ $finishUrl }}" @endisset
     data-t='@json(__('placement'), JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)'>
@@ -59,9 +64,18 @@
                     @endforeach
                 </ol>
 
+                <div class="pt-notice" role="note">
+                    <svg viewBox="0 0 24 24" class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    <div class="min-w-0">
+                        <b class="block text-sm text-amber-900">{{ __('placement.lock.notice_title') }}</b>
+                        <p class="mt-0.5 text-sm leading-7 text-amber-800/90">{{ __('placement.lock.notice') }}</p>
+                    </div>
+                </div>
+
                 <button type="button" class="btn-primary mt-6 w-full sm:w-auto sm:min-w-56" data-pt-go="choose">
                     {{ __('placement.intro.start') }} {!! $chev !!}
                 </button>
+                <button type="button" class="pt-link mt-3 block" data-pt-go="levels">{{ __('placement.guide.link') }}</button>
             </div>
 
             <aside class="grid gap-4">
@@ -83,6 +97,7 @@
                             <li data-pt-scale="{{ $lv }}">
                                 <b dir="ltr">{{ strtoupper($lv) }}</b>
                                 <span>{{ __('placement.levels.' . $lv) }}</span>
+                                <small dir="ltr">IELTS {{ __('placement.ielts.' . $lv) }}</small>
                             </li>
                         @endforeach
                     </ul>
@@ -106,7 +121,39 @@
             </div>
         </header>
 
-        <div class="grid gap-4 md:grid-cols-3">
+        {{-- قفل ۱۵ روزه --}}
+        <div class="pt-lock" data-pt-lock hidden role="status">
+            <svg viewBox="0 0 24 24" class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <div class="min-w-0">
+                <b class="block text-sm" data-pt-lock-title></b>
+                <p class="mt-0.5 text-xs leading-6 opacity-90">{{ __('placement.lock.banner_text') }}</p>
+            </div>
+        </div>
+
+        {{-- نوع آزمون: معمولی / پیشرفته --}}
+        <div class="pt-modes" role="radiogroup" aria-label="{{ __('placement.mode.label') }}">
+            <button type="button" role="radio" aria-checked="true" data-pt-mode="standard">
+                <b>{{ __('placement.mode.standard') }}</b>
+                <span>{{ __('placement.mode.standard_text') }}</span>
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-pt-mode="advanced">
+                <b>{{ __('placement.mode.advanced') }}
+                    <em class="pt-modes__pro" data-pt-pro hidden>
+                        <svg viewBox="0 0 24 24" class="size-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>{{ __('placement.mode.pro') }}
+                    </em>
+                </b>
+                <span>{{ __('placement.mode.advanced_text') }}</span>
+            </button>
+        </div>
+
+        {{-- آزمون پیشرفته برای کاربر رایگان --}}
+        <div class="pt-upsell" data-pt-upsell hidden>
+            <h2 class="text-base font-extrabold text-brand-900">{{ __('placement.mode.locked_title') }}</h2>
+            <p class="mt-1.5 text-sm leading-7 text-slate-500">{{ __('placement.mode.locked_text') }}</p>
+            <a href="{{ url('/subscription') }}" class="btn-primary mt-4 w-full sm:w-auto sm:min-w-48">{{ __('placement.mode.locked_cta') }}</a>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-3" data-pt-cards>
             @foreach ($sections as $s)
                 @php $k = $s['key']; @endphp
                 <article class="pt-card" data-pt-card="{{ $k }}">
@@ -134,6 +181,49 @@
                 </article>
             @endforeach
         </div>
+
+        {{-- انتخاب دستی سطح --}}
+        <div class="pt-manual card">
+            <div class="min-w-0">
+                <h2 class="text-base font-extrabold text-brand-900">{{ __('placement.manual.title') }}</h2>
+                <p class="mt-1 text-sm leading-7 text-slate-500">{{ __('placement.manual.text') }}</p>
+                <p class="mt-2 text-xs font-bold text-slate-500" data-pt-manual-current hidden>{{ __('placement.manual.current') }}: <b class="ms-1 rounded-md bg-brand-700 px-2 py-0.5 text-white" dir="ltr" data-pt-manual-level></b></p>
+            </div>
+            <button type="button" class="btn-outline shrink-0" data-pt-go="levels">{{ __('placement.manual.cta') }}</button>
+        </div>
+    </section>
+
+    {{-- ───────────── راهنمای سطح‌ها + انتخاب دستی ───────────── --}}
+    <section data-pt-stage="levels" hidden>
+        <header class="mb-5">
+            <button type="button" class="pt-back" data-pt-go="choose">{!! $chevBack !!} {{ __('placement.guide.back') }}</button>
+            <h1 class="mt-2 text-xl font-extrabold text-brand-900 md:text-2xl">{{ __('placement.guide.title') }}</h1>
+            <p class="mt-2 max-w-2xl text-sm leading-7 text-slate-500">{{ __('placement.guide.text') }}</p>
+        </header>
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @foreach ($levels as $lv)
+                <article class="pt-lvl" data-pt-lvl="{{ $lv }}">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="pt-lvl__code" dir="ltr">{{ strtoupper($lv) }}</span>
+                        <span class="pt-lvl__ielts" dir="ltr">IELTS {{ __('placement.ielts.' . $lv) }}</span>
+                    </div>
+                    <h2 class="mt-3 text-base font-extrabold text-brand-900">{{ __('placement.guide.items.' . $lv . '.title') }}</h2>
+                    <p class="mt-1 text-xs font-bold text-slate-400">{{ __('placement.guide.means') }}</p>
+                    <p class="mt-1 text-sm leading-7 text-slate-600">{{ __('placement.guide.items.' . $lv . '.means') }}</p>
+                    <p class="mt-3 text-xs font-bold text-slate-400">{{ __('placement.guide.cando') }}</p>
+                    <ul class="mt-1.5 grid gap-1.5">
+                        @foreach (__('placement.guide.items.' . $lv . '.cando') as $c)
+                            <li class="flex gap-2 text-sm leading-6 text-slate-600">
+                                <svg viewBox="0 0 24 24" class="mt-1 size-4 shrink-0 text-brand-600" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                                <span>{{ $c }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-outline mt-auto w-full" data-pt-pick-level="{{ $lv }}" data-t-choose="{{ __('placement.guide.choose') }}" data-t-chosen="{{ __('placement.guide.chosen') }}">{{ __('placement.guide.choose') }}</button>
+                </article>
+            @endforeach
+        </div>
+        <p class="mt-4 text-xs leading-6 text-slate-400">{{ __('placement.ielts.note') }}</p>
     </section>
 
     {{-- ───────────── ۳) آزمون ───────────── --}}
@@ -231,7 +321,9 @@
                     <b class="rounded-lg bg-brand-700 px-2.5 py-0.5 text-sm text-white" dir="ltr" data-pt-r-level></b>
                     <span class="text-sm font-bold text-brand-800" data-pt-r-level-name></span>
                 </div>
+                <p class="mt-2 text-xs font-bold text-slate-500" dir="auto">{{ __('placement.result.ielts') }}: <b class="ms-1 text-brand-800" dir="ltr" data-pt-r-ielts></b></p>
                 <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-slate-500" data-pt-r-msg></p>
+                <p class="mx-auto mt-2 max-w-md text-xs leading-6 text-amber-700" data-pt-r-note hidden></p>
 
                 <div class="mx-auto mt-5 max-w-md rounded-2xl bg-slate-50 p-4 text-start" data-pt-r-overall hidden>
                     <p class="text-xs font-bold text-slate-500">{{ __('placement.result.overall_updated') }}
@@ -251,6 +343,7 @@
                 <h2 class="text-sm font-extrabold text-brand-900">{{ __('placement.result.by_level') }}</h2>
                 <ul class="pt-bylevel" data-pt-bylevel></ul>
                 <p class="mt-4 text-xs leading-6 text-slate-400">{{ __('placement.result.level_note') }}</p>
+                <p class="mt-2 text-xs leading-6 text-slate-400">{{ __('placement.ielts.note') }}</p>
             </aside>
         </div>
 

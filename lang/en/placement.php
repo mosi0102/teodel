@@ -10,6 +10,7 @@ return [
         'b1' => 'Intermediate',
         'b2' => 'Upper-intermediate',
         'c1' => 'Advanced',
+        'c2' => 'Proficiency',
     ],
 
     'intro' => [
@@ -117,6 +118,9 @@ return [
         'review' => 'Review answers',
         'hide_review' => 'Hide review',
         'retake' => 'Retake this test',
+        'ielts' => 'Approx. IELTS',
+        'locked_retake' => 'Your next test unlocks in :n days.',
+        'adv_low' => 'Your result is below the advanced test’s range (B1 and above). Take the standard test for a more accurate estimate.',
         'to_tests' => 'Back to tests',
         'next_test' => 'Take another test',
         'review_title' => 'Answers',
@@ -134,6 +138,93 @@ return [
             'b1' => 'You can handle everyday English. Time to widen your range.',
             'b2' => 'You’re a confident user. Now work on the fine details.',
             'c1' => 'Excellent. You work comfortably with complex English.',
+            'c2' => 'Outstanding. Your English is close to a highly educated native speaker’s.',
+        ],
+    ],
+
+    'ielts' => [
+        'label' => 'Approx. IELTS equivalent',
+        'a1' => 'Below 3',
+        'a2' => '3–3.5',
+        'b1' => '4–5',
+        'b2' => '5.5–6.5',
+        'c1' => '7–8',
+        'c2' => '8.5–9',
+        'note' => 'The IELTS equivalent is only a rough estimate based on the common CEFR–IELTS comparison table. It is not an official IELTS score.',
+    ],
+
+    'lock' => [
+        'notice_title' => 'Once every 15 days',
+        'notice' => 'To protect the questions and keep results accurate, you can take the level test only once every 15 days. Choosing your level manually has no limit.',
+        'banner' => 'Your next test unlocks in :n days.',
+        'banner_today' => 'Your next test unlocks today.',
+        'banner_text' => 'Meanwhile you can review your results or choose your level yourself.',
+        'btn' => 'In :n days',
+        'btn_today' => 'Unlocks today',
+        'blocked' => 'You can’t start a new test for :n more days.',
+    ],
+
+    'mode' => [
+        'label' => 'Test type',
+        'standard' => 'Standard',
+        'advanced' => 'Advanced',
+        'standard_text' => 'For every level from A1 to C1. Free.',
+        'advanced_text' => 'Harder questions from B1 to C2 with a finer estimate, for learners above intermediate.',
+        'locked_title' => 'The advanced test is for subscribers',
+        'locked_text' => 'Subscribe to unlock the advanced level assessment (B1 to C2).',
+        'locked_cta' => 'See plans',
+        'pro' => 'Pro',
+    ],
+
+    'manual' => [
+        'title' => 'Already know your level?',
+        'text' => 'If you’re sure of your level, choose it without a test. There’s no 15-day limit and you can change it any time.',
+        'cta' => 'Choose level manually',
+        'current' => 'Your chosen level',
+        'saved' => 'Your level was set to :level.',
+        'failed' => 'Couldn’t save your level. Please try again.',
+    ],
+
+    'guide' => [
+        'title' => 'Levels guide',
+        'text' => 'What does each level mean? See the six European (CEFR) levels with their approximate IELTS bands, and pick yours if you like.',
+        'back' => 'Back to tests',
+        'link' => 'Full levels guide and manual choice',
+        'means' => 'What it means',
+        'cando' => 'What you can do',
+        'choose' => 'Choose this level',
+        'chosen' => 'Your current level',
+        'items' => [
+            'a1' => [
+                'title' => 'Beginner',
+                'means' => 'You’re just starting out. You understand very simple, familiar phrases and can say a few short sentences about yourself.',
+                'cando' => ['Introduce yourself and ask someone’s name and age', 'Follow very simple, slow speech', 'Fill in simple forms with personal details'],
+            ],
+            'a2' => [
+                'title' => 'Elementary',
+                'means' => 'You can communicate in everyday situations such as shopping, asking directions, work and family, using simple short sentences.',
+                'cando' => ['Hold short everyday conversations', 'Describe where you live, your job and interests simply', 'Write short, simple messages and emails'],
+            ],
+            'b1' => [
+                'title' => 'Intermediate',
+                'means' => 'You understand the main points of clear speech and texts about work, school and hobbies, and can cope with most situations when travelling.',
+                'cando' => ['Talk about experiences, hopes and plans', 'Get the gist of simple films and podcasts', 'Write simple connected text'],
+            ],
+            'b2' => [
+                'title' => 'Upper-Intermediate',
+                'means' => 'You understand more complex texts and can talk with native speakers fluently enough that neither side gets tired.',
+                'cando' => ['Discuss and defend your opinion with reasons', 'Understand most news and films', 'Write clear, detailed text on many topics'],
+            ],
+            'c1' => [
+                'title' => 'Advanced',
+                'means' => 'You understand long, demanding texts including implied meaning, and speak fluently and naturally without searching much for words.',
+                'cando' => ['Use the language flexibly for work and study', 'Understand idioms and implied meaning', 'Write well-structured reports and essays'],
+            ],
+            'c2' => [
+                'title' => 'Proficiency',
+                'means' => 'You understand virtually everything you hear or read and express yourself precisely and subtly, like a highly fluent speaker.',
+                'cando' => ['Summarise several sources into one coherent account', 'Tell apart fine shades of meaning', 'Express yourself in any situation, however complex'],
+            ],
         ],
     ],
 

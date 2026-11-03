@@ -662,7 +662,9 @@ html.sidebar-closed { --rail: 0px; }
     .pt-steps { @apply mt-5 grid gap-4; }
     .pt-steps li { @apply flex gap-3.5; }
     .pt-steps__n { @apply grid size-8 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-extrabold text-brand-700; }
-    .pt-scale { @apply mt-3 grid grid-cols-5 gap-1.5 text-center; }
+    .pt-scale { @apply mt-3 grid grid-cols-3 gap-1.5 text-center; }
+    .pt-scale small { @apply text-[0.58rem] font-bold leading-4 text-slate-400; }
+    .pt-scale li.is-me small { @apply text-white/80; }
     .pt-scale li { @apply flex flex-col items-center gap-1 rounded-xl bg-slate-50 px-1 py-2.5 transition duration-200; }
     .pt-scale b { @apply text-sm font-extrabold text-brand-700; }
     .pt-scale span { @apply text-[0.62rem] font-medium leading-4 text-slate-500; }
@@ -670,6 +672,27 @@ html.sidebar-closed { --rail: 0px; }
     .pt-scale li.is-me b, .pt-scale li.is-me span { @apply text-white; }
 
     /* انتخاب آزمون */
+    /* ── آزمون: هشدار ۱۵ روز، نوع آزمون، انتخاب دستی، راهنمای سطح‌ها ── */
+    .pt-notice { @apply mt-5 flex gap-3 rounded-2xl bg-amber-50 p-4 text-amber-700; }
+    .pt-link { @apply text-sm font-bold text-brand-700 underline-offset-4 transition-colors duration-200 hover:underline; }
+    .pt-lock { @apply mb-4 flex gap-3 rounded-2xl bg-amber-50 p-4 text-amber-800; }
+    .pt-modes { @apply mb-4 grid gap-2 sm:grid-cols-2; }
+    .pt-modes > button { @apply flex flex-col items-start gap-1 rounded-2xl border border-slate-200 bg-white p-4 text-start transition duration-200 hover:border-brand-200 active:scale-[0.99]; }
+    .pt-modes > button b { @apply flex items-center gap-2 text-sm font-extrabold text-brand-900; }
+    .pt-modes > button span { @apply text-xs leading-6 text-slate-500; }
+    .pt-modes > button[aria-checked='true'] { @apply border-brand-600 bg-brand-50 ring-2 ring-brand-100; }
+    .pt-modes__pro { @apply inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[0.65rem] font-extrabold not-italic text-amber-700; }
+    .pt-upsell { @apply rounded-3xl bg-white p-5 shadow-card md:p-6; }
+    .pt-manual { @apply mt-4 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between; }
+    .pt-card.is-locked { @apply opacity-80; }
+    .pt-card [data-pt-start]:disabled { @apply cursor-not-allowed; }
+    .pt-lvl { @apply flex flex-col rounded-3xl bg-white p-5 shadow-card transition duration-300 md:p-6; }
+    .pt-lvl.is-me { @apply ring-2 ring-brand-600; }
+    .pt-lvl__code { @apply grid min-w-12 place-items-center rounded-xl bg-brand-700 px-3 py-1.5 text-base font-extrabold text-white; }
+    .pt-lvl__ielts { @apply rounded-full bg-brand-50 px-3 py-1 text-xs font-extrabold text-brand-700; }
+    .pt-lvl > ul { @apply mb-4; }
+    .pt-lvl .is-chosen { @apply border-brand-600 bg-brand-700 text-white hover:bg-brand-700; }
+    @media (hover: hover) { .pt-lvl:hover { transform: translateY(-2px); } }
     .pt-overall { @apply inline-flex shrink-0 items-center gap-2.5 self-start rounded-2xl bg-white px-4 py-2.5 shadow-card md:self-auto; }
     .pt-overall__lv { @apply grid min-w-10 place-items-center rounded-lg bg-brand-700 px-2 py-0.5 text-sm font-extrabold text-white; }
     .pt-overall.is-empty .pt-overall__lv { @apply bg-slate-200 text-slate-500; }

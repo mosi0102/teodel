@@ -27,11 +27,20 @@ import { digits } from './digits';
  *
  * سطح کلی = میانگین سطح آخرین نمره‌ی آزمون‌هایی که داده شده؛ هر المانی با [data-user-level] (سایدبار) خودکار به‌روز می‌شود.
  *
+ * نوع آزمون: standard (A1–C1، رایگان) و advanced (B1–C2، ویژه‌ی اشتراک؛ data-advanced="1" یعنی پلن کاربر advanced_level دارد).
+ *   با data-start-url پارامتر &track=standard|advanced هم می‌رود؛ در payload و data-results هم track هست.
+ * محدودیت ۱۵ روز: data-next-at (unix ثانیه، از بک‌اند) + data-lock-days + data-lock-scope (all | each). در دمو از localStorage حساب می‌شود.
+ * انتخاب دستی سطح (بدون محدودیت زمانی): $(document).on('placement:set-level', (e, { level }) => {...}) یا data-level-url (POST JSON {level}).
+ *   اگر preventDefault کنید خودتان ذخیره می‌کنید و با Teodel.placement.levelSaved(true|false, level) جواب می‌دهید.
+ *
  * LOCAL: در دمو نمره‌ها و آزمون نیمه‌کاره در localStorage می‌مانند. با اتصال بک‌اند false کنید (نمره‌ها از data-results می‌آید).
  */
 const LOCAL = true;
 const KEY = 'teodel:placement';
-const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+const STD_LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+const ADV_LEVELS = ['b1', 'b2', 'c1', 'c2'];
+const DAY = 86400;
 const PASS = 0.6; // حداقل درصد درست در یک سطح تا آن سطح «قبول» حساب شود
 
 const store = {
@@ -74,10 +83,15 @@ export function grade(questions, answers) {
     return { perLevel, correct, total, score, level: estimate(perLevel) };
 }
 
-/** بالاترین سطحی که پشت‌سرهم از A1 قبول شده (حداقل A1) */
+/**
+ * بالاترین سطحی که پشت‌سرهم قبول شده. آزمون معمولی از A1 شروع می‌شود؛ در آزمون پیشرفته (سطح‌های پایین سؤال ندارند)
+ * اگر اولین سطح هم قبول نشود، سطح زیرِ آن گزارش می‌شود (یعنی «پایین‌تر از دامنه‌ی این آزمون»).
+ */
 export function estimate(perLevel) {
-    let best = 0;
-    for (let i = 0; i < LEVELS.length; i++) {
+    const tested = LEVELS.filter((l) => perLevel[l] && perLevel[l].total > 0);
+    if (!tested.length) return LEVELS[0];
+    let best = Math.max(0, LEVELS.indexOf(tested[0]) - (tested[0] === LEVELS[0] ? 0 : 1));
+    for (let i = LEVELS.indexOf(tested[0]); i < LEVELS.length; i++) {
         const p = perLevel[LEVELS[i]];
         if (!p || !p.total) break;
         if (p.correct / p.total >= PASS) best = i;
@@ -104,24 +118,36 @@ function shuffle(a) {
     return r;
 }
 
-/** انتخاب سؤال از بانک با توزیع مساوی سطح‌ها؛ ترتیب از آسان به سخت و گزینه‌ها شافل (جواب هم جابه‌جا می‌شود) */
-export function pick(bank, section, count) {
+/** انتخاب سؤال از بانک با توزیع مساوی سطح‌ها (معمولی: A1–C1، پیشرفته: B1–C2)؛ ترتیب از آسان به سخت و گزینه‌ها شافل (جواب هم جابه‌جا می‌شود) */
+export function pick(bank, section, count, track) {
+    const L = track === 'advanced' ? ADV_LEVELS : STD_LEVELS;
     const pool = bank.filter((q) => q.section === section);
-    const base = Math.floor(count / LEVELS.length);
-    let extra = count - base * LEVELS.length;
+    const base = Math.floor(count / L.length);
+    let extra = count - base * L.length;
     const need = {};
-    // باقی‌مانده از سطح‌های میانی شروع می‌شود (A2، B1، B2 …) تا به یک سطح بیش از حد وزن داده نشود
-    [1, 2, 3, 0, 4].forEach((i) => {
-        need[LEVELS[i]] = base + (extra-- > 0 ? 1 : 0);
+    // باقی‌مانده از سطح‌های میانی شروع می‌شود تا به یک سطح بیش از حد وزن داده نشود
+    [1, 2, 3, 0, 4].filter((i) => i < L.length).forEach((i) => {
+        need[L[i]] = base + (extra-- > 0 ? 1 : 0);
     });
     const out = [];
-    LEVELS.forEach((l) => {
+    L.forEach((l) => {
         out.push(...shuffle(pool.filter((q) => q.level === l)).slice(0, need[l]));
     });
     return out.map((q) => {
         const order = shuffle([0, 1, 2, 3]);
         return Object.assign({}, q, { options: order.map((i) => q.options[i]), answer: order.indexOf(q.answer) });
     });
+}
+
+/** سطح ذخیره‌شده‌ی دمو (آخرین چیزی که تازه‌تر است: انتخاب دستی یا میانگین آزمون‌ها) — برای سایدبار در همه‌ی صفحه‌ها */
+function localLevel() {
+    const s = store.get();
+    const rs = Object.values(s.results || {});
+    const ov = overallLevel(s.results);
+    const tAt = rs.reduce((m, r) => Math.max(m, (r && r.at) || 0), 0);
+    const m = s.manual;
+    if (m && LEVELS.includes(m.level) && (!ov || m.at >= tAt)) return m.level;
+    return ov;
 }
 
 /* ── صفحه ────────────────────────────────────────────────────────────── */
@@ -132,7 +158,7 @@ $(function () {
     // سطح کلی روی همه‌ی صفحه‌ها (سایدبار): فقط دمو
     const syncLevel = (lv) => $('[data-user-level]').text(lv.toUpperCase());
     if (LOCAL) {
-        const o = overallLevel(store.get().results);
+        const o = localLevel();
         if (o) syncLevel(o);
     }
 
@@ -150,6 +176,12 @@ $(function () {
     const TT = parse('data-t', {});
     const bank = parse('data-bank', []);
     const COUNT = parseInt($root.attr('data-count'), 10) || 15;
+    const CAN_ADV = $root.attr('data-advanced') === '1';
+    const LOCK_DAYS = parseInt($root.attr('data-lock-days'), 10) || 15;
+    const LOCK_SCOPE = $root.attr('data-lock-scope') === 'each' ? 'each' : 'all';
+    const NEXT_AT = parseInt($root.attr('data-next-at'), 10) || 0;
+    const levelUrl = $root.attr('data-level-url') || '';
+    const SERVER_LEVEL = $root.attr('data-level') || '';
     const startUrl = $root.attr('data-start-url') || '';
     const finishUrl = $root.attr('data-finish-url') || '';
 
@@ -165,8 +197,37 @@ $(function () {
     /* وضعیت */
     let results = Object.assign({}, parse('data-results', {}));
     if (LOCAL) results = Object.assign({}, results, store.get().results || {});
-    let session = null; // { section, questions, answers:{id:option}, idx }
+    let session = null; // { section, questions, answers:{id:option}, idx, track }
     let stage = 'intro';
+    let mode = 'standard'; // نوع آزمونی که در صفحه‌ی انتخاب دیده می‌شود
+    let manual = LOCAL ? store.get().manual || null : null; // { level, at }
+
+    /** روزهای مانده تا باز شدن آزمون (۰ = باز است). section فقط وقتی scope=each مهم است */
+    function lockLeft(section) {
+        let until = NEXT_AT;
+        if (LOCAL) {
+            const f = store.get().finished || {};
+            const last = LOCK_SCOPE === 'each' ? f[section] || 0 : Math.max(0, ...Object.values(f));
+            if (last) until = Math.max(until, last + LOCK_DAYS * DAY);
+        }
+        const left = until - Math.floor(Date.now() / 1000);
+        return left > 0 ? Math.ceil(left / DAY) : 0;
+    }
+    function lockedAll() {
+        // برای نوار هشدار: قفل کلی (scope=all) یا قفل همه‌ی آزمون‌ها (scope=each)
+        const ks = $root.find('[data-pt-card]').map((i, el) => $(el).attr('data-pt-card')).get();
+        const ls = ks.map((k) => lockLeft(k));
+        return ls.length && ls.every((x) => x > 0) ? Math.min(...ls) : 0;
+    }
+    /** سطح فعلی کاربر: تازه‌ترین بین انتخاب دستی و میانگین آزمون‌ها (یا سطح سرور) */
+    function currentLevel() {
+        const rs = Object.values(results);
+        const ov = overallLevel(results);
+        const tAt = rs.reduce((m, r) => Math.max(m, (r && r.at) || 0), 0);
+        if (manual && LEVELS.includes(manual.level) && (!ov || manual.at >= tAt)) return { level: manual.level, manual: true };
+        if (ov) return { level: ov, manual: false };
+        return SERVER_LEVEL ? { level: SERVER_LEVEL, manual: true } : null;
+    }
 
     const persist = () => {
         if (!LOCAL) return;
@@ -201,39 +262,129 @@ $(function () {
         }
         if (to === 'exam') return show('choose'); // آزمون با «برگشت مرورگر» دوباره باز نشود
         if (to === 'result' && !$root.find('[data-pt-r-title]').text()) return show('choose');
+        if (to === 'choose') renderChoose();
+        if (to === 'levels') renderLevels();
         show(to);
     });
 
     $root.on('click', '[data-pt-go]', function () {
         show($(this).attr('data-pt-go'), true);
         if ($(this).attr('data-pt-go') === 'choose') renderChoose();
+        if ($(this).attr('data-pt-go') === 'levels') renderLevels();
     });
 
     /* ── انتخاب آزمون ──────────────────────────────────────────────── */
     function renderChoose() {
         const n = Object.keys(results).length;
-        const ov = overallLevel(results);
-        const $ov = $root.find('[data-pt-overall]').toggleClass('is-empty', !ov);
-        $ov.find('[data-pt-overall-level]').text(ov ? ov.toUpperCase() : '—');
-        $ov.find('[data-pt-overall-text]').text(ov ? t('choose.overall_text', { n: dig(n) }) : t('choose.overall_none'));
+        const cur = currentLevel();
+        const $ov = $root.find('[data-pt-overall]').toggleClass('is-empty', !cur);
+        $ov.find('[data-pt-overall-level]').text(cur ? cur.level.toUpperCase() : '—');
+        $ov.find('[data-pt-overall-text]').text(cur ? (cur.manual ? t('manual.current') : t('choose.overall_text', { n: dig(n) })) : t('choose.overall_none'));
         $root.find('[data-pt-scale]').each(function () {
-            $(this).toggleClass('is-me', $(this).attr('data-pt-scale') === ov);
+            $(this).toggleClass('is-me', !!cur && $(this).attr('data-pt-scale') === cur.level);
         });
+        $root.find('[data-pt-manual-current]').prop('hidden', !cur || !cur.manual).find('[data-pt-manual-level]').text(cur ? cur.level.toUpperCase() : '');
+
+        // قفل ۱۵ روزه (نوار هشدار)
+        const all = lockedAll();
+        const $lock = $root.find('[data-pt-lock]').prop('hidden', !all);
+        if (all) $lock.find('[data-pt-lock-title]').text(t('lock.banner', { n: dig(all) }));
+
+        // نوع آزمون
+        $root.find('[data-pt-mode]').each(function () {
+            $(this).attr('aria-checked', $(this).attr('data-pt-mode') === mode ? 'true' : 'false');
+        });
+        $root.find('[data-pt-pro]').prop('hidden', CAN_ADV);
+        const showUpsell = mode === 'advanced' && !CAN_ADV;
+        $root.find('[data-pt-upsell]').prop('hidden', !showUpsell);
+        $root.find('[data-pt-cards]').prop('hidden', showUpsell);
 
         $root.find('[data-pt-card]').each(function () {
             const $c = $(this);
             const k = $c.attr('data-pt-card');
             const r = results[k];
             const resume = session && session.section === k && Object.keys(session.answers).length > 0;
+            const left = resume ? 0 : lockLeft(k);
             $c.find('[data-pt-card-count]').text(t('card.questions', { n: dig(COUNT) }));
             $c.find('[data-pt-card-min]').text(t('card.minutes', { n: dig(Math.ceil((COUNT * 2) / 3)) }));
             $c.find('[data-pt-card-level]').prop('hidden', !r).text(r ? r.level.toUpperCase() : '');
             $c.find('[data-pt-card-bar]').css('width', r ? r.score + '%' : '0%');
             $c.find('[data-pt-card-label]').text(r ? t('card.last_score') : t('card.not_taken'));
             $c.find('[data-pt-card-num]').text(r ? dig(r.score) + (fa ? '٪' : '%') : '');
-            $c.find('[data-pt-card-cta]').text(resume ? t('card.resume') : r ? t('card.retake') : t('card.start'));
-            $c.toggleClass('has-resume', !!resume);
+            $c.find('[data-pt-card-cta]').text(
+                left ? t('lock.btn', { n: dig(left) }) : resume ? t('card.resume') : r ? t('card.retake') : t('card.start')
+            );
+            $c.find('[data-pt-start]').prop('disabled', left > 0).attr('aria-disabled', left > 0 ? 'true' : null);
+            $c.toggleClass('has-resume', !!resume).toggleClass('is-locked', left > 0);
         });
+    }
+    $root.on('click', '[data-pt-mode]', function () {
+        mode = $(this).attr('data-pt-mode');
+        renderChoose();
+    });
+
+    /* ── راهنمای سطح‌ها و انتخاب دستی ───────────────────────────────── */
+    function renderLevels() {
+        const cur = currentLevel();
+        $root.find('[data-pt-lvl]').each(function () {
+            const l = $(this).attr('data-pt-lvl');
+            const mine = !!cur && cur.level === l;
+            $(this).toggleClass('is-me', mine);
+            const $b = $(this).find('[data-pt-pick-level]');
+            $b.text(mine ? $b.attr('data-t-chosen') : $b.attr('data-t-choose')).toggleClass('is-chosen', mine).attr('aria-pressed', mine ? 'true' : 'false');
+        });
+    }
+    $root.on('click', '[data-pt-pick-level]', function () {
+        const lv = $(this).attr('data-pt-pick-level');
+        if (!LEVELS.includes(lv)) return;
+        const prev = manual;
+        manual = { level: lv, at: Math.floor(Date.now() / 1000) };
+        if (LOCAL) {
+            const s = store.get();
+            s.manual = manual;
+            store.set(s);
+        }
+        syncLevel(lv);
+        renderLevels();
+        $(document).trigger('placement:level', { overall: lv, skills: {} });
+        const ev = $.Event('placement:set-level');
+        $(document).trigger(ev, { level: lv });
+        if (ev.isDefaultPrevented()) {
+            levelPrev = prev;
+            return; // بک‌اند با Teodel.placement.levelSaved جواب می‌دهد
+        }
+        if (levelUrl) {
+            levelPrev = prev;
+            const csrf = $('meta[name="csrf-token"]').attr('content') || '';
+            fetch(levelUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ level: lv }),
+            })
+                .then((r) => {
+                    if (!r.ok) throw new Error('http ' + r.status);
+                    levelSaved(true, lv);
+                })
+                .catch(() => levelSaved(false, lv));
+        } else {
+            levelSaved(true, lv); // دمو
+        }
+    });
+    let levelPrev = null;
+    function levelSaved(ok, lv) {
+        if (ok) return toast(t('manual.saved', { level: String(lv).toUpperCase() }));
+        // خطا: برگرد به انتخاب قبلی
+        manual = levelPrev;
+        if (LOCAL) {
+            const s = store.get();
+            s.manual = manual;
+            store.set(s);
+        }
+        const c = currentLevel();
+        if (c) syncLevel(c.level);
+        renderLevels();
+        toast(t('manual.failed'), true);
     }
 
     /* ── شروع آزمون ────────────────────────────────────────────────── */
@@ -245,17 +396,24 @@ $(function () {
 
     async function begin(k, $btn) {
         let qs = [];
+        const track = mode === 'advanced' && CAN_ADV ? 'advanced' : 'standard';
+        const left = lockLeft(k);
+        if (left) {
+            renderChoose();
+            show('choose', true);
+            return toast(t('lock.blocked', { n: dig(left) }), true);
+        }
         if ($btn) $btn.prop('disabled', true).find('[data-pt-card-cta]').text(t('exam.loading'));
         try {
             if (startUrl) {
-                const res = await fetch(startUrl + (startUrl.indexOf('?') < 0 ? '?' : '&') + 'section=' + encodeURIComponent(k), {
+                const res = await fetch(startUrl + (startUrl.indexOf('?') < 0 ? '?' : '&') + 'section=' + encodeURIComponent(k) + '&track=' + track, {
                     headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                     credentials: 'same-origin',
                 });
                 if (!res.ok) throw new Error('http ' + res.status);
                 qs = ((await res.json()) || {}).questions || [];
             } else {
-                qs = pick(bank, k, COUNT);
+                qs = pick(bank, k, COUNT, track);
             }
         } catch (e) {
             qs = [];
@@ -265,9 +423,9 @@ $(function () {
             renderChoose();
             return toast(t('exam.failed'), true);
         }
-        session = { section: k, questions: qs, answers: {}, idx: 0 };
+        session = { section: k, questions: qs, answers: {}, idx: 0, track };
         persist();
-        $(document).trigger('placement:start', { section: k });
+        $(document).trigger('placement:start', { section: k, track });
         openExam();
     }
 
@@ -422,11 +580,13 @@ $(function () {
         const qs = session.questions;
         const answers = session.answers;
         const g = grade(qs, answers);
-        const rec = { score: g.score, level: g.level, correct: g.correct, total: g.total, at: Math.floor(Date.now() / 1000) };
+        const track = session.track || 'standard';
+        const rec = { score: g.score, level: g.level, correct: g.correct, total: g.total, track, at: Math.floor(Date.now() / 1000) };
         const nextResults = Object.assign({}, results, { [sec]: rec });
         const ov = overallLevel(nextResults);
         const payload = {
             section: sec,
+            track,
             answers: qs.map((q) => ({ id: q.id, option: answers[q.id] == null ? null : answers[q.id] })),
             correct: g.correct,
             total: g.total,
@@ -439,8 +599,14 @@ $(function () {
 
         // نتیجه را همین حالا نشان بده؛ ذخیره‌ی سمت سرور بعدش (خطا فقط با پیام اعلام می‌شود)
         results = nextResults;
-        const snapshot = { section: sec, questions: qs, answers: Object.assign({}, answers), grade: g };
+        const snapshot = { section: sec, track, questions: qs, answers: Object.assign({}, answers), grade: g };
         session = null;
+        if (LOCAL) {
+            // شروع قفل ۱۵ روزه (دمو): بک‌اند باید data-next-at را بدهد
+            const s = store.get();
+            s.finished = Object.assign({}, s.finished || {}, { [sec]: rec.at });
+            store.set(s);
+        }
         persist();
         renderResult(snapshot, ov);
         show('result', true);
@@ -483,7 +649,7 @@ $(function () {
         toast(t('toast.saved'));
     }
     window.Teodel = window.Teodel || {};
-    window.Teodel.placement = { done };
+    window.Teodel.placement = { done, levelSaved };
 
     /* ── نتیجه ─────────────────────────────────────────────────────── */
     let lastSnap = null;
@@ -496,6 +662,11 @@ $(function () {
         $root.find('[data-pt-r-level]').text(g.level.toUpperCase());
         $root.find('[data-pt-r-level-name]').text(levelName(g.level));
         $root.find('[data-pt-r-msg]').text(t('result.msg.' + g.level));
+        $root.find('[data-pt-r-ielts]').text(t('ielts.' + g.level));
+        const low = snap.track === 'advanced' && LEVELS.indexOf(g.level) < LEVELS.indexOf('b1');
+        const left = lockLeft(snap.section);
+        $root.find('[data-pt-r-note]').prop('hidden', !low && !left).text(low ? t('result.adv_low') : left ? t('result.locked_retake', { n: dig(left) }) : '');
+        $root.find('[data-pt-retake]').prop('hidden', !!left);
         // حلقه: از صفر شروع و بعد پر می‌شود (انیمیشن)
         const $ring = $root.find('[data-pt-ring]').css('--p', 0);
         requestAnimationFrame(() => requestAnimationFrame(() => $ring.css('--p', g.score)));

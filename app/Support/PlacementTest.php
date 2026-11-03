@@ -20,6 +20,13 @@ namespace App\Support;
  *     transcript (listening) متن صدا؛ در مرور پایان آزمون نشان داده می‌شود
  *     explain   (اختیاری) توضیح کوتاه جواب
  *
+ *   سطح c2 فقط در آزمون پیشرفته می‌آید (level: a1 … c2).
+ *
+ *   نوع آزمون: standard (رایگان، A1–C1) | advanced (ویژه‌ی اشتراک؛ B1–C2). در حالت start-url پارامتر ?track=advanced هم فرستاده می‌شود.
+ *   محدودیت ۱۵ روز: بک‌اند باید تاریخ باز شدن آزمون بعدی را (unix ثانیه، بعد از آخرین پایان هر آزمون + LOCK_DAYS) به‌صورت
+ *   data-next-at بدهد و سمت سرور هم اجرا کند (فرانت فقط نمایش و دمو است). lockScope: all (همه‌ی آزمون‌ها با هم) | each (هر آزمون جدا).
+ *   انتخاب دستی سطح: رویداد placement:set-level {level} یا data-level-url (POST JSON {level}) — محدودیت زمانی ندارد.
+ *
  *   دو راه تحویل سؤال‌ها:
  *     ۱) $bank = همه‌ی بانک؛ مرورگر برای هر آزمون به‌طور تصادفی و با توزیع مساوی سطح‌ها انتخاب می‌کند (دمو).
  *     ۲) data-start-url: GET ?section=vocab ← { "questions": [ … ] } (بک‌اند خودش انتخاب می‌کند؛ پیشنهاد می‌شود جواب درست
@@ -31,7 +38,17 @@ namespace App\Support;
  */
 class PlacementTest
 {
+    /** سطح‌های آزمون معمولی */
     public const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+
+    /** همه‌ی سطح‌های CEFR (راهنمای سطح‌ها، انتخاب دستی و آزمون پیشرفته تا C2) */
+    public const ALL_LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+
+    /** آزمون پیشرفته (ویژه‌ی اشتراک؛ ویژگی advanced_level پلن): فقط سؤال‌های این سطح‌ها */
+    public const ADVANCED_LEVELS = ['b1', 'b2', 'c1', 'c2'];
+
+    /** محدودیت: بین دو آزمون (برای محافظت از سؤال‌ها) */
+    public const LOCK_DAYS = 15;
 
     /** @return array<int, array<string, mixed>> */
     public static function sections(): array
@@ -80,6 +97,10 @@ class PlacementTest
             ['c1', 'The government’s response was ____; it came too late to make any difference.', ['belated', 'bewildered', 'bountiful', 'bashful'], 0],
             ['c1', 'His argument was so ____ that nobody could find a single flaw in it.', ['watertight', 'waterproof', 'waterlogged', 'watery'], 0],
             ['c1', 'The politician tried to ____ the question by changing the subject.', ['evade', 'evoke', 'evict', 'evolve'], 0],
+            ['c2', 'The critic’s review was so ____ that the author never wrote again.', ['withering', 'wavering', 'wandering', 'wondering'], 0],
+            ['c2', 'The treaty was ____ by both sides, who had no real intention of honouring it.', ['flouted', 'floated', 'flaunted', 'flustered'], 0],
+            ['c2', 'Her ____ prose made even the most technical subject a pleasure to read.', ['limpid', 'livid', 'languid', 'lurid'], 0],
+            ['c2', 'The scandal ____ the minister’s reputation beyond repair.', ['besmirched', 'bestowed', 'bewitched', 'bequeathed'], 0],
         ];
         $grammar = [
             ['a1', 'She ____ a student.', ['is', 'are', 'am', 'be'], 0],
@@ -102,6 +123,10 @@ class PlacementTest
             ['c1', 'The more you practise, ____ you become.', ['the more confident', 'more confident', 'the confident more', 'most confident'], 0],
             ['c1', 'It is high time you ____ your own decisions.', ['made', 'make', 'will make', 'have made'], 0],
             ['c1', 'I’d rather you ____ smoke in here.', ['didn’t', 'don’t', 'won’t', 'hadn’t'], 0],
+            ['c2', 'Scarcely ____ the building when the alarm went off.', ['had they entered', 'they had entered', 'did they enter', 'they entered'], 0],
+            ['c2', 'Were it not for her support, the project ____ collapsed long ago.', ['would have', 'will have', 'had', 'would'], 0],
+            ['c2', 'So ____ was the noise that nobody could hear the speaker.', ['deafening', 'deafened', 'it deafening', 'deafen'], 0],
+            ['c2', 'Whatever the outcome, the committee insists that the decision ____ final.', ['be', 'is being', 'was', 'would being'], 0],
         ];
         $listening = [
             ['a1', 'Hello, my name is Sara. I am twelve years old.', 'How old is Sara?', ['Ten', 'Eleven', 'Twelve', 'Thirteen'], 2],
@@ -124,6 +149,10 @@ class PlacementTest
             ['c1', 'While the initial results looked promising, the researchers cautioned that the sample was too small to draw any firm conclusions.', 'What did the researchers say about the results?', ['They are conclusive', 'They should be treated with caution', 'They are wrong', 'They were confirmed by others'], 1],
             ['c1', 'Far from being a setback, the delay gave the team an opportunity to refine the design, and the final product was considerably better as a result.', 'How does the speaker view the delay?', ['As a disaster', 'As beneficial', 'As irrelevant', 'As avoidable'], 1],
             ['c1', 'She gave up a lucrative career in law to open a small bookshop, a decision her family regarded as reckless but which she has never regretted.', 'How did her family react to her decision?', ['They supported her', 'They thought it was irresponsible', 'They were indifferent', 'They were envious'], 1],
+            ['c2', 'The minister’s statement was carefully worded: it neither confirmed nor denied the allegations, leaving journalists to read between the lines.', 'What can be inferred about the minister’s statement?', ['It was deliberately ambiguous', 'It admitted everything', 'It rejected the claims fully', 'It was unplanned'], 0],
+            ['c2', 'For all its apparent simplicity, the poem rewards repeated reading, since each pass reveals another layer of irony the first glance misses.', 'What is said about the poem?', ['It is shallow', 'It has hidden depth', 'It is too long', 'It is humourless'], 1],
+            ['c2', 'Her optimism, bordering on the quixotic, led her to invest everything in a venture that most analysts had written off.', 'How is her optimism described?', ['Realistic and cautious', 'Idealistic and impractical', 'Cynical', 'Borrowed from analysts'], 1],
+            ['c2', 'Far from vindicating the theory, the experiment exposed fundamental weaknesses that its proponents had hitherto glossed over.', 'What did the experiment show?', ['The theory was proven', 'The theory had serious flaws', 'The experiment was invalid', 'Nothing new'], 1],
         ];
 
         $out = [];
