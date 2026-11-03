@@ -39,6 +39,7 @@
                 <li><x-icon name="check-circle" class="size-4" />{{ $chip }}</li>
             @endforeach
         </ul>
+        <p class="st-slogan"><span class="st-h2__dots" aria-hidden="true"></span>{{ __('subscription.slogan') }}</p>
     </div>
     <div class="st-hero__art" aria-hidden="false">
         @unless ($heroFile)<div class="st-hero__glow" aria-hidden="true"></div>@endunless
@@ -132,7 +133,7 @@
                     @endforeach
                 </ul>
                 @if ($isFree)
-                    <p class="sb-tag" dir="auto"><span class="font-bold text-brand-700" dir="ltr">{{ __('subscription.tagline_en') }}</span><span class="text-slate-600">{{ __('subscription.tagline_fa') }}</span></p>
+                    <p class="sb-tag">{{ __('subscription.slogan') }}</p>
                 @else
                     <p class="sb-guarantee">{!! __('subscription.guarantee') !!}</p>
                 @endif
@@ -169,7 +170,7 @@
             @foreach (__('site.reviews.items') as $i => $r)
                 <li class="st-rev" data-st-in style="--d: {{ ($i % 3) * 70 }}ms">
                     <div class="st-rev__top">
-                        <img src="{{ asset('images/avatars/avatar-'.sprintf('%02d', $avatars[$i % count($avatars)]).'.svg') }}" alt="" width="44" height="44" loading="lazy" decoding="async" class="st-rev__av">
+                        <img src="{{ asset('images/avatars/avatar-'.sprintf('%02d', $avatars[$i % count($avatars)]).'.webp') }}" alt="" width="44" height="44" loading="lazy" decoding="async" class="st-rev__av">
                         <div class="min-w-0"><b>{{ $r['n'] }}</b><small>{{ $r['d'] }}</small></div>
                     </div>
                     <p>{{ $r['t'] }}</p>

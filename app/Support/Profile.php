@@ -39,12 +39,12 @@ class Profile
         ];
     }
 
-    /** آواتارهای نمونه (pixel-art ساخته‌شده برای تست). فایل‌های public/images/avatars/avatar-XX.svg را با آواتارهای اصلی عوض کنید. */
+    /** آواتارهای اصلی (۲۰ عدد، ارسالی کارفرما). فایل‌های public/images/avatars/avatar-XX.webp را با آواتارهای اصلی عوض کنید. */
     public static function avatars(): array
     {
-        return collect(range(1, 15))->map(fn ($i) => [
+        return collect(range(1, 21))->map(fn ($i) => [
             'id' => $i,
-            'src' => asset(sprintf('images/avatars/avatar-%02d.svg', $i)),
+            'src' => asset(sprintf('images/avatars/avatar-%02d.webp', $i)),
             'locked' => false,
         ])->all();
     }

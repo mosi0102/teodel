@@ -97,10 +97,7 @@
                 </ul>
 
                 @if ($isFree)
-                    <p class="sb-tag" dir="auto">
-                        <span class="font-bold text-brand-700" dir="ltr">{{ __('subscription.tagline_en') }}</span>
-                        <span class="text-slate-600">{{ __('subscription.tagline_fa') }}</span>
-                    </p>
+                    <p class="sb-tag">{{ __('subscription.slogan') }}</p>
                 @else
                     <p class="sb-guarantee">{!! __('subscription.guarantee') !!}</p>
                 @endif

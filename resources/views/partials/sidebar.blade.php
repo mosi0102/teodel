@@ -30,7 +30,7 @@
                    class="group flex items-center justify-center gap-3 rounded-xl transition lg:justify-start"
                    title="{{ __('profile.title') }}" aria-label="{{ __('profile.title') }}: {{ $u['name'] }}"
                    @if (request()->routeIs('profile.*')) aria-current="page" @endif>
-                    <img src="{{ $u['avatar'] ?? asset('images/avatars/avatar-01.svg') }}" alt="" width="44" height="44" data-user-avatar
+                    <img src="{{ $u['avatar'] ?? asset('images/avatars/avatar-01.webp') }}" alt="" width="44" height="44" data-user-avatar
                          class="size-11 shrink-0 rounded-full bg-white object-cover ring-2 ring-white transition group-hover:ring-brand-200">
                     <div class="hidden min-w-0 flex-1 lg:block">
                         <p class="truncate text-sm font-bold text-brand-900 transition group-hover:text-brand-700">{{ $u['name'] }}</p>

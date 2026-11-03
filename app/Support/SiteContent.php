@@ -20,7 +20,7 @@ class SiteContent
         ];
     }
 
-    /** آواتارهای نظرها: فایل‌های public/images/avatars/avatar-NN.svg */
+    /** آواتارهای نظرها: فایل‌های public/images/avatars/avatar-NN.webp */
     public static function reviewAvatars(): array
     {
         return [3, 7, 11, 5, 14, 9, 2, 12, 6];

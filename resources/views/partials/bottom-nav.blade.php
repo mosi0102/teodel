@@ -35,7 +35,7 @@
         {{-- کارت کاربر: لینک به صفحه‌ی پروفایل (data-user-avatar: با تغییر آواتار، این عکس هم عوض می‌شود) --}}
         <a href="{{ $profileUrl }}" class="mb-3 flex min-h-16 items-center gap-3 rounded-2xl bg-brand-50 px-3.5 py-2.5 transition active:scale-[.98]"
            @if (request()->routeIs('profile.*')) aria-current="page" @endif>
-            <img src="{{ $mu['avatar'] ?? asset('images/avatars/avatar-01.svg') }}" alt="" width="44" height="44" data-user-avatar
+            <img src="{{ $mu['avatar'] ?? asset('images/avatars/avatar-01.webp') }}" alt="" width="44" height="44" data-user-avatar
                  class="size-11 shrink-0 rounded-full bg-white object-cover ring-2 ring-white">
             <span class="min-w-0 flex-1">
                 <span class="block truncate text-sm font-bold text-brand-900">{{ $mu['name'] ?? __('profile.title') }}</span>

@@ -152,6 +152,7 @@ class MusicController extends Controller
             'name' => 'مهدی پوربشیری',
             'days_left' => 0,
             'points' => 560,
+            'streak' => 5, // TODO(backend): روزهای پیاپی درس خواندن کاربر (همان streak.current داشبورد)
             'level' => 'A2',
             'skills' => ['listening' => 'A3', 'reading' => 'A1', 'writing' => 'A2', 'speaking' => 'A2'],
         ];

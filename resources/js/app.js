@@ -11,3 +11,4 @@ import './modules/focus-mode';
 import './modules/sidebar';
 import './modules/report';
 import './modules/logout-confirm';
+import './modules/select';

@@ -34,7 +34,7 @@
         <div class="st-head__acts">
             <a href="{{ url('/lang/'.$other) }}" hreflang="{{ $other }}" lang="{{ $other }}" class="st-lang">
                 <x-icon name="globe" class="size-4"/>
-                <span>{{ __('site.switch_code') }}</span>
+                <span lang="{{ $other }}">{{ __('site.switch_code') }}</span>
             </a>
             @if ($loggedIn)
                 <a href="{{ url('/dashboard') }}" class="st-cta st-cta--head">{{ __('site.dashboard') }}</a>

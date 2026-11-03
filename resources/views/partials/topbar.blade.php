@@ -1,6 +1,7 @@
 @php
     // TODO(backend): امتیاز را از کاربر واقعی بدهید
     $topPoints = $user['points'] ?? 0;
+    $topStreak = $user['streak'] ?? null; // TODO(backend): streak.current کاربر؛ اگر داده نشود، چیپ نشان داده نمی‌شود
     $otherLocale = app()->getLocale() === 'fa' ? 'en' : 'fa';
 @endphp
 
@@ -31,6 +32,19 @@
                 <span class="block text-sm font-extrabold text-brand-900">{{ num($topPoints) }}</span>
             </span>
         </div>
+
+        {{-- Streak (روزهای پیاپی) کنار امتیاز --}}
+        @if ($topStreak !== null)
+            <div class="flex h-11 items-center gap-2 rounded-full bg-slate-100 ps-1.5 pe-4" data-topbar-streak title="{{ __('ui.streak') }}">
+                <span class="grid size-8 place-items-center rounded-full bg-orange-100 text-orange-500">
+                    <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3 4 4.5 4 8a4 4 0 0 1-8 0c0-1.6.7-2.6 1.5-3.5C10 9 12 7 12 3z"/><path d="M8.5 17.5A5 5 0 0 0 12 21a5 5 0 0 0 3.5-3.5"/></svg>
+                </span>
+                <span class="leading-tight">
+                    <span class="hidden text-[11px] text-slate-500 sm:block">{{ __('ui.streak') }}</span>
+                    <span class="block text-sm font-extrabold text-brand-900">{{ num($topStreak) }}</span>
+                </span>
+            </div>
+        @endif
 
         {{-- تغییر زبان --}}
         <a href="{{ url('/lang/' . $otherLocale) }}" hreflang="{{ $otherLocale }}" class="chip-btn h-11"

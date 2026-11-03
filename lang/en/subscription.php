@@ -3,8 +3,7 @@
 return [
     'title' => 'Get a subscription',
     'subtitle' => 'Pick a plan and unlock every step of every song.',
-    'tagline_en' => 'Learn from what you love.',
-    'tagline_fa' => 'Learn English from what you already enjoy',
+    'slogan' => 'Your learning path, designed.',
     'currency' => 'Toman',
     'per_month' => 'About :price Toman / month',
     'off' => ':n% off',

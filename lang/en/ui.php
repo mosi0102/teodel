@@ -7,6 +7,7 @@ return [
     'sidebar_open' => 'Open sidebar',
     'soon' => 'Soon',
     'points' => 'Points',
+    'streak' => 'Day streak',
     'days_left' => 'Subscription days left',
     'buy' => 'Get a subscription',
     'logout' => 'Log out',

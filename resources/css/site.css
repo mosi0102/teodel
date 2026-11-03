@@ -26,6 +26,7 @@
 .st-nav__a[aria-current='page'], .st-nav__a.is-on { @apply bg-brand-50 text-brand-700; }
 .st-head__acts { @apply ms-auto flex items-center gap-2 lg:ms-0; }
 .st-lang { @apply inline-flex min-h-10 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-600 transition duration-200 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 active:scale-95; }
+.st-lang [lang='fa'], .st-lang--wide[lang='fa'] { font-family: var(--font-fa, 'Yekan Bakh', system-ui, sans-serif); }
 .st-lang--wide { @apply w-full justify-center text-sm; }
 .st-login { @apply hidden min-h-10 items-center rounded-full px-3 text-sm font-bold text-slate-600 transition-colors duration-200 hover:text-brand-700 md:inline-flex; }
 .st-cta { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-extrabold text-white shadow-card transition duration-200 hover:-translate-y-0.5 hover:bg-brand-800 hover:shadow-lift active:translate-y-0 active:scale-[.98]; }
@@ -64,6 +65,7 @@ html.st-sheet-open { overflow: hidden; }
 .st-hero__txt { @apply flex flex-col items-start; }
 .st-hero__t { @apply mt-3 text-4xl font-extrabold leading-[1.45] text-brand-900 md:text-5xl md:leading-[1.4]; }
 .st-hero__p { @apply mt-4 max-w-md text-sm leading-8 text-slate-500 md:text-base; }
+.st-slogan { @apply mt-5 inline-flex items-center gap-2 text-sm font-extrabold text-brand-700 md:text-base; }
 .st-hero__acts { @apply mt-6 flex flex-wrap items-center gap-2; }
 .st-chips { @apply mt-6 flex flex-wrap gap-2; }
 .st-chips li { @apply inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm; }
