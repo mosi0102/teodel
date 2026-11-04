@@ -12,6 +12,9 @@ class WordsController extends Controller
 {
     public function index()
     {
-        return view('words.index', ['words' => SavedWords::demo()]);
+        return view('words.index', [
+            'words' => SavedWords::demo(),
+            // 'viewUrl' => route('words.view'),  // POST {id} ← ثبت هر بار دیدن لغت (بعد از SavedWords::LEARN_AT بار، «یاد گرفته‌ام» می‌شود)
+        ]);
     }
 }

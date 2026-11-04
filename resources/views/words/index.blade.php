@@ -8,7 +8,8 @@
 
 {{--
     لغات و عبارت‌های هایلایت‌شده: لیست + دیالوگ اطلاعات هر لغت + حالت مرور.
-    رفتار کامل در resources/js/modules/saved-words.js (جست‌وجو، فیلتر، مرتب‌سازی، حذف با بازگردانی، مرور).
+    رفتار کامل در resources/js/modules/saved-words.js (جست‌وجو، فیلتر، مرتب‌سازی، حذف با بازگردانی، مرور، شمارنده‌ی دیدن).
+    اختیاری از کنترلر: $viewUrl ← POST {id} برای ثبت هر بار دیدن در سرور (قرارداد: بالای saved-words.js).
     داده: app/Support/SavedWords.php ($words از کنترلر) — هر ترجمه/مثالِ ترجمه‌شده تار است و با کلیک نمایش داده می‌شود.
 --}}
 @section('content')
@@ -17,7 +18,10 @@
     data-song-url="{{ url('/music') }}" data-dict-url="{{ url('/dictionary') }}"
     data-t-removed="{{ __('words.removed') }}" data-t-position="{{ __('words.position') }}" data-t-count="{{ __('words.count') }}"
     data-t-review-count="{{ __('words.review.progress') }}" data-t-done-text="{{ __('words.review.done_text') }}"
-    data-t-again="{{ __('words.review.again') }}" data-t-status-learning="{{ __('words.status.learning') }}" data-t-status-learned="{{ __('words.status.learned') }}"
+    data-learn-at="{{ \App\Support\SavedWords::LEARN_AT }}" @isset($viewUrl) data-view-url="{{ $viewUrl }}" @endisset
+    data-t-views-label="{{ __('words.views.label') }}" data-t-views-learned="{{ __('words.views.learned') }}" data-t-views-hint="{{ __('words.views.hint') }}"
+    data-t-continue="{{ __('words.review.continue') }}" data-t-finish="{{ __('words.review.finish') }}"
+    data-t-status-learning="{{ __('words.status.learning') }}" data-t-status-learned="{{ __('words.status.learned') }}"
     data-t-see="{{ __('words.see') }}" data-t-hide="{{ __('words.hide') }}" data-t-start="{{ __('words.review.start') }}">
 
     {{-- عنوان + ابزارها --}}
@@ -70,7 +74,7 @@
 
             {{-- تب‌های سطح (با شمارنده) --}}
             <nav class="no-scrollbar mt-3 flex divide-x divide-slate-200 overflow-x-auto rounded-xl border border-slate-200 rtl:divide-x-reverse md:mt-4" aria-label="{{ __('words.levels_label') }}" data-sw-tabs>
-                @foreach (['all', 'a1', 'a2', 'b1', 'b2', 'c1'] as $l)
+                @foreach (['all', 'a1', 'a2', 'b1', 'b2', 'c1', 'c2'] as $l)
                     <button type="button" class="level-tab sw-tab" data-level="{{ $l }}" @if ($l === 'all') aria-current="page" @endif>
                         <span>{{ $l === 'all' ? __('words.tabs.all') : strtoupper($l) }}</span>
                         <span class="sw-tab__n" data-sw-tab-n>{{ num(0) }}</span>
@@ -182,6 +186,15 @@
                 <button type="button" data-dialog-close class="sw-x -me-2 -mt-1" aria-label="{{ __('ui.close') }}"><x-icon name="x" class="size-5" /></button>
             </div>
 
+            {{-- شمارنده‌ی دیدن: «دیدن N از ۵» (تنها جای نمایش شمارنده)؛ بعد از ۵ بار خودکار «یاد گرفته‌ام» --}}
+            <div class="sw-views" data-sw-views>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-xs font-extrabold text-slate-600" data-sw-views-text></span>
+                    <span class="sw-views__dots" data-sw-views-dots aria-hidden="true"></span>
+                </div>
+                <p class="mt-1.5 text-[0.7rem] leading-5 text-slate-400" data-sw-views-hint></p>
+            </div>
+
             {{-- ترجمه‌ی لغت (تار) --}}
             <div class="mt-4 flex items-center gap-3" data-d-tr-wrap>
                 <span class="shrink-0 text-xs font-bold text-slate-500">{{ __('words.translate') }}</span>
@@ -208,6 +221,9 @@
                 <div data-d-row="synonyms"><dt>{{ __('words.synonyms') }}</dt><dd data-d="synonyms"></dd></div>
                 <div data-d-row="antonyms"><dt>{{ __('words.antonyms') }}</dt><dd data-d="antonyms"></dd></div>
             </dl>
+
+            {{-- اطلاعات بیشتر: سطح/دسته، connotation، نقش‌های دیگر، کالوکیشن، هم‌خانواده، ریشه (فقط اگر داده باشد) --}}
+            <div data-wx data-t='@json(__('wordextra'), JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)' hidden></div>
 
             <a href="#" class="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3.5 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-100" data-d-song hidden>
                 <x-icon name="music" class="size-4" />
@@ -245,16 +261,14 @@
                     <div data-r-reveal-wrap>
                         <button type="button" class="btn-primary w-full" data-r-reveal><x-icon name="eye" class="size-5" />{{ __('words.review.reveal') }}</button>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 " data-r-answer-wrap hidden>
-                        <button type="button" class="btn-ghost sw-ans sw-ans--no" data-r-answer="no"><x-icon name="x" class="size-4" />{{ __('words.review.no') }}</button>
-                        <button type="button" class="btn-primary sw-ans sw-ans--yes" data-r-answer="yes"><x-icon name="check" class="size-4" />{{ __('words.review.yes') }}</button>
+                    <div data-r-answer-wrap hidden>
+                        <button type="button" class="btn-primary w-full" data-r-continue><span data-r-continue-label>{{ __('words.review.continue') }}</span></button>
                     </div>
                 </div>
                 <button type="button" class="sw-round" data-r-prev aria-label="{{ __('words.prev') }}"><x-icon name="chevron-start" class="size-5" /></button>
 
             </div>
             <div class="grid gap-2.5" data-foot="done" hidden>
-                <button type="button" class="btn-primary" data-r-again hidden></button>
                 <button type="button" class="btn-ghost" data-dialog-close>{{ __('ui.close') }}</button>
             </div>
         </div>

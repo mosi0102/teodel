@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { openDialog, closeDialog } from './dialogs';
 import { digits } from './digits';
+import { renderExtra } from './word-extra';
 
 /**
  * لغات و عبارت‌های هایلایت‌شده (صفحه‌ی /words)
@@ -8,20 +9,22 @@ import { digits } from './digits';
  * - لیست در مرورگر فیلتر، جست‌وجو و مرتب می‌شود (بدون رفرش)؛ تب‌های سطح شمارنده دارند.
  * - بوکمارک روی کارت = حذف از لیست؛ بلافاصله حذف می‌شود و یک پیام «بازگردانی» (۶ ثانیه) می‌آید.
  * - «اطلاعات بیشتر» یک offcanvas باز می‌کند (قبلی/بعدی، کلید ←/→، کشیدن انگشت). فقط ترجمه‌های فارسی تارند و با کلیک نمایش داده می‌شوند.
- * - «شروع مرور»: ترجمه‌ها تارند تا کاربر اول خودش یادآوری کند، بعد «نمایش جواب» و «یاد گرفتم / هنوز نه».
- *   دکمه‌های قبلی/بعدی هم هست و جواب هر لغت جدا نگه داشته و قابل‌تغییر است.
+ * - «شروع مرور»: ترجمه‌ها تارند تا کاربر اول خودش یادآوری کند، بعد «نمایش جواب» و «بعدی». دکمه‌ی دستی «یاد گرفتم» وجود ندارد.
+ * - یادگیری خودکار: هر بار که جزئیات یک لغت باز شود (یا در مرور نشان داده شود) یک «دیدن» حساب می‌شود؛ بعد از ۵ بار وضعیت
+ *   خودکار «یاد گرفته‌ام» می‌شود. شمارنده («دیدن N از ۵») فقط یک جا، بالای پنجره‌ی جزئیات، نشان داده می‌شود.
  *
  * ── برای بک‌اند ─────────────────────────────────────────────────────────
  *   لیست: app/Support/SavedWords.php (data-words).
  *   $(document).on('word:bookmark', (e, { id, key, text, saved, song }) => {...})   ← حذف (saved=false) / بازگردانی (saved=true)
- *   $(document).on('words:review',  (e, { id, key, known }) => {...})              ← جواب هر لغت در مرور (known=true → status=learned، وگرنه learning)
- *   $(document).on('words:review-done', (e, { total, known }) => {...})
+ *   $(document).on('words:view', (e, { id, key, views, learned }) => {...})        ← هر بار دیدن یک لغت (views = شمارنده‌ی جدید؛ learned=true وقتی تازه به ۵ رسید)
+ *      یا data-view-url روی ریشه: POST JSON { id } ← { views } (سرور شمارنده را نگه می‌دارد؛ وضعیت = views ≥ 5 ؟ learned)
+ *   $(document).on('words:review-done', (e, { total, learned }) => {...})
  *   تلفظ: audio.uk / audio.us اگر باشد پخش می‌شود، وگرنه صدای خود مرورگر.
  */
 const LOCAL = true; // دمو: حذف‌ها و نتیجه‌ی مرور در مرورگر می‌ماند و لغت‌های ذخیره‌شده‌ی مرحله‌ی ۳ هم اضافه می‌شوند. با اتصال بک‌اند false کنید.
 const SAVED_KEY = 'teodel:words:saved'; // همان کلیدِ words.js (مرحله‌ی ۳)
 const REMOVED_KEY = 'teodel:words:removed';
-const REVIEW_KEY = 'teodel:words:review';
+const VIEWS_KEY = 'teodel:words:views'; // { [id]: تعداد دفعات دیدن } (دمو)
 const PAGE = 12;
 const UNDO_MS = 6000;
 
@@ -39,7 +42,7 @@ const store = {
     },
 };
 
-const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
 const fill = (tpl, map) => Object.keys(map).reduce((s, k) => s.replace(':' + k, map[k]), tpl);
 const rtl = () => document.documentElement.dir === 'rtl';
 
@@ -73,6 +76,7 @@ function init(root) {
     const tplCard = $root.find('[data-sw-card-tpl]')[0];
     const T = (n) => $root.attr('data-t-' + n) || '';
     const songUrl = $root.attr('data-song-url') || '#';
+    const LEARN_AT = parseInt($root.attr('data-learn-at'), 10) || 5;
 
     // ---------- داده ----------
     let all = [];
@@ -95,13 +99,20 @@ function init(root) {
                 ipa: info.ipa || { uk: '', us: '' }, audio: info.audio || { uk: '', us: '' },
                 meaning: info.meaning || '', example: info.example || '', example_tr: info.example_tr || '',
                 translate: info.translate || '', synonyms: info.synonyms || [], antonyms: info.antonyms || [],
+                tags: info.tags || [], connotation: info.connotation || '', senses: info.senses || [], collocations: info.collocations || [],
+                family: info.family || [], morphemes: info.morphemes || [], origin: info.origin || '',
                 image: info.image || null, song: v.song ? { id: v.song, title: '' } : null, saved_at: v.at || 0, status: 'new',
             });
         });
 
-        const review = store.get(REVIEW_KEY, {});
-        all.forEach((w) => { if (review[w.id]) w.status = review[w.id]; });
+        const vs = store.get(VIEWS_KEY, {});
+        all.forEach((w) => { w.views = Math.max(w.views || 0, vs[w.id] || 0); });
     }
+    all.forEach((w) => { w.views = w.views || 0; w.status = statusOf(w.views); });
+
+    const viewUrl = $root.attr('data-view-url') || '';
+    function statusOf(n) { return n >= LEARN_AT ? 'learned' : n > 0 ? 'learning' : 'new'; }
+    const keyOf = (w) => String(w.id);
 
     // ---------- وضعیت لیست ----------
     const st = { q: '', filter: 'all', sort: 'newest', level: 'all', shown: PAGE };
@@ -290,7 +301,7 @@ function init(root) {
     });
 
     // ---------- دیالوگ ----------
-    const d = { mode: 'view', list: [], i: 0, total: 0, answers: {}, done: false, unknown: [] };
+    const d = { mode: 'view', list: [], i: 0, total: 0, revealed: new Set(), seen: new Set(), done: false };
     const $b = $dlg.find('.sw-b');
     const cur = () => d.list[d.i];
 
@@ -305,6 +316,41 @@ function init(root) {
         const $e = $dlg.find('[data-d="' + el + '"]');
         $e.text((arr || []).join(', '));
         $dlg.find('[data-d-row="' + el + '"]').prop('hidden', !(arr && arr.length));
+    }
+
+    /** یک بار دیدن (در هر بار باز بودن پنجره برای هر لغت حداکثر یک بار) */
+    function countView(w) {
+        if (!w || d.seen.has(keyOf(w))) return;
+        d.seen.add(keyOf(w));
+        const was = w.status;
+        w.views = (w.views || 0) + 1;
+        w.status = statusOf(w.views);
+        if (LOCAL) {
+            const vs = store.get(VIEWS_KEY, {});
+            vs[w.id] = w.views;
+            store.set(VIEWS_KEY, vs);
+        }
+        $(document).trigger('words:view', [{ id: w.id, key: w.key, views: w.views, learned: was !== 'learned' && w.status === 'learned' }]);
+        if (viewUrl) {
+            const csrf = $('meta[name="csrf-token"]').attr('content') || '';
+            fetch(viewUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ id: w.id }),
+            }).catch(() => {});
+        }
+    }
+
+    /** شمارنده‌ی «دیدن N از ۵» — تنها جایی که شمارنده نشان داده می‌شود */
+    function paintViews(w) {
+        const learned = w.views >= LEARN_AT;
+        const n = Math.min(w.views, LEARN_AT);
+        const $v = $dlg.find('[data-sw-views]').toggleClass('is-learned', learned);
+        $v.find('[data-sw-views-text]').text(learned ? T('views-learned') : fill(T('views-label'), { n: digits(n), total: digits(LEARN_AT) }));
+        $v.find('[data-sw-views-hint]').text(learned ? '' : fill(T('views-hint'), { total: digits(LEARN_AT) }));
+        const $dots = $v.find('[data-sw-views-dots]').empty();
+        for (let i = 1; i <= LEARN_AT; i++) $dots.append($('<i></i>').toggleClass('is-on', i <= w.views));
     }
 
     function showWord(w) {
@@ -326,6 +372,8 @@ function init(root) {
         $dlg.find('[data-d-ex-wrap]').prop('hidden', !w.example);
         setList('synonyms', w.synonyms);
         setList('antonyms', w.antonyms);
+        renderExtra($dlg.find('[data-wx]')[0], w);
+        paintViews(w);
         thumb($dlg.find('[data-d-img]')[0], w);
 
         const $s = $dlg.find('[data-d-song]');
@@ -350,6 +398,7 @@ function init(root) {
     function paintView() {
         const w = cur();
         if (!w) { closeDialog($dlg); return; }
+        countView(w);
         showWord(w);
         $dlg.find('[data-d-pos]').text(fill($root.attr('data-t-position'), { n: digits(d.i + 1), total: digits(d.list.length) }));
         $dlg.find('[data-d-prev]').prop('disabled', d.i === 0);
@@ -359,6 +408,7 @@ function init(root) {
     function openView(w) {
         d.mode = 'view';
         d.done = false;
+        d.seen = new Set();
         d.list = view();
         d.i = Math.max(d.list.indexOf(w), 0);
         $dlg.attr('data-mode', 'view');
@@ -429,26 +479,15 @@ function init(root) {
     });
 
     // ---------- مرور ----------
-    // d.answers: کلیدِ هر لغت ← true (بلد بودم) | false (هنوز نه). با «قبلی» می‌شود جواب را عوض کرد.
-    const keyOf = (w) => String(w.id);
-    const counts = () => {
-        let known = 0;
-        let answered = 0;
-        d.list.forEach((w) => {
-            const a = d.answers[keyOf(w)];
-            if (a === undefined) return;
-            answered++;
-            if (a) known++;
-        });
-        return { known, answered };
-    };
-
+    // مرور = ورق‌زدن لغت‌ها با ترجمه‌ی تار: اول خودت یادآوری کن، بعد «نمایش جواب». دکمه‌ی دستیِ «یاد گرفتم» حذف شده؛
+    // هر لغتی که در مرور نشان داده شود یک بار دیدن حساب می‌شود (d.seen) و بعد از LEARN_AT بار خودکار «یاد گرفته‌ام» می‌شود.
     function startReview(list) {
         d.mode = 'review';
         d.list = list;
         d.i = 0;
         d.total = list.length;
-        d.answers = {};
+        d.revealed = new Set();
+        d.seen = new Set();
         d.done = false;
         $dlg.attr('data-mode', 'review');
         $dlg.find('[data-sw-body]').prop('hidden', false);
@@ -459,18 +498,14 @@ function init(root) {
 
     function paintReview() {
         const w = cur();
+        countView(w);
         showWord(w); // ترجمه‌ها تار
-        const a = d.answers[keyOf(w)];
-        const answered = a !== undefined;
-        if (answered) setBlur(false); // لغتِ جواب‌داده: ترجمه باز
-        $dlg.find('[data-r-reveal-wrap]').prop('hidden', answered);
-        $dlg.find('[data-r-answer-wrap]').prop('hidden', !answered);
-        $dlg.find('[data-r-answer]').each(function () {
-            const yes = this.getAttribute('data-r-answer') === 'yes';
-            if (answered && yes === a) this.setAttribute('data-picked', '');
-            else this.removeAttribute('data-picked');
-        });
-        $dlg.find('[data-sw-rbar]').css('width', (counts().answered / d.total) * 100 + '%');
+        const shown = d.revealed.has(keyOf(w));
+        if (shown) setBlur(false); // لغتِ نشان‌داده‌شده: ترجمه باز
+        $dlg.find('[data-r-reveal-wrap]').prop('hidden', shown);
+        $dlg.find('[data-r-answer-wrap]').prop('hidden', !shown);
+        $dlg.find('[data-r-continue] [data-r-continue-label]').text(d.i >= d.list.length - 1 ? T('finish') : T('continue'));
+        $dlg.find('[data-sw-rbar]').css('width', (d.revealed.size / d.total) * 100 + '%');
         $dlg.find('[data-sw-rcount]').text(fill(T('review-count'), { n: digits(d.i + 1), total: digits(d.total) }));
         $dlg.find('[data-r-prev]').prop('disabled', d.i === 0);
         $dlg.find('[data-r-next]').prop('disabled', d.i >= d.list.length - 1);
@@ -491,50 +526,28 @@ function init(root) {
         if (list.length) startReview(list);
     });
     $dlg.on('click', '[data-r-reveal]', () => {
+        d.revealed.add(keyOf(cur()));
         setBlur(false);
         $dlg.find('[data-r-reveal-wrap]').prop('hidden', true);
         $dlg.find('[data-r-answer-wrap]').prop('hidden', false);
+        $dlg.find('[data-sw-rbar]').css('width', (d.revealed.size / d.total) * 100 + '%');
     });
-    $dlg.on('click', '[data-r-answer]', function () {
-        const w = cur();
-        const known = this.getAttribute('data-r-answer') === 'yes';
-        d.answers[keyOf(w)] = known;
-        w.status = known ? 'learned' : 'learning';
-        if (LOCAL) {
-            const r = store.get(REVIEW_KEY, {});
-            r[w.id] = w.status;
-            store.set(REVIEW_KEY, r);
-        }
-        $(document).trigger('words:review', [{ id: w.id, key: w.key, known }]);
-
-        // برو به اولین لغتِ بی‌جواب بعدی (دورانی)؛ اگر همه جواب داده شد ← پایان
-        for (let k = 1; k <= d.list.length; k++) {
-            const idx = (d.i + k) % d.list.length;
-            if (d.answers[keyOf(d.list[idx])] === undefined) {
-                d.i = idx;
-                paintReview();
-                return;
-            }
-        }
-        finishReview();
+    $dlg.on('click', '[data-r-continue]', () => {
+        if (d.i >= d.list.length - 1) finishReview();
+        else goReview(1);
     });
 
     function finishReview() {
-        const { known } = counts();
-        const unknown = d.list.filter((w) => d.answers[keyOf(w)] === false);
         d.done = true;
-        d.unknown = unknown;
         $dlg.find('[data-sw-body]').prop('hidden', true);
         $dlg.find('[data-sw-done]').prop('hidden', false);
         $dlg.find('[data-sw-rbar]').css('width', '100%');
-        $dlg.find('[data-sw-done-text]').text(fill(T('done-text'), { known: digits(known), total: digits(d.total) }));
-        const $again = $dlg.find('[data-r-again]');
-        $again.prop('hidden', !unknown.length).text(unknown.length ? fill($root.attr('data-t-again') || '', { n: digits(unknown.length) }) : '');
+        const learned = d.list.filter((w) => w.status === 'learned').length;
+        $dlg.find('[data-sw-done-text]').text(fill(T('done-text'), { learned: digits(learned), total: digits(d.total) }));
         $dlg.find('[data-sw-scroll]')[0].scrollTop = 0;
         foot('done');
-        $(document).trigger('words:review-done', [{ total: d.total, known }]);
+        $(document).trigger('words:review-done', [{ total: d.total, learned }]);
     }
-    $dlg.on('click', '[data-r-again]', () => startReview(d.unknown.slice()));
 
     $dlg.on('dialog:close', () => {
         if (audio) audio.pause();

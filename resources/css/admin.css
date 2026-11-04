@@ -515,6 +515,15 @@ a.ad-user:hover b { @apply text-brand-700; }
 .dc-segs--lg { @apply flex w-full gap-1.5; }
 .dc-segs--lg i { @apply h-2 flex-1; }
 
+/* اطلاعات تکمیلی لغت */
+.dc-x { @apply mt-2 border-t border-slate-100 pt-4; }
+.dc-tag span { @apply inline-flex min-h-10 cursor-pointer items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition duration-200 hover:border-brand-200 peer-focus-visible:ring-4 peer-focus-visible:ring-brand-100; }
+.dc-tag input:checked + span { @apply border-brand-600 bg-brand-50 text-brand-700; }
+.dc-sense { @apply grid gap-2.5 rounded-2xl border border-slate-200 bg-slate-50/60 p-3.5; }
+.dc-sense__head { @apply flex items-center justify-between gap-2; }
+.dc-sense__grid { @apply grid gap-2.5 sm:grid-cols-2; }
+.dc-sense .field { @apply !min-h-10 bg-white !text-sm; }
+.dc-sense textarea.field { @apply !min-h-14; }
 .dc-play { @apply grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700 transition duration-200 hover:bg-brand-100; }
 .dc-play--sm { @apply size-7; }
 .dc-play.is-on { @apply bg-brand-700 text-white; }

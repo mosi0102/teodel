@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * دیکشنری (صفحه‌ی /dictionary). سطح‌بندی ندارد؛ لغت‌ها الفبایی‌اند.
+ * دیکشنری (صفحه‌ی /dictionary). لغت‌ها الفبایی‌اند و با سطح (A1–C2) و دسته (GRE / IELTS / اصطلاحات / اسلنگ) فیلتر می‌شوند.
  *
  * 🔌 دو حالت برای بک‌اند:
  *   ۱) لیست کوچک تا چند هزار مورد: کنترلر کل لیست را به‌صورت $words می‌دهد (Dictionary::normalize) و جست‌وجو/فیلتر در مرورگر انجام می‌شود.
@@ -11,6 +11,10 @@ namespace App\Support;
  *        GET {endpoint}?q=&letter=a&type=noun|verb|adjective|adverb|other&saved=1&sort=az|za&page=1&per=60
  *        ← { "data": [ لغت… ], "total": 1234, "has_more": true }
  *      (در این حالت $letters = حروفی که لغت دارند، مثلاً ['a','b','c'] تا بقیه‌ی حروف غیرفعال نمایش داده شوند.)
+ *
+ * فیلترها: type (نقش دستوری)، level (a1…c2)، category (gre|ielts|idiom|slang). در حالت endpoint هر سه به‌صورت query فرستاده می‌شوند:
+ *   GET {endpoint}?q=&letter=&type=&level=a1&category=gre&saved=1&sort=az&page=1&per=60
+ * داده‌های تکمیلی هر لغت (level, tags, connotation, senses, collocations, family, morphemes, origin): app/Support/WordExtras.php
  *
  * هر لغت (همه‌ی کلیدها اختیاری‌اند جز id و phrase):
  *   id, phrase, type (noun|verb|adjective|adverb|conjunction|phrasal verb|idiom …), ipa{uk,us}, audio{uk,us},
@@ -44,7 +48,7 @@ class Dictionary
                 'image' => $r['image'] ?? null,
                 'synonyms' => array_values((array) ($r['synonyms'] ?? [])),
                 'antonyms' => array_values((array) ($r['antonyms'] ?? [])),
-            ];
+            ] + WordExtras::normalize($r);
         }
 
         return $out;
@@ -149,14 +153,100 @@ class Dictionary
             ['zone', 'noun', 'منطقه؛ ناحیه', 'An area that is different from others in some way.', 'This is a no-parking zone.', 'اینجا منطقه‌ی ممنوعِ پارک است.', '/zəʊn/', '/zoʊn/', ['area'], []],
         ];
 
+        $lv = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
         $out = [];
         foreach ($rows as $i => [$phrase, $type, $tr, $meaning, $ex, $exTr, $uk, $us, $syn, $ant]) {
+            // سطح و دسته‌ی نمونه فقط برای دیدن فیلترها در دمو (بک‌اند مقدار واقعی می‌دهد)
+            $h = abs(crc32($phrase));
+            $tags = [];
+            if (in_array($type, ['idiom', 'phrasal verb'], true)) {
+                $tags[] = 'idiom';
+            }
+            if ($h % 3 === 0) {
+                $tags[] = 'ielts';
+            }
+            if ($h % 7 === 0) {
+                $tags[] = 'gre';
+            }
             $out[] = [
                 'id' => $i + 1, 'phrase' => $phrase, 'type' => $type, 'ipa' => ['uk' => $uk, 'us' => $us],
                 'meaning' => $meaning, 'example' => $ex, 'example_tr' => $exTr, 'translate' => $tr, 'synonyms' => $syn, 'antonyms' => $ant,
+                'level' => $lv[$h % 6], 'tags' => $tags,
             ];
         }
 
-        return self::normalize($out);
+        return self::normalize(array_merge($out, self::demoRich(count($out) + 1)));
+    }
+
+    /** چند لغت با داده‌های تکمیلی کامل (برای دیدن جزئیات در دمو) */
+    private static function demoRich(int $startId): array
+    {
+        return [
+            [
+                'id' => $startId, 'phrase' => 'speechless', 'type' => 'adjective', 'level' => 'b2', 'tags' => ['ielts'], 'connotation' => 'neutral',
+                'ipa' => ['uk' => '/ˈspiːtʃləs/', 'us' => '/ˈspiːtʃləs/'],
+                'meaning' => 'Unable to speak because of strong emotion such as surprise, anger or joy.',
+                'example' => 'The news left her speechless.', 'example_tr' => 'این خبر او را بی‌زبان کرد.', 'translate' => 'ناگفتنی؛ بی‌زبان؛ مات‌ومبهوت',
+                'synonyms' => ['dumbfounded', 'stunned'], 'antonyms' => ['talkative'],
+                'collocations' => ['left speechless', 'absolutely speechless', 'speechless with rage'],
+                'family' => [['word' => 'speech', 'pos' => 'noun'], ['word' => 'speak', 'pos' => 'verb'], ['word' => 'speaker', 'pos' => 'noun'], ['word' => 'speechlessly', 'pos' => 'adverb']],
+                'morphemes' => [['part' => 'speech', 'meaning' => 'گفتار؛ توانایی حرف زدن'], ['part' => '-less', 'meaning' => 'بدون؛ فاقد (پسوند)']],
+                'origin' => 'Formed in Old English from “spǣc” (speech) + “-lēas” (without).',
+            ],
+            [
+                'id' => $startId + 1, 'phrase' => 'write', 'type' => 'verb', 'level' => 'a1', 'tags' => ['ielts'], 'connotation' => 'neutral',
+                'ipa' => ['uk' => '/raɪt/', 'us' => '/raɪt/'],
+                'meaning' => 'To make letters, words or numbers on a surface, usually with a pen or on a keyboard.',
+                'example' => 'Please write your name at the top of the page.', 'example_tr' => 'لطفاً نامت را بالای صفحه بنویس.', 'translate' => 'نوشتن',
+                'synonyms' => ['compose', 'note down'], 'antonyms' => [],
+                'collocations' => ['write a letter', 'write an essay', 'write back', 'write down'],
+                'family' => [['word' => 'writer', 'pos' => 'noun'], ['word' => 'writing', 'pos' => 'noun'], ['word' => 'written', 'pos' => 'adjective'], ['word' => 'rewrite', 'pos' => 'verb']],
+                'morphemes' => [['part' => 'writ-', 'meaning' => 'نوشتن (ریشه‌ی ژرمنی)'], ['part' => '-er', 'meaning' => 'انجام‌دهنده‌ی کار (در writer)']],
+            ],
+            [
+                'id' => $startId + 2, 'phrase' => 'light', 'type' => 'noun', 'level' => 'a2', 'tags' => [], 'connotation' => 'positive',
+                'ipa' => ['uk' => '/laɪt/', 'us' => '/laɪt/'],
+                'meaning' => 'The natural energy from the sun or a lamp that lets you see things.',
+                'example' => 'Turn on the light, it’s getting dark.', 'example_tr' => 'چراغ را روشن کن، دارد تاریک می‌شود.', 'translate' => 'نور؛ روشنایی',
+                'synonyms' => ['brightness'], 'antonyms' => ['darkness'],
+                'senses' => [
+                    ['pos' => 'adjective', 'meaning' => 'Not heavy; easy to lift.', 'example' => 'This bag is very light.', 'example_tr' => 'این کیف خیلی سبک است.', 'translate' => 'سبک'],
+                    ['pos' => 'verb', 'meaning' => 'To make something start burning.', 'example' => 'She lit a candle.', 'example_tr' => 'او یک شمع روشن کرد.', 'translate' => 'روشن کردن'],
+                ],
+                'collocations' => ['natural light', 'turn on the light', 'light bulb', 'light rain'],
+                'family' => [['word' => 'lighten', 'pos' => 'verb'], ['word' => 'lighting', 'pos' => 'noun'], ['word' => 'lightly', 'pos' => 'adverb']],
+            ],
+            [
+                'id' => $startId + 3, 'phrase' => 'cunning', 'type' => 'adjective', 'level' => 'c1', 'tags' => ['gre', 'ielts'], 'connotation' => 'negative',
+                'ipa' => ['uk' => '/ˈkʌnɪŋ/', 'us' => '/ˈkʌnɪŋ/'],
+                'meaning' => 'Clever in a dishonest or deceptive way, to get what you want.',
+                'example' => 'The cunning fox tricked the farmer.', 'example_tr' => 'روباه حیله‌گر کشاورز را فریب داد.', 'translate' => 'حیله‌گر؛ مکار',
+                'synonyms' => ['sly', 'crafty'], 'antonyms' => ['naive', 'honest'],
+                'senses' => [['pos' => 'noun', 'meaning' => 'Skill in deceiving others to get an advantage.', 'example' => 'He won by pure cunning.', 'example_tr' => 'او فقط با حیله برنده شد.', 'translate' => 'حیله؛ مکر']],
+                'collocations' => ['a cunning plan', 'cunning trick'],
+                'family' => [['word' => 'cunningly', 'pos' => 'adverb']],
+                'origin' => 'From Old English “cunnan” (to know); the sense of “deceptive” came later.',
+            ],
+            [
+                'id' => $startId + 4, 'phrase' => 'chill', 'type' => 'verb', 'level' => 'b1', 'tags' => ['slang'], 'connotation' => 'positive',
+                'ipa' => ['uk' => '/tʃɪl/', 'us' => '/tʃɪl/'],
+                'meaning' => '(Slang) To relax and spend time without doing anything stressful.',
+                'example' => 'Let’s just chill at home tonight.', 'example_tr' => 'بیا امشب فقط توی خونه ریلکس کنیم.', 'translate' => 'ریلکس کردن؛ وقت گذراندن',
+                'synonyms' => ['relax', 'hang out'], 'antonyms' => ['stress'],
+                'senses' => [
+                    ['pos' => 'noun', 'meaning' => 'A feeling of coldness.', 'example' => 'There was a chill in the air.', 'example_tr' => 'سرمایی در هوا بود.', 'translate' => 'سرما؛ خنکی'],
+                    ['pos' => 'adjective', 'meaning' => '(Slang) Calm and easy-going.', 'example' => 'He’s a really chill guy.', 'example_tr' => 'او آدم خیلی آروم و راحتیه.', 'translate' => 'آروم؛ راحت'],
+                ],
+                'collocations' => ['chill out', 'chill pill', 'chill with friends'],
+                'family' => [['word' => 'chilly', 'pos' => 'adjective'], ['word' => 'chilled', 'pos' => 'adjective']],
+            ],
+            [
+                'id' => $startId + 5, 'phrase' => 'no cap', 'type' => 'slang', 'level' => 'b2', 'tags' => ['slang'], 'connotation' => 'neutral',
+                'ipa' => ['uk' => '/nəʊ kæp/', 'us' => '/noʊ kæp/'],
+                'meaning' => '(Slang) Not lying; being completely honest.',
+                'example' => 'That was the best pizza I’ve ever had, no cap.', 'example_tr' => 'بهترین پیتزایی بود که تا حالا خوردم، شوخی نیست.', 'translate' => 'دروغ نمی‌گم؛ جدی',
+                'synonyms' => ['for real', 'seriously'], 'antonyms' => ['cap'],
+            ],
+        ];
     }
 }

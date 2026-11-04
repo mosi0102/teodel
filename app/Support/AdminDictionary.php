@@ -13,6 +13,10 @@ namespace App\Support;
  *   ipa{uk,us}، audio{uk,us}، meaning (تعریف انگلیسی)، example، example_tr، translate (فارسی)،
  *   synonyms[]، antonyms[]، image (آدرس یا null)، updated_at
  *   — همان کلیدهای Dictionary::normalize + status و updated_at.
+ *   داده‌های تکمیلی (همه اختیاری؛ کاربر هر بخش را فقط اگر پر باشد می‌بیند) — قرارداد کامل: app/Support/WordExtras.php
+ *     level (a1…c2)، tags[] (gre|ielts|idiom|slang)، connotation (positive|neutral|negative)، collocations[]،
+ *     family [{word,pos}]، morphemes [{part,meaning}]، origin، senses [{pos,meaning,example,example_tr,translate}]
+ *     این بخش‌ها جزو «کامل بودن» مدخل حساب نمی‌شوند (اختیاری‌اند).
  *
  * ذخیره (صفحه‌ی ویرایش): data-save-url (POST ساخت، PUT ویرایش؛ JSON همین مدل + CSRF) ← 200 { id, status } | 422 { message, errors }
  * آپلود: data-upload-url (POST multipart: file, kind = image|audio_uk|audio_us) ← { url }
@@ -21,7 +25,9 @@ namespace App\Support;
  * مدخل تکراری (همان phrase + type) را سرور رد کند: 422 { errors:{ phrase:['…'] } }.
  *
  * 🔌 AI (Teodel.admin.ai.request؛ پاسخ: { fields, missing }):
- *   kind 'word'        seeds {phrase, type?}  fields: type, ipa_uk, ipa_us, meaning, example, example_tr, translate, synonyms, antonyms, image, audio_uk, audio_us
+ *   kind 'word'        seeds {phrase, type?}  fields: type, ipa_uk, ipa_us, meaning, example, example_tr, translate, synonyms, antonyms, image, audio_uk, audio_us,
+ *                      level, connotation, collocations (لیست با ویرگول), family ('writer (noun), writing (noun)'),
+ *                      morphemes (هر خط 'speech = گفتار'), origin, senses (آرایه‌ی JSON یا هر خط 'pos | meaning | example | example_tr | translate')
  *                      — تصویر و صوت را AI نمی‌سازد: در missing برگردانید تا مدیر دستی بگذارد.
  *   kind 'word_batch'  seeds {words:'هر خط یک لغت', type?}  ← { fields:{ items:[ {phrase,type,ipa{uk,us},meaning,example,example_tr,translate,synonyms[],antonyms[]} … ] }, missing:[] }
  */
@@ -43,6 +49,7 @@ class AdminDictionary
         return [
             'id' => null, 'status' => 'draft', 'phrase' => '', 'type' => '', 'ipa' => ['uk' => '', 'us' => ''], 'audio' => ['uk' => '', 'us' => ''],
             'meaning' => '', 'example' => '', 'example_tr' => '', 'translate' => '', 'synonyms' => [], 'antonyms' => [], 'image' => null, 'updated_at' => null,
+            'level' => '', 'tags' => [], 'connotation' => '', 'senses' => [], 'collocations' => [], 'family' => [], 'morphemes' => [], 'origin' => '',
         ];
     }
 
@@ -64,6 +71,8 @@ class AdminDictionary
                 'translate' => $w['translate'], 'synonyms' => $w['synonyms'], 'antonyms' => $w['antonyms'],
                 'image' => ($i % 4 === 0) ? 'https://example.com/img/'.$w['key'].'.jpg' : null,
                 'updated_at' => $now - ($i * 7200 + 900),
+                'level' => $w['level'], 'tags' => $w['tags'], 'connotation' => $w['connotation'], 'senses' => $w['senses'],
+                'collocations' => $w['collocations'], 'family' => $w['family'], 'morphemes' => $w['morphemes'], 'origin' => $w['origin'],
             ];
         }
 

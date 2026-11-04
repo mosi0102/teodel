@@ -42,6 +42,11 @@ return [
     'prev' => 'Previous word',
     'next' => 'Next word',
     'position' => ':n of :total',
+    'views' => [
+        'label' => 'View :n of :total',
+        'learned' => 'You’ve learned this word ✓',
+        'hint' => 'Each time you open this word it counts as one view; after :total views it becomes “Learned”.',
+    ],
     'status' => [
         'new' => 'Not reviewed',
         'learning' => 'Still learning',
@@ -63,10 +68,9 @@ return [
         'start' => 'Start review',
         'progress' => 'Word :n of :total',
         'reveal' => 'Show answer',
-        'yes' => 'I know it',
-        'no' => 'Not yet',
         'done_title' => 'Review complete! Well done 👏',
-        'done_text' => 'You knew :known of :total words.',
-        'again' => 'Review the ones I missed (:n)',
+        'done_text' => ':learned of :total words are now “Learned”.',
+        'continue' => 'Next',
+        'finish' => 'Finish review',
     ],
 ];

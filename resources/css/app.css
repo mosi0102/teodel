@@ -497,6 +497,13 @@ html.sidebar-closed { --rail: 0px; }
         @apply shrink-0 border-t border-slate-100 bg-white px-4 pt-3 md:px-6;
         padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
+    .sw-views { @apply mt-4 rounded-2xl bg-slate-50 p-3.5; }
+    .sw-views__dots { @apply inline-flex gap-1.5; }
+    .sw-views__dots i { @apply size-2.5 rounded-full bg-slate-200 transition-colors duration-300; }
+    .sw-views__dots i.is-on { @apply bg-brand-600; }
+    .sw-views.is-learned { @apply bg-emerald-50; }
+    .sw-views.is-learned [data-sw-views-text] { @apply text-emerald-700; }
+    .sw-views.is-learned .sw-views__dots i.is-on { @apply bg-emerald-500; }
     .sw-ans { @apply !min-h-12 gap-1.5 !px-2 text-sm; }
     .sw-ans--no { @apply !bg-rose-50 !text-rose-700; }
     .sw-ans--yes { @apply !bg-emerald-600; }
@@ -610,8 +617,41 @@ html.sidebar-closed { --rail: 0px; }
     .dd-clear { @apply absolute end-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition active:scale-90; }
     @media (hover: hover) { .dd-clear:hover { @apply bg-slate-100 text-slate-600; } }
     .dd-search input[type='search']::-webkit-search-cancel-button { display: none; }
-    .dd-sel { @apply !min-h-10 !w-auto min-w-0 flex-1 cursor-pointer !py-0 !text-[13px] md:flex-none; }
+    .dd-pill { @apply !min-h-10 min-w-[calc(50%-0.25rem)] flex-1 !ps-3 !pe-2 text-[13px] md:min-w-0 md:flex-none; }
+    .dd-pill .sp-btn { @apply !py-2 !pe-5 text-[13px]; }
+    .dd-pill .chev { @apply end-2.5; }
+    .dd-pill .sp-list { @apply !inset-x-auto start-0 w-max min-w-full max-w-[18rem]; }
     .dd-chip { @apply !min-h-10 shrink-0 gap-1.5 !px-3 !text-[13px]; }
+
+    /* ---------- اطلاعات بیشتر لغت (word-extra.js) ---------- */
+    .wx-meta { @apply mt-4 flex flex-wrap items-center gap-1.5; }
+    .wx-chip { @apply inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600; }
+    .wx-chip--lv { @apply bg-brand-700 text-white; }
+    .wx-chip--tag { @apply bg-brand-50 text-brand-700; }
+    .wx-chip--conn { @apply bg-slate-100 text-slate-600; }
+    .wx-dot { @apply size-2 rounded-full bg-slate-400; }
+    .wx-chip--conn[data-conn='positive'] { @apply bg-emerald-50 text-emerald-700; }
+    .wx-chip--conn[data-conn='positive'] .wx-dot { @apply bg-emerald-500; }
+    .wx-chip--conn[data-conn='negative'] { @apply bg-rose-50 text-rose-700; }
+    .wx-chip--conn[data-conn='negative'] .wx-dot { @apply bg-rose-500; }
+    .wx-hint { @apply mt-1.5 text-xs leading-6 text-slate-500; }
+    .wx-sec { @apply mt-5; }
+    .wx-h { @apply mb-2 text-xs font-extrabold text-slate-500; }
+    .wx-h--sub { @apply mt-3; }
+    .wx-sense { @apply mb-2 space-y-1.5 rounded-2xl bg-slate-50 p-3.5; }
+    .wx-sense__head { @apply text-left text-sm leading-7 text-slate-700; }
+    .wx-sense__ex { @apply text-left text-sm font-semibold leading-7 text-brand-900; }
+    .wx-pos { @apply rounded-md bg-white px-1.5 py-0.5 text-[0.7rem] font-extrabold uppercase tracking-wide text-brand-700; }
+    .wx-pos-s { @apply text-[0.65rem] font-bold text-slate-400; }
+    .wx-chips { @apply flex flex-wrap gap-1.5; }
+    .wx-chips .wx-chip { @apply bg-white text-brand-900 ring-1 ring-slate-200; }
+    .wx-eq { @apply flex flex-wrap items-center gap-2 text-lg font-extrabold text-brand-900; }
+    .wx-plus { @apply text-base font-bold text-slate-400; }
+    .wx-parts { @apply mt-2 grid gap-1.5 rounded-2xl bg-slate-50 p-3.5; }
+    .wx-parts > div { @apply flex items-baseline gap-3 text-sm; }
+    .wx-parts dt { @apply min-w-16 text-left font-extrabold text-brand-700; direction: ltr; }
+    .wx-parts dd { @apply text-slate-600; }
+    .wx-origin { @apply text-left text-sm leading-7 text-slate-600; }
 
     .dd-letters { @apply flex gap-1 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0; scrollbar-width: none; }
     .dd-letters::-webkit-scrollbar { display: none; }

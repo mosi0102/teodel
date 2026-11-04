@@ -1,9 +1,10 @@
 import $ from 'jquery';
 import { openDialog, closeDialog } from './dialogs';
 import { digits } from './digits';
+import { renderExtra } from './word-extra';
 
 /**
- * دیکشنری (/dictionary): الفبایی، بدون سطح‌بندی، لیست جمع‌وجور برای تعداد زیاد.
+ * دیکشنری (/dictionary): الفبایی، با فیلتر سطح (A1–C2) و دسته (GRE / IELTS / اصطلاحات / اسلنگ)، لیست جمع‌وجور برای تعداد زیاد.
  *
  * - جست‌وجو (لغت، ترجمه، تعریف)، نوار الفبا (حروفِ بدون لغت غیرفعال)، فیلتر نوع (اسم/فعل/صفت/قید/عبارت)، «ذخیره‌شده‌ها» و مرتب‌سازی A–Z / Z–A.
  * - ترجمه‌ی فارسی هر ردیف تار است و با کلیک باز می‌شود؛ دکمه‌ی «نمایش ترجمه‌ها» همه را یکجا باز می‌کند (انتخاب در مرورگر می‌ماند).
@@ -94,6 +95,7 @@ function paintPic(el, w) {
 function clean(w) {
     return Object.assign({
         image: null, type: '', meaning: '', example: '', example_tr: '', translate: '', synonyms: [], antonyms: [],
+        level: '', tags: [], connotation: '', senses: [], collocations: [], family: [], morphemes: [], origin: '',
     }, w, {
         key: w.key || String(w.phrase).toLowerCase(),
         ipa: Object.assign({ uk: '', us: '' }, w.ipa),
@@ -109,6 +111,8 @@ function init(root) {
     const $q = $root.find('[data-dd-q]');
     const $clear = $root.find('[data-dd-clear]');
     const $type = $root.find('[data-dd-type]');
+    const $level = $root.find('[data-dd-level]');
+    const $cat = $root.find('[data-dd-cat]');
     const $sort = $root.find('[data-dd-sort]');
     const $savedBtn = $root.find('[data-dd-saved]');
     const $revealBtn = $root.find('[data-dd-reveal]');
@@ -135,7 +139,7 @@ function init(root) {
     });
 
     // ---------- وضعیت ----------
-    const st = { q: '', letter: '', type: 'all', saved: false, sort: 'az' };
+    const st = { q: '', letter: '', type: 'all', level: 'all', cat: 'all', saved: false, sort: 'az' };
     let items = [];
     let total = 0;
     let hasMore = false;
@@ -150,6 +154,9 @@ function init(root) {
         let list = all.filter((w) => {
             if (st.letter && firstLetter(w.phrase) !== st.letter) return false;
             if (st.type !== 'all' && typeGroup(w.type) !== st.type) return false;
+            if (st.level !== 'all' && w.level !== st.level) return false;
+            // «اصطلاحات»: هم برچسب idiom و هم لغت‌هایی که نوعشان idiom / phrasal verb است
+            if (st.cat !== 'all' && !(w.tags || []).includes(st.cat) && !(st.cat === 'idiom' && /idiom|phrasal/i.test(w.type))) return false;
             if (st.saved && !saved.has(w.key)) return false;
             if (q && !norm([w.phrase, w.translate, w.meaning].join(' ')).includes(q)) return false;
             return true;
@@ -180,6 +187,8 @@ function init(root) {
         try {
             const u = new URL(endpoint, window.location.href);
             const p = { q: st.q.trim(), letter: st.letter, type: st.type, sort: st.sort, page, per: PAGE };
+            if (st.level !== 'all') p.level = st.level;
+            if (st.cat !== 'all') p.category = st.cat;
             if (st.saved) p.saved = 1;
             Object.keys(p).forEach((k) => { if (p[k] !== '' && p[k] != null) u.searchParams.set(k, p[k]); });
             const res = await fetch(u.toString(), { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
@@ -272,6 +281,8 @@ function init(root) {
     });
     $clear.on('click', () => { $q.val('').trigger('focus'); st.q = ''; reload(); });
     $type.on('change', function () { st.type = this.value; reload(); });
+    $level.on('change', function () { st.level = this.value; reload(); });
+    $cat.on('change', function () { st.cat = this.value; reload(); });
     $sort.on('change', function () { st.sort = this.value; reload(); });
     $savedBtn.on('click', function () {
         st.saved = !st.saved;
@@ -288,8 +299,9 @@ function init(root) {
         scrollToTop();
     });
     $root.on('click', '[data-dd-reset]', () => {
-        st.q = ''; st.letter = ''; st.type = 'all'; st.saved = false;
-        $q.val(''); $type.val('all');
+        st.q = ''; st.letter = ''; st.type = 'all'; st.level = 'all'; st.cat = 'all'; st.saved = false;
+        $q.val(''); $type.val('all'); $level.val('all'); $cat.val('all');
+        $root.find('.select-pill select').trigger('select:sync');
         $savedBtn.attr('aria-pressed', 'false');
         $letters.each(function () { this.setAttribute('aria-pressed', this.getAttribute('data-letter') === '' ? 'true' : 'false'); });
         reload();
@@ -352,7 +364,8 @@ function init(root) {
             if (on) {
                 m[w.key] = {
                     key: w.key, text: w.phrase, song: 0, line: 0, at: Math.floor(Date.now() / 1000),
-                    info: { phrase: w.phrase, type: w.type, image: w.image, ipa: w.ipa, audio: w.audio, meaning: w.meaning, example: w.example, example_tr: w.example_tr, translate: w.translate, synonyms: w.synonyms, antonyms: w.antonyms },
+                    info: { phrase: w.phrase, type: w.type, image: w.image, ipa: w.ipa, audio: w.audio, meaning: w.meaning, example: w.example, example_tr: w.example_tr, translate: w.translate, synonyms: w.synonyms, antonyms: w.antonyms,
+                        level: w.level, tags: w.tags, connotation: w.connotation, senses: w.senses, collocations: w.collocations, family: w.family, morphemes: w.morphemes, origin: w.origin },
                 };
             } else delete m[w.key];
             store.set(SAVED_KEY, m);
@@ -426,6 +439,7 @@ function init(root) {
         $dlg.find('[data-d-ex-wrap]').prop('hidden', !w.example);
         setList('synonyms', w.synonyms);
         setList('antonyms', w.antonyms);
+        renderExtra($dlg.find('[data-wx]')[0], w);
         $dlg.find('[data-dd-body]').closest('[data-dd-scroll]')[0].scrollTop = 0;
         setBlur();
         syncDialogBm();

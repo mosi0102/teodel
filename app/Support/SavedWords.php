@@ -21,11 +21,21 @@ namespace App\Support;
  *     'image'      => 'https://…webp',           // تصویر لغت (اختیاری)
  *     'song'       => ['id' => 1, 'title' => 'Step by Step in Time'],   // موزیکی که از آن ذخیره شده
  *     'saved_at'   => 1760000000,               // زمان ذخیره (timestamp)
- *     'status'     => 'new',                    // new | learning | learned (نتیجه‌ی مرور)
+ *     'views'      => 2,                        // چند بار جزئیات این لغت را باز کرده (هر بار باز کردن = ۱ بار دیدن)
+ *     // وضعیت از views می‌آید: ۰ = مرور نشده، ۱ تا ۴ = در حال یادگیری، ≥ ۵ = یاد گرفته‌ام (دکمه‌ی دستی «یاد گرفتم» حذف شد)
+ *     // + داده‌های تکمیلی لغت (tags, connotation, senses, collocations, family, morphemes, origin): app/Support/WordExtras.php
  *   ]
  */
 class SavedWords
 {
+    /** تعداد دفعات دیدن تا «یاد گرفته‌ام» */
+    public const LEARN_AT = 5;
+
+    public static function statusOf(int $views): string
+    {
+        return $views >= self::LEARN_AT ? 'learned' : ($views > 0 ? 'learning' : 'new');
+    }
+
     /** @return array<int, array<string, mixed>> */
     public static function normalize(array $rows): array
     {
@@ -35,13 +45,12 @@ class SavedWords
             if ($phrase === '' || ! isset($r['id'])) {
                 continue;
             }
-            $level = strtolower((string) ($r['level'] ?? ''));
+            $views = max(0, (int) ($r['views'] ?? 0));
             $out[] = [
                 'id' => $r['id'],
                 'key' => mb_strtolower($phrase),
                 'phrase' => $phrase,
                 'type' => (string) ($r['type'] ?? ''),
-                'level' => in_array($level, ['a1', 'a2', 'b1', 'b2', 'c1'], true) ? $level : '',
                 'ipa' => ['uk' => $r['ipa']['uk'] ?? '', 'us' => $r['ipa']['us'] ?? ''],
                 'audio' => ['uk' => $r['audio']['uk'] ?? '', 'us' => $r['audio']['us'] ?? ''],
                 'meaning' => (string) ($r['meaning'] ?? ''),
@@ -53,8 +62,9 @@ class SavedWords
                 'image' => $r['image'] ?? null,
                 'song' => isset($r['song']['id']) ? ['id' => (int) $r['song']['id'], 'title' => (string) ($r['song']['title'] ?? '')] : null,
                 'saved_at' => (int) ($r['saved_at'] ?? 0),
-                'status' => in_array($r['status'] ?? '', ['learning', 'learned'], true) ? $r['status'] : 'new',
-            ];
+                'views' => $views,
+                'status' => self::statusOf($views),
+            ] + WordExtras::normalize($r);
         }
 
         return $out;
@@ -88,9 +98,22 @@ class SavedWords
                 'translate' => $tr, 'synonyms' => $syn, 'antonyms' => $ant,
                 'song' => $i >= 8 ? $song : null,
                 'saved_at' => $now - ($i * 3600 * 7),
-                'status' => $i === 2 ? 'learned' : ($i === 5 ? 'learning' : 'new'),
+                'views' => $i === 2 ? 5 : ($i === 5 ? 3 : ($i === 0 ? 4 : 0)),
             ];
         }
+        // دو لغت با داده‌های تکمیلی کامل (برای دیدن جزئیات در دمو)
+        $out[0] += [
+            'tags' => ['ielts'], 'connotation' => 'neutral',
+            'collocations' => ['bathroom sink', 'en-suite bathroom', 'go to the bathroom'],
+            'family' => [['word' => 'bath', 'pos' => 'noun'], ['word' => 'bathe', 'pos' => 'verb']],
+            'morphemes' => [['part' => 'bath', 'meaning' => 'وان؛ حمام'], ['part' => 'room', 'meaning' => 'اتاق']],
+        ];
+        $out[10] += [
+            'tags' => ['gre'], 'connotation' => 'positive',
+            'senses' => [['pos' => 'noun', 'meaning' => 'A delay or a lingering stay.', 'example' => 'A long linger over coffee.', 'example_tr' => 'مکثی طولانی بر سر قهوه.', 'translate' => 'مکث؛ درنگ']],
+            'collocations' => ['linger on', 'linger over', 'linger in the memory'],
+            'family' => [['word' => 'lingering', 'pos' => 'adjective'], ['word' => 'lingerer', 'pos' => 'noun']],
+        ];
 
         return self::normalize($out);
     }

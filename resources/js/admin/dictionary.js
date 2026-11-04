@@ -2,6 +2,7 @@ import $ from 'jquery';
 import { openDialog, closeDialog } from '../modules/dialogs';
 import { readJSON, send, toast, ago, num } from './common';
 import { API, overlay, createApi, paginate, tFrom, el, splitList } from './bank';
+import { renderExtra } from '../modules/word-extra';
 
 /**
  * مدیریت دیکشنری — لیست (/admin/dictionary) و ویرایشگر (/admin/dictionary/{id}/edit).
@@ -20,6 +21,52 @@ const LS = 'teodel:admin:dictionary';
 export const TYPES = ['noun', 'verb', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection', 'phrasal verb', 'idiom', 'other'];
 export const PARTS = ['core', 'meaning', 'example', 'ipa', 'audio', 'image'];
 const MAX_BATCH = 30;
+const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+const WTAGS = ['gre', 'ielts', 'idiom', 'slang'];
+const CONNS = ['positive', 'neutral', 'negative'];
+
+/* ── داده‌های تکمیلی لغت (قرارداد: app/Support/WordExtras.php) — تبدیل متن فرم ↔ ساختار ── */
+const tr1 = (v) => String(v == null ? '' : v).trim();
+
+/** «writer (noun), writing (noun)» ← [{word,pos}] */
+export function parseFamily(v) {
+    if (Array.isArray(v)) return v.map((x) => (typeof x === 'string' ? { word: tr1(x), pos: '' } : { word: tr1(x.word), pos: tr1(x.pos) })).filter((x) => x.word);
+    return splitList(v).map((x) => {
+        const m = x.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+        return m ? { word: tr1(m[1]), pos: tr1(m[2]) } : { word: x, pos: '' };
+    }).filter((x) => x.word);
+}
+export const fmtFamily = (a) => (a || []).map((x) => (x.pos ? `${x.word} (${x.pos})` : x.word)).join(', ');
+
+/** هر خط «جزء = معنی» ← [{part,meaning}] */
+export function parseMorphemes(v) {
+    if (Array.isArray(v)) return v.map((x) => ({ part: tr1(x.part), meaning: tr1(x.meaning) })).filter((x) => x.part);
+    return String(v || '').split(/\r?\n/).map((line) => {
+        const i = line.indexOf('=');
+        return i < 0 ? { part: tr1(line), meaning: '' } : { part: tr1(line.slice(0, i)), meaning: tr1(line.slice(i + 1)) };
+    }).filter((x) => x.part);
+}
+export const fmtMorphemes = (a) => (a || []).map((x) => (x.meaning ? `${x.part} = ${x.meaning}` : x.part)).join('\n');
+
+/** آرایه‌ی JSON یا هر خط «pos | meaning | example | example_tr | translate» ← [{pos,meaning,example,example_tr,translate}] */
+export function parseSenses(v) {
+    let arr = v;
+    if (typeof v === 'string') {
+        const s = v.trim();
+        if (s.startsWith('[')) {
+            try { arr = JSON.parse(s); } catch (e) { arr = []; }
+        } else {
+            arr = s.split(/\r?\n/).filter(Boolean).map((line) => {
+                const [pos, meaning, example, example_tr, translate] = line.split('|').map(tr1);
+                return { pos, meaning, example, example_tr, translate };
+            });
+        }
+    }
+    return (Array.isArray(arr) ? arr : []).map((x) => ({
+        pos: tr1(x.pos), meaning: tr1(x.meaning), example: tr1(x.example), example_tr: tr1(x.example_tr), translate: tr1(x.translate),
+    })).filter((x) => x.pos || x.meaning);
+}
+export const fmtSenses = (a) => (a || []).map((x) => [x.pos, x.meaning, x.example, x.example_tr, x.translate].join(' | ')).join('\n');
 
 /* ── توابع خالص (تست‌شده؛ همان قانون AdminDictionary در PHP) ───────── */
 
@@ -129,6 +176,15 @@ export function cleanWord(W) {
         synonyms: list(W.synonyms),
         antonyms: list(W.antonyms),
         image: t(W.image) || null,
+        // اختیاری: هر کدام خالی بود، برای کاربر نمایش داده نمی‌شود
+        level: LEVELS.includes(t(W.level)) ? t(W.level) : '',
+        tags: (W.tags || []).filter((x) => WTAGS.includes(x)),
+        connotation: CONNS.includes(t(W.connotation)) ? t(W.connotation) : '',
+        senses: parseSenses(W.senses),
+        collocations: list(W.collocations),
+        family: parseFamily(W.family),
+        morphemes: parseMorphemes(W.morphemes),
+        origin: t(W.origin),
     };
 }
 
@@ -147,6 +203,12 @@ export function parseWords(text, max = MAX_BATCH) {
 
 /* ── نمونه‌های AI در «حالت دمو» (بدون بک‌اند) ───────────────────── */
 const E = (type, translate, meaning, example, example_tr, uk, us, synonyms, antonyms) => ({ type, translate, meaning, example, example_tr, ipa: { uk, us }, synonyms, antonyms });
+// نمونه‌ی داده‌ی تکمیلی برای دموی AI (بک‌اند واقعی همه‌ی لغت‌ها را پر می‌کند)
+const X = {
+    abandon: { level: 'b2', connotation: 'negative', collocations: ['abandon hope', 'abandon a plan'], family: 'abandoned (adjective), abandonment (noun)', morphemes: 'a- = به؛ سمت\nbandon = اختیار؛ قدرت', origin: 'From Old French “a bandon” (under someone’s control).', senses: '' },
+    challenge: { level: 'b1', connotation: 'neutral', collocations: ['face a challenge', 'rise to the challenge'], family: 'challenging (adjective), challenger (noun)', morphemes: '', origin: '', senses: 'verb | To test someone’s ability. | The task challenged him. | این کار او را به چالش کشید. | به چالش کشیدن' },
+    happy: { level: 'a1', connotation: 'positive', collocations: ['happy birthday', 'happy ending'], family: 'happily (adverb), happiness (noun), unhappy (adjective)', morphemes: 'happ- = شانس؛ خوشی\n-y = دارای (پسوند صفت‌ساز)', origin: 'From Middle English “hap” (luck).', senses: '' },
+};
 const KNOWN = {
     happy: E('adjective', 'خوشحال', 'Feeling pleased and satisfied.', 'She was happy to see her old friends.', 'او از دیدن دوستان قدیمی‌اش خوشحال بود.', '/ˈhæpi/', '/ˈhæpi/', ['glad', 'cheerful'], ['sad']),
     library: E('noun', 'کتابخانه', 'A place where books can be read or borrowed.', 'I study at the library every evening.', 'من هر عصر در کتابخانه درس می‌خوانم.', '/ˈlaɪbrəri/', '/ˈlaɪbreri/', [], []),
@@ -174,6 +236,8 @@ export function demoWord(phrase, type) {
 function demoWordFields(payload) {
     const d = demoWord(payload.seeds.phrase, TYPES.includes(payload.seeds.type) ? payload.seeds.type : '');
     const all = { type: d.type, translate: d.translate, meaning: d.meaning, example: d.example, example_tr: d.example_tr, ipa_uk: d.ipa.uk, ipa_us: d.ipa.us, synonyms: d.synonyms.join(', '), antonyms: d.antonyms.join(', ') };
+    const x = X[String(payload.seeds.phrase || '').trim().toLowerCase()] || { level: 'b1', connotation: 'neutral', collocations: [], family: '', morphemes: '', origin: '', senses: '' };
+    Object.assign(all, { level: x.level, connotation: x.connotation, collocations: (x.collocations || []).join(', '), family: x.family, morphemes: x.morphemes, origin: x.origin, senses: x.senses });
     const out = {};
     const missing = [];
     payload.fields.forEach((f) => {
@@ -575,6 +639,11 @@ $(function () {
     W.audio = Object.assign({ uk: '', us: '' }, W.audio);
     W.synonyms = W.synonyms || [];
     W.antonyms = W.antonyms || [];
+    W.tags = W.tags || [];
+    W.senses = W.senses || [];
+    W.collocations = W.collocations || [];
+    W.family = W.family || [];
+    W.morphemes = W.morphemes || [];
     const api = createApi({ $root, kind: 'word', ns: 'dictionary', local: LOCAL, ov, t, send });
     const $form = $('#dc-form');
     const f = (n) => $form.find('[data-f="' + n + '"]');
@@ -609,6 +678,14 @@ $(function () {
         f('synonyms').val((W.synonyms || []).join(', '));
         f('antonyms').val((W.antonyms || []).join(', '));
         f('image').val(W.image || '');
+        f('level').val(LEVELS.includes(W.level) ? W.level : '');
+        f('connotation').val(CONNS.includes(W.connotation) ? W.connotation : '');
+        f('collocations').val((W.collocations || []).join(', '));
+        f('family').val(fmtFamily(W.family));
+        f('morphemes').val(fmtMorphemes(W.morphemes));
+        f('origin').val(W.origin || '');
+        $form.find('[data-dc-tag]').each(function () { this.checked = (W.tags || []).includes(this.value); });
+        renderSenses();
         renderMedia();
     }
     /* → فرم به مدل */
@@ -619,14 +696,83 @@ $(function () {
         W.synonyms = splitList(f('synonyms').val());
         W.antonyms = splitList(f('antonyms').val());
         W.image = f('image').val() || null;
+        W.level = f('level').val() || '';
+        W.connotation = f('connotation').val() || '';
+        W.collocations = splitList(f('collocations').val());
+        W.family = parseFamily(f('family').val());
+        W.morphemes = parseMorphemes(f('morphemes').val());
+        W.origin = f('origin').val() || '';
+        W.tags = $form.find('[data-dc-tag]:checked').map(function () { return this.value; }).get();
     }
+
+    /* ── نقش‌های دستوری دیگر: هر نقش یک باکس؛ فیلد مخفی senses همان را به‌صورت متن برای AI نگه می‌دارد ── */
+    const $senses = $form.find('[data-dc-senses]');
+    const SF = ['meaning', 'example', 'example_tr', 'translate'];
+    function senseRow(x, i) {
+        const $r = $('<div class="dc-sense"></div>');
+        const $head = $('<div class="dc-sense__head"></div>').append(
+            $('<b class="text-xs font-extrabold text-slate-600"></b>').text(t('x.sense_n').replace(':n', num(i + 1))),
+            $('<button type="button" class="btn-ghost !min-h-8 !px-2 !text-xs !text-rose-600" data-dc-sense-del></button>').text(t('x.remove'))
+        );
+        const $sel = $('<select class="field" data-sf="pos" dir="ltr"></select>').attr('aria-label', t('x.pos')).append($('<option value=""></option>').text(t('x.pos')));
+        TYPES.forEach((ty) => $sel.append($('<option></option>').attr('value', ty).text(t('type.' + ty))));
+        if (x.pos && !TYPES.includes(x.pos)) $sel.append($('<option></option>').attr('value', x.pos).text(x.pos));
+        $sel.val(x.pos || '');
+        const $g = $('<div class="dc-sense__grid"></div>');
+        const mk = (n, label, dir, area) => $(area ? '<textarea class="field"></textarea>' : '<input class="field" autocomplete="off">').attr({ 'data-sf': n, dir, 'aria-label': label, placeholder: label }).val(x[n] || '');
+        $g.append(
+            $('<div class="sm:col-span-2"></div>').append($sel),
+            $('<div class="sm:col-span-2"></div>').append(mk('meaning', t('x.smeaning'), 'ltr', true)),
+            $('<div></div>').append(mk('example', t('x.sexample'), 'ltr', true)),
+            $('<div></div>').append(mk('example_tr', t('x.sexample_tr'), 'rtl', true)),
+            $('<div class="sm:col-span-2"></div>').append(mk('translate', t('x.strans'), 'rtl', false))
+        );
+        return $r.append($head, $g);
+    }
+    function renderSenses() {
+        $senses.empty().append((W.senses || []).map(senseRow));
+        f('senses').val(fmtSenses(W.senses));
+    }
+    function readSenses() {
+        W.senses = $senses.children('.dc-sense').map(function () {
+            const o = { pos: $(this).find('[data-sf=pos]').val() || '' };
+            SF.forEach((n) => { o[n] = $(this).find('[data-sf="' + n + '"]').val() || ''; });
+            return o;
+        }).get();
+        f('senses').val(fmtSenses(W.senses));
+    }
+    $root.on('click', '[data-dc-sense-add]', function () {
+        readSenses();
+        W.senses.push({ pos: '', meaning: '', example: '', example_tr: '', translate: '' });
+        renderSenses();
+        $senses.find('.dc-sense').last().find('select').trigger('focus');
+        markDirty();
+    });
+    $root.on('click', '[data-dc-sense-del]', function () {
+        $(this).closest('.dc-sense').remove();
+        readSenses();
+        markDirty();
+        renderPreview();
+        refresh();
+    });
+    $senses.on('input change', '[data-sf]', function () {
+        readSenses();
+        markDirty();
+        renderPreview();
+    });
     $form.on('input change', '[data-f]', function () {
+        if ($(this).attr('data-f') === 'senses') return; // مخفی؛ فقط با AI عوض می‌شود (پایین)
         readForm();
         markDirty();
         renderMedia();
         refresh();
     });
-    $(document).on('admin:ai-applied', () => { readForm(); markDirty(); renderMedia(); refresh(); });
+    $form.on('change', '[data-dc-tag]', function () { readForm(); markDirty(); renderPreview(); });
+    $(document).on('admin:ai-applied', (e, d) => {
+        readForm();
+        if (d && (d.fields || []).includes('senses')) { W.senses = parseSenses(f('senses').val()); renderSenses(); }
+        markDirty(); renderMedia(); refresh();
+    });
 
     /* ── تصویر و صدا ── */
     function renderMedia() {
@@ -727,6 +873,7 @@ $(function () {
         };
         chips('[data-pv=syn]', W.synonyms);
         chips('[data-pv=ant]', W.antonyms);
+        renderExtra($pv.find('[data-wx]')[0], W, { plain: true });
     }
 
     /* ── بررسی (چک‌لیست زنده + نوار کامل بودن) ── */

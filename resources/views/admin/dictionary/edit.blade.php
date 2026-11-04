@@ -53,7 +53,7 @@
         <section class="ad-card is-2" aria-labelledby="dc-form-t">
             <div class="ad-card__h">
                 <h2 class="ad-card__t" id="dc-form-t">{{ __('admindictionary.edit_title') }}</h2>
-                <button type="button" class="ad-ai" data-ai-open data-ai-target="#dc-form" data-ai-seeds="phrase,type" data-ai-fields="type,translate,meaning,example,example_tr,ipa_uk,ipa_us,synonyms,antonyms,image,audio_uk,audio_us">{!! $ic('sparkles') !!}{{ __('admin.ai.btn_long') }}</button>
+                <button type="button" class="ad-ai" data-ai-open data-ai-target="#dc-form" data-ai-seeds="phrase,type" data-ai-fields="type,translate,meaning,example,example_tr,ipa_uk,ipa_us,synonyms,antonyms,image,audio_uk,audio_us,level,connotation,collocations,family,morphemes,origin,senses">{!! $ic('sparkles') !!}{{ __('admin.ai.btn_long') }}</button>
             </div>
 
             <form id="dc-form" class="ad-form-grid" data-ai-form="word" @isset($urls['ai']) data-ai-url="{{ $urls['ai'] }}" @endisset onsubmit="return false" novalidate>
@@ -141,6 +141,58 @@
                         <button type="button" class="ad-ai ad-ai--sm" data-ai-one="antonyms" data-ai-seeds="phrase,type">{!! $ic('sparkles', 'size-3.5') !!}{{ __('admin.ai.btn') }}</button></label>
                     <input id="dc-ant" name="antonyms" class="field" dir="ltr" data-f="antonyms" data-ai-field autocomplete="off">
                     <p class="ad-hint">{{ __('admindictionary.f.list_hint') }}</p></div>
+
+                {{-- ───── اطلاعات تکمیلی (اختیاری): خالی‌ها برای کاربر نمایش داده نمی‌شوند ───── --}}
+                <div class="ad-field is-wide dc-x">
+                    <div class="dc-x__head">
+                        <h3 class="text-sm font-extrabold text-brand-900">{{ __('admindictionary.x.title') }}</h3>
+                        <p class="ad-hint !mt-0.5">{{ __('admindictionary.x.lead') }}</p>
+                    </div>
+                </div>
+
+                <div class="ad-field"><label class="ad-label" for="dc-level"><span>{{ __('admindictionary.x.level') }}{!! $chip !!}</span></label>
+                    <select id="dc-level" name="level" class="field" data-f="level" data-ai-field><option value="">{{ __('admindictionary.x.level_ph') }}</option>@foreach (\App\Support\WordExtras::LEVELS as $lv)<option value="{{ $lv }}">{{ strtoupper($lv) }}</option>@endforeach</select></div>
+                <div class="ad-field"><label class="ad-label" for="dc-conn"><span>{{ __('admindictionary.x.conn') }}{!! $chip !!}</span></label>
+                    <select id="dc-conn" name="connotation" class="field" data-f="connotation" data-ai-field><option value="">{{ __('admindictionary.x.conn_ph') }}</option>@foreach (\App\Support\WordExtras::CONNOTATIONS as $cn)<option value="{{ $cn }}">{{ __('admindictionary.x.'.$cn) }}</option>@endforeach</select></div>
+
+                <fieldset class="ad-field is-wide">
+                    <legend class="ad-label"><span>{{ __('admindictionary.x.tags') }}</span></legend>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (\App\Support\WordExtras::TAGS as $tg)
+                            <label class="dc-tag"><input type="checkbox" class="peer sr-only" value="{{ $tg }}" data-dc-tag><span>{{ __('admindictionary.x.'.$tg) }}</span></label>
+                        @endforeach
+                    </div>
+                    <p class="ad-hint">{{ __('admindictionary.x.tags_hint') }}</p>
+                </fieldset>
+
+                <div class="ad-field is-wide"><label class="ad-label" for="dc-colloc"><span>{{ __('admindictionary.x.colloc') }}{!! $chip !!}</span>
+                        <button type="button" class="ad-ai ad-ai--sm" data-ai-one="collocations" data-ai-seeds="phrase,type">{!! $ic('sparkles', 'size-3.5') !!}{{ __('admin.ai.btn') }}</button></label>
+                    <input id="dc-colloc" name="collocations" class="field" dir="ltr" data-f="collocations" data-ai-field autocomplete="off">
+                    <p class="ad-hint">{{ __('admindictionary.x.colloc_hint') }}</p></div>
+
+                <div class="ad-field is-wide"><label class="ad-label" for="dc-family"><span>{{ __('admindictionary.x.family') }}{!! $chip !!}</span>
+                        <button type="button" class="ad-ai ad-ai--sm" data-ai-one="family" data-ai-seeds="phrase,type">{!! $ic('sparkles', 'size-3.5') !!}{{ __('admin.ai.btn') }}</button></label>
+                    <input id="dc-family" name="family" class="field" dir="ltr" data-f="family" data-ai-field autocomplete="off">
+                    <p class="ad-hint">{{ __('admindictionary.x.family_hint') }}</p></div>
+
+                <div class="ad-field is-wide"><label class="ad-label" for="dc-morph"><span>{{ __('admindictionary.x.morph') }}{!! $chip !!}</span>
+                        <button type="button" class="ad-ai ad-ai--sm" data-ai-one="morphemes,origin" data-ai-seeds="phrase,type">{!! $ic('sparkles', 'size-3.5') !!}{{ __('admin.ai.btn') }}</button></label>
+                    <textarea id="dc-morph" name="morphemes" class="field !min-h-16" dir="auto" data-f="morphemes" data-ai-field></textarea>
+                    <p class="ad-hint">{{ __('admindictionary.x.morph_hint') }}</p></div>
+
+                <div class="ad-field is-wide"><label class="ad-label" for="dc-origin"><span>{{ __('admindictionary.x.origin') }}{!! $chip !!}</span></label>
+                    <textarea id="dc-origin" name="origin" class="field !min-h-16" dir="ltr" data-f="origin" data-ai-field></textarea>
+                    <p class="ad-hint">{{ __('admindictionary.x.origin_hint') }}</p></div>
+
+                {{-- نقش‌های دستوری دیگر: هر نقش یک باکس (نقش، تعریف، مثال، ترجمه‌ها). فیلد مخفی برای AI است --}}
+                <div class="ad-field is-wide">
+                    <p class="ad-label !mb-0"><span>{{ __('admindictionary.x.senses') }}{!! $chip !!}</span>
+                        <button type="button" class="ad-ai ad-ai--sm" data-ai-one="senses" data-ai-seeds="phrase,type">{!! $ic('sparkles', 'size-3.5') !!}{{ __('admin.ai.btn') }}</button></p>
+                    <p class="ad-hint !mt-0 mb-2">{{ __('admindictionary.x.senses_hint') }}</p>
+                    <input type="hidden" name="senses" data-f="senses" data-ai-field aria-label="{{ __('admindictionary.x.senses') }}">
+                    <div class="grid gap-3" data-dc-senses></div>
+                    <button type="button" class="btn-outline !min-h-10 mt-3 !text-xs" data-dc-sense-add>+ {{ __('admindictionary.x.add') }}</button>
+                </div>
             </form>
         </section>
 
@@ -170,6 +222,7 @@
                     </div>
                     <div class="dc-pv__chips" data-pv="syn" hidden dir="ltr"><b>{{ __('admindictionary.pv.syn') }}</b><ul></ul></div>
                     <div class="dc-pv__chips is-ant" data-pv="ant" hidden dir="ltr"><b>{{ __('admindictionary.pv.ant') }}</b><ul></ul></div>
+                    <div data-wx data-t='@json(__('wordextra'), $flags)' hidden></div>
                 </div>
             </section>
 

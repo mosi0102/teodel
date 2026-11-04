@@ -14,6 +14,8 @@
 @php
     $types = ['all', 'noun', 'verb', 'adjective', 'adverb', 'other'];
     $az = range('a', 'z');
+    $lvls = ['all', 'a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
+    $cats = ['all', 'gre', 'ielts', 'idiom', 'slang'];
 @endphp
 @section('content')
 <div class="page-wrap" data-dd
@@ -53,15 +55,37 @@
                 <button type="button" class="dd-clear" data-dd-clear aria-label="{{ __('dictionary.clear') }}" hidden><x-icon name="x" class="size-4" /></button>
             </label>
 
-            <select class="field dd-sel" data-dd-type aria-label="{{ __('dictionary.types.all') }}">
-                @foreach ($types as $t)
-                    <option value="{{ $t }}">{{ __('dictionary.types.' . $t) }}</option>
-                @endforeach
-            </select>
-            <select class="field dd-sel" data-dd-sort aria-label="{{ __('dictionary.sort.az') }}">
-                <option value="az">{{ __('dictionary.sort.az') }}</option>
-                <option value="za">{{ __('dictionary.sort.za') }}</option>
-            </select>
+            <label class="select-pill dd-pill">
+                <select data-dd-type aria-label="{{ __('dictionary.types.all') }}">
+                    @foreach ($types as $t)
+                        <option value="{{ $t }}">{{ __('dictionary.types.' . $t) }}</option>
+                    @endforeach
+                </select>
+                <x-icon name="chevron-down" class="chev" />
+            </label>
+            <label class="select-pill dd-pill">
+                <select data-dd-level aria-label="{{ __('dictionary.filter_level') }}">
+                    @foreach ($lvls as $l)
+                        <option value="{{ $l }}">{{ __('dictionary.levels.' . $l) }}</option>
+                    @endforeach
+                </select>
+                <x-icon name="chevron-down" class="chev" />
+            </label>
+            <label class="select-pill dd-pill">
+                <select data-dd-cat aria-label="{{ __('dictionary.filter_category') }}">
+                    @foreach ($cats as $c)
+                        <option value="{{ $c }}">{{ __('dictionary.categories.' . $c) }}</option>
+                    @endforeach
+                </select>
+                <x-icon name="chevron-down" class="chev" />
+            </label>
+            <label class="select-pill dd-pill">
+                <select data-dd-sort aria-label="{{ __('dictionary.sort.az') }}">
+                    <option value="az">{{ __('dictionary.sort.az') }}</option>
+                    <option value="za">{{ __('dictionary.sort.za') }}</option>
+                </select>
+                <x-icon name="chevron-down" class="chev" />
+            </label>
 
             <button type="button" class="chip-btn dd-chip" data-dd-saved aria-pressed="false" title="{{ __('dictionary.saved_only') }}">
                 <x-icon name="bookmark" class="size-4" /><span class="max-sm:sr-only">{{ __('dictionary.saved_only') }}</span>
@@ -172,6 +196,9 @@
                     <div data-d-row="synonyms"><dt>{{ __('dictionary.synonyms') }}</dt><dd data-d="synonyms"></dd></div>
                     <div data-d-row="antonyms"><dt>{{ __('dictionary.antonyms') }}</dt><dd data-d="antonyms"></dd></div>
                 </dl>
+
+                {{-- اطلاعات بیشتر: سطح/دسته، connotation، نقش‌های دیگر، کالوکیشن، هم‌خانواده، ریشه (فقط اگر داده باشد) --}}
+                <div data-wx data-t='@json(__('wordextra'), JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)' hidden></div>
             </div>
         </div>
 
