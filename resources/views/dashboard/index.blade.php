@@ -36,6 +36,23 @@
     data-goal-options="10,20,30,45"
     @isset($goalUrl) data-goal-url="{{ $goalUrl }}" @endisset>
 
+    @if (app()->getLocale() === 'fa' && ! empty($d['tip_english']['show']))
+        {{-- پیشنهاد انگلیسی‌کردن سایت (بعد از اولین آهنگ تمام‌شده): رفتار در modules/dashboard.js --}}
+        <aside class="db-tip" data-db-tip data-tip-key="english" hidden role="note"
+            @if (! empty($d['tip_english']['dismiss_url'])) data-dismiss-url="{{ $d['tip_english']['dismiss_url'] }}" @endif>
+            <span class="db-tip__ic" aria-hidden="true">{!! $ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9S14.600 18.400 12 21M12 3C9.400 5.600 8.100 8.600 8.100 12S9.400 18.400 12 21"/>') !!}</span>
+            <div class="db-tip__b">
+                <b>{{ __('dashboard.tip.title') }}</b>
+                <p>{{ __('dashboard.tip.text') }}</p>
+                <div class="db-tip__acts">
+                    <a href="{{ $d['tip_english']['switch_url'] ?? url('/lang/en') }}" class="btn-primary !min-h-10 !text-xs" data-tip-switch>{{ __('dashboard.tip.switch') }}</a>
+                    <button type="button" class="btn-ghost !min-h-10 !text-xs" data-tip-never>{{ __('dashboard.tip.never') }}</button>
+                </div>
+            </div>
+            <button type="button" class="db-tip__x" data-tip-close aria-label="{{ __('dashboard.tip.close') }}">{!! $ic('<path d="M6 6l12 12M18 6 6 18"/>', 'size-4') !!}</button>
+        </aside>
+    @endif
+
     <div class="db-grid">
 
         {{-- ───────── سلام + ادامه‌ی یادگیری ───────── --}}

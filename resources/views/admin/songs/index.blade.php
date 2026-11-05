@@ -27,6 +27,7 @@
             <p class="ad-sub">{{ __('adminsongs.sub') }}</p>
         </div>
         <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'songs', 'url' => $urls['export'] ?? null])
             <a href="{{ url('/admin/songs/create') }}" class="btn-primary !min-h-10 !text-xs">{!! AdminNav::icon('plus', 'size-4') !!}{{ __('adminsongs.new') }}</a>
         </div>
     </div>

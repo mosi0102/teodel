@@ -11,7 +11,7 @@
     $letters = ['A', 'B', 'C', 'D'];
     // ⚠️ داخل @json ویرگول نگذارید (بلید تکه‌تکه‌اش می‌کند)؛ مقدارها را اینجا بسازید
     $defaults = ['fa' => AdminPlacement::FA, 'title' => AdminPlacement::TITLES];
-    $range = ['a1' => [80, 95], 'a2' => [65, 85], 'b1' => [50, 72], 'b2' => [38, 60], 'c1' => [25, 48]];
+    $range = ['a1' => [80, 95], 'a2' => [65, 85], 'b1' => [50, 72], 'b2' => [38, 60], 'c1' => [25, 48], 'c2' => [15, 35]];
 @endphp
 
 @section('title', $isNew ? __('adminplacement.new_title') : __('adminplacement.edit_title').' #'.$q['id'])

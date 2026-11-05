@@ -30,6 +30,7 @@
             <p class="ad-sub">{{ __('admindictionary.sub') }}</p>
         </div>
         <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'dictionary', 'table' => '[data-dc-list] .ad-tbl', 'url' => $urls['export'] ?? null])
             <button type="button" class="ad-ai" data-dc-batch-open>{!! $ic('sparkles') !!}{{ __('admindictionary.batch') }}</button>
             <a href="{{ url('/admin/dictionary/create') }}" class="btn-primary !min-h-10 !text-xs">{!! $ic('plus') !!}{{ __('admindictionary.new') }}</a>
         </div>

@@ -30,6 +30,9 @@
             <h1 class="ad-h1">{{ __('adminreport.title') }}</h1>
             <p class="ad-sub">{{ __('adminreport.sub') }}</p>
         </div>
+        <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'reports', 'url' => $urls['export'] ?? null])
+        </div>
     </div>
 
     <form method="GET" class="ad-tools" data-ad-filter role="search">

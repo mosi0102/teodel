@@ -613,15 +613,15 @@ html.sidebar-closed { --rail: 0px; }
     /* ---------- دیکشنری (/dictionary): جمع‌وجور، بدون سطح‌بندی ---------- */
     .dd-bar { @apply sticky z-20 -mx-4 mb-3 space-y-2 bg-[#f4f5fa]/90 px-4 pb-2 pt-2 backdrop-blur md:mx-0 md:rounded-2xl md:px-3; top: var(--topbar-h); }
     .dd-tools { @apply flex flex-wrap items-center gap-2; }
-    .dd-search { @apply relative block min-w-0 basis-full md:flex-1 md:basis-60; }
+    .dd-search { @apply relative block min-w-0 basis-full; }
     .dd-clear { @apply absolute end-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-slate-400 transition active:scale-90; }
     @media (hover: hover) { .dd-clear:hover { @apply bg-slate-100 text-slate-600; } }
     .dd-search input[type='search']::-webkit-search-cancel-button { display: none; }
-    .dd-pill { @apply !min-h-10 min-w-[calc(50%-0.25rem)] flex-1 !ps-3 !pe-2 text-[13px] md:min-w-0 md:flex-none; }
+    .dd-pill { @apply !min-h-10 min-w-[calc(50%-0.25rem)] flex-1 !ps-3 !pe-2 text-[13px] md:min-w-0 md:basis-0; }
     .dd-pill .sp-btn { @apply !py-2 !pe-5 text-[13px]; }
     .dd-pill .chev { @apply end-2.5; }
     .dd-pill .sp-list { @apply !inset-x-auto start-0 w-max min-w-full max-w-[18rem]; }
-    .dd-chip { @apply !min-h-10 shrink-0 gap-1.5 !px-3 !text-[13px]; }
+    .dd-chip { @apply !min-h-10 flex-1 shrink-0 justify-center gap-1.5 !px-3 !text-[13px] md:flex-none; }
 
     /* ---------- اطلاعات بیشتر لغت (word-extra.js) ---------- */
     .wx-meta { @apply mt-4 flex flex-wrap items-center gap-1.5; }
@@ -653,10 +653,10 @@ html.sidebar-closed { --rail: 0px; }
     .wx-parts dd { @apply text-slate-600; }
     .wx-origin { @apply text-left text-sm leading-7 text-slate-600; }
 
-    .dd-letters { @apply flex gap-1 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible md:pb-0; scrollbar-width: none; }
+    .dd-letters { @apply flex gap-1 overflow-x-auto pb-1 lg:justify-between lg:overflow-visible lg:pb-0; scrollbar-width: none; }
     .dd-letters::-webkit-scrollbar { display: none; }
-    .dd-letter-btn { @apply grid h-8 min-w-8 shrink-0 place-items-center rounded-lg px-1.5 text-[13px] font-extrabold text-slate-500 transition duration-150 active:scale-90 disabled:pointer-events-none disabled:opacity-30; }
-    .dd-letter-btn--all { @apply px-3; }
+    .dd-letter-btn { @apply grid h-8 min-w-8 shrink-0 place-items-center rounded-lg px-1.5 text-[13px] font-extrabold text-slate-500 transition duration-150 active:scale-90 disabled:pointer-events-none disabled:opacity-30 lg:shrink lg:flex-1 lg:px-0; }
+    .dd-letter-btn--all { @apply px-3 lg:flex-none lg:px-4; }
     @media (hover: hover) { .dd-letter-btn:not(:disabled):hover { @apply bg-brand-50 text-brand-700; } }
     .dd-letter-btn[aria-pressed='true'] { @apply bg-brand-700 text-white; }
 
@@ -1362,3 +1362,15 @@ html.sidebar-closed { --rail: 0px; }
         scroll-behavior: auto !important;
     }
 }
+
+/* پیشنهاد انگلیسی‌کردن سایت (داشبورد) */
+.db-tip { @apply mb-4 flex items-start gap-3 rounded-3xl border border-sky-200 bg-sky-50 p-4 md:mb-5 md:items-center md:p-5; opacity: 0; transform: translateY(-6px); transition: opacity .22s ease, transform .22s ease; }
+.db-tip[hidden] { @apply hidden; }
+.db-tip.is-in { opacity: 1; transform: none; }
+.db-tip__ic { @apply grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-sky-600; }
+.db-tip__b { @apply min-w-0 flex-1; }
+.db-tip__b b { @apply block text-sm font-extrabold text-slate-800; }
+.db-tip__b p { @apply mt-1 text-xs leading-6 text-slate-600; }
+.db-tip__acts { @apply mt-3 flex flex-wrap items-center gap-2; }
+.db-tip__x { @apply grid size-9 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white hover:text-slate-600; }
+@media (prefers-reduced-motion: reduce) { .db-tip { transition: none; transform: none; } }

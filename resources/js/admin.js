@@ -6,6 +6,7 @@ window.$ = window.jQuery = $;
 import './modules/dialogs';
 import './modules/logout-confirm';
 import './admin/shell';
+import './admin/export';
 import './admin/dashboard';
 import './admin/ai';
 import './admin/users';

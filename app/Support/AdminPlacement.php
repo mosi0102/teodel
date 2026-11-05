@@ -32,7 +32,7 @@ class AdminPlacement
 {
     public const SECTIONS = ['vocab', 'grammar', 'listening'];
 
-    public const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+    public const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
 
     public const MIN_PER_LEVEL = 3;
 
@@ -126,7 +126,7 @@ class AdminPlacement
             // چند پیش‌نویس و یک کمبود عمدی (c1 شنیداری) تا هشدار پوشش دیده شود
             $draft = $id % 11 === 0 || ($b['section'] === 'listening' && $b['level'] === 'c1' && $id % 2 === 0);
             $asked = $draft ? 0 : 40 + ($id * 37) % 420;
-            $base = ['a1' => 88, 'a2' => 74, 'b1' => 58, 'b2' => 44, 'c1' => 31][$b['level']];
+            $base = ['a1' => 88, 'a2' => 74, 'b1' => 58, 'b2' => 44, 'c1' => 31, 'c2' => 22][$b['level']];
             $out[] = [
                 'id' => $id, 'status' => $draft ? 'draft' : 'published', 'section' => $b['section'], 'level' => $b['level'],
                 'title' => $b['title'], 'fa' => $b['fa'], 'q' => $b['q'], 'options' => $b['options'], 'answer' => $b['answer'],

@@ -38,7 +38,7 @@
             <p class="ad-sub">{{ __('adminbilling.sub') }}</p>
         </div>
         <div class="ad-acts">
-            <button type="button" class="btn-outline !min-h-10 !text-xs" data-bl-export>{{ __('adminbilling.export') }}</button>
+            @include('admin.partials.export', ['name' => 'payments', 'table' => '[data-bl-list] .ad-tbl', 'url' => $urls['export'] ?? null])
         </div>
     </div>
 

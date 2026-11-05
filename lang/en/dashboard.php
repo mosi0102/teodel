@@ -86,6 +86,14 @@ return [
         'renew' => 'Renew subscription',
     ],
 
+    'tip' => [
+        'title' => 'Try the site in English too',
+        'text' => 'You finished your first song! You can switch the whole site to English to stay in touch with the language every day.',
+        'switch' => 'Switch to English',
+        'never' => 'Don’t show again',
+        'close' => 'Close',
+    ],
+
     'support' => [
         'title' => 'Support',
         'open' => ':n open tickets',

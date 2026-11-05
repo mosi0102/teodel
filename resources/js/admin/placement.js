@@ -17,7 +17,7 @@ import { API, overlay, createApi, paginate, tFrom, el } from './bank';
 const LOCAL = true;
 const LS = 'teodel:admin:placement';
 export const SECTIONS = ['vocab', 'grammar', 'listening'];
-export const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1'];
+export const LEVELS = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
 const LETTERS = ['A', 'B', 'C', 'D'];
 
 /* ── توابع خالص (تست‌شده؛ همان قانون AdminPlacement::validate در PHP) ───── */
@@ -142,7 +142,7 @@ function shuffleWithAnswer(opts, ans, seed) {
 
 /** یک سؤال نمونه برای (بخش، سطح) — n امین نمونه */
 export function demoQuestion(section, level, n) {
-    const list = POOL[section][level];
+    const list = POOL[section][level] || POOL[section].c1; // c2 هم از نمونه‌های c1 استفاده می‌کند (AI واقعی سؤال c2 می‌سازد)
     const it = list[n % list.length];
     const seed = n + LEVELS.indexOf(level) + 1;
     if (section === 'listening') {
@@ -196,7 +196,7 @@ $(function () {
     const editUrl = (id) => $root.attr('data-edit-url').replace('__ID__', id);
     const PER = 15;
     const F = { q: '', section: 'all', level: 'all', status: 'all', sort: 'newest', page: 1 };
-    const range = { a1: [80, 95], a2: [65, 85], b1: [50, 72], b2: [38, 60], c1: [25, 48] };
+    const range = { a1: [80, 95], a2: [65, 85], b1: [50, 72], b2: [38, 60], c1: [25, 48], c2: [15, 35] };
 
     // فیلترها از آدرس
     const sp = new URLSearchParams(location.search);
@@ -276,6 +276,14 @@ $(function () {
         td.appendChild(el('small', 'block text-[0.7rem] text-slate-400', t('stats_fmt', { p: num(s.correct_pct), n: num(s.asked) }).replace(/^[^ ]+ /, '')));
         return td;
     }
+
+    /* خروجی Excel/CSV: همه‌ی ردیف‌های فیلترشده (نه فقط صفحه‌ی جاری) — admin/export.js */
+    $(document).on('ad:export', (e, req) => {
+        if (!$root.length || req.rows) return;
+        const iso = (ts) => (ts ? new Date(ts * 1000).toISOString().slice(0, 16).replace('T', ' ') : '');
+        req.head = ['id', 'q', 'section', 'level', 'answer', 'status', 'updated'].map((k) => (k === 'id' ? t('col.id') : t('col.' + (k === 'updated' ? 'updated' : k))));
+        req.rows = filterRows(rows, F).map((r) => [r.id, r.q, t('section.' + r.section), t('level.' + r.level), (r.options || [])[parseAnswer(r.answer)] || '', t('status_label.' + r.status), iso(r.updated_at)]);
+    });
 
     function renderRows() {
         const list = filterRows(rows, F);
@@ -504,8 +512,8 @@ $(function () {
         const count = parseInt(s.count, 10) || 10;
         const out = [];
         for (let i = 0; i < count; i++) {
-            const level = s.level === 'all' ? LEVELS[i % 5] : s.level;
-            out.push(Object.assign(demoQuestion(s.section, level, Math.floor(i / (s.level === 'all' ? 5 : 1)) + (i % 2)), { level }));
+            const level = s.level === 'all' ? LEVELS[i % LEVELS.length] : s.level;
+            out.push(Object.assign(demoQuestion(s.section, level, Math.floor(i / (s.level === 'all' ? LEVELS.length : 1)) + (i % 2)), { level }));
         }
         return { fields: { items: out }, missing: [] };
     }

@@ -57,6 +57,13 @@ return [
         'upload' => 'Choose file',
     ],
 
+    'export' => [
+        'btn' => 'Export',
+        'hint' => 'Only the currently filtered rows',
+        'done' => ':n rows downloaded',
+        'empty' => 'No rows to export',
+    ],
+
     'ai' => [
         'btn' => 'AI',
         'btn_long' => 'Generate with AI',

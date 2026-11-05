@@ -31,6 +31,7 @@
             <p class="ad-sub">{{ __('adminplacement.sub') }}</p>
         </div>
         <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'question-bank', 'table' => '[data-bk-list] .ad-tbl', 'url' => $urls['export'] ?? null])
             <button type="button" class="ad-ai" data-bk-batch-open>{!! $ic('sparkles') !!}{{ __('adminplacement.batch') }}</button>
             <a href="{{ url('/admin/placement/create') }}" class="btn-primary !min-h-10 !text-xs">{!! $ic('plus') !!}{{ __('adminplacement.new') }}</a>
         </div>

@@ -7,10 +7,13 @@ import $ from 'jquery';
  * 🔌 بک‌اند — هدف روزانه (گزینه‌ها: data-goal-options):
  *   • آدرس: data-goal-url روی ریشه ← POST JSON { minutes } + CSRF
  *   • یا رویداد:  $(document).on('dashboard:goal', (e, { minutes }) => { … })
- * LOCAL: در دمو هدف انتخاب‌شده در localStorage می‌ماند. با اتصال بک‌اند false کنید (هدف از سرور می‌آید).
+ * پیشنهاد انگلیسی [data-db-tip]: «دیگر نشان نده» ← POST data-dismiss-url (JSON { key:'english' }) یا رویداد
+ *   $(document).on('dashboard:tip-dismiss', (e, { key }) => …)؛ دکمه‌ی تغییر زبان هم همین را صدا می‌زند.
+ * LOCAL: در دمو هدف انتخاب‌شده و بستن پیشنهاد در localStorage می‌ماند. با اتصال بک‌اند false کنید (هدف از سرور می‌آید).
  */
 const LOCAL = true;
 const KEY = 'teodel:dashboard:goal';
+const TIP_KEY = 'teodel:tip:dismissed';
 
 /** بازه‌ی ساعت → کلید سلام */
 export function greetKey(hour) {
@@ -47,6 +50,53 @@ $(function () {
         if (rep) Object.keys(rep).forEach((k) => (v = v.split(':' + k).join(rep[k])));
         return v;
     };
+
+    /* پیشنهاد انگلیسی‌کردن سایت */
+    const $tip = $root.find('[data-db-tip]');
+    if ($tip.length) {
+        const key = $tip.attr('data-tip-key') || 'english';
+        let gone = false;
+        if (LOCAL) {
+            try {
+                gone = (JSON.parse(localStorage.getItem(TIP_KEY) || '[]') || []).indexOf(key) > -1;
+            } catch (e) {
+                gone = false;
+            }
+        }
+        const never = () => {
+            if (LOCAL) {
+                try {
+                    const l = JSON.parse(localStorage.getItem(TIP_KEY) || '[]') || [];
+                    if (l.indexOf(key) < 0) l.push(key);
+                    localStorage.setItem(TIP_KEY, JSON.stringify(l));
+                } catch (e) {
+                    /* ignore */
+                }
+            }
+            $(document).trigger('dashboard:tip-dismiss', [{ key }]);
+            const url = $tip.attr('data-dismiss-url');
+            if (url) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'same-origin',
+                    keepalive: true,
+                    body: JSON.stringify({ key }),
+                }).catch(() => {});
+            }
+        };
+        const hide = () => {
+            $tip.removeClass('is-in');
+            setTimeout(() => $tip.prop('hidden', true), reduce ? 0 : 220);
+        };
+        if (!gone) {
+            $tip.prop('hidden', false);
+            requestAnimationFrame(() => requestAnimationFrame(() => $tip.addClass('is-in')));
+        }
+        $tip.on('click', '[data-tip-close]', hide);
+        $tip.on('click', '[data-tip-never]', () => { never(); hide(); });
+        $tip.on('click', '[data-tip-switch]', never); // کاربر زبان را عوض می‌کند؛ دیگر لازم نیست دوباره نشان داده شود
+    }
 
     /* سلام */
     const $hello = $root.find('[data-db-hello]');

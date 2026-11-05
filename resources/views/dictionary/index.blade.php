@@ -88,10 +88,10 @@
             </label>
 
             <button type="button" class="chip-btn dd-chip" data-dd-saved aria-pressed="false" title="{{ __('dictionary.saved_only') }}">
-                <x-icon name="bookmark" class="size-4" /><span class="max-sm:sr-only">{{ __('dictionary.saved_only') }}</span>
+                <x-icon name="bookmark" class="size-4" /><span>{{ __('dictionary.saved_only') }}</span>
             </button>
             <button type="button" class="chip-btn dd-chip" data-dd-reveal aria-pressed="false" title="{{ __('dictionary.reveal_all') }}">
-                <x-icon name="eye" class="size-4" /><span data-dd-reveal-label class="max-sm:sr-only">{{ __('dictionary.reveal_all') }}</span>
+                <x-icon name="eye" class="size-4" /><span data-dd-reveal-label>{{ __('dictionary.reveal_all') }}</span>
             </button>
         </div>
 

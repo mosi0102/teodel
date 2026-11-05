@@ -10,8 +10,8 @@ return [
     'edit_title' => 'Edit question',
 
     'section' => ['vocab' => 'Vocabulary', 'grammar' => 'Grammar', 'listening' => 'Listening'],
-    'level' => ['a1' => 'A1', 'a2' => 'A2', 'b1' => 'B1', 'b2' => 'B2', 'c1' => 'C1'],
-    'level_name' => ['a1' => 'Beginner', 'a2' => 'Elementary', 'b1' => 'Intermediate', 'b2' => 'Upper-intermediate', 'c1' => 'Advanced'],
+    'level' => ['a1' => 'A1', 'a2' => 'A2', 'b1' => 'B1', 'b2' => 'B2', 'c1' => 'C1', 'c2' => 'C2'],
+    'level_name' => ['a1' => 'Beginner', 'a2' => 'Elementary', 'b1' => 'Intermediate', 'b2' => 'Upper-intermediate', 'c1' => 'Advanced', 'c2' => 'Proficient'],
     'status' => ['all' => 'All', 'published' => 'Published', 'draft' => 'Draft'],
     'sort' => ['label' => 'Sort', 'newest' => 'Last edited', 'level' => 'Level', 'hard' => 'Hardest first'],
 

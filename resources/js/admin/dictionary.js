@@ -378,6 +378,14 @@ $(function () {
         return box;
     }
 
+    /* خروجی Excel/CSV: همه‌ی ردیف‌های فیلترشده (نه فقط صفحه‌ی جاری) — admin/export.js */
+    $(document).on('ad:export', (e, req) => {
+        if (!$root.length || req.rows) return;
+        const iso = (ts) => (ts ? new Date(ts * 1000).toISOString().slice(0, 16).replace('T', ' ') : '');
+        req.head = ['id', 'phrase', 'type', 'translate', 'status', 'updated'].map((k) => (k === 'id' ? '#' : t('col.' + k)));
+        req.rows = filterRows(rows, F).map((r) => [r.id, r.phrase, t('type.' + r.type) === 'type.' + r.type ? r.type : t('type.' + r.type), r.translate || '', t('status_label.' + r.status), iso(r.updated_at)]);
+    });
+
     function renderRows() {
         const list = filterRows(rows, F);
         const pg = paginate(list, F.page, PER);

@@ -11,7 +11,7 @@ import { viaEvent, tFrom } from './bank';
  *     یا رویداد لغوشدنی admin:payment-action { action, payment, payload, done(status), fail(msg) }. بدون هر دو: حالت دمو (فقط ظاهر).
  *   • ذخیره‌ی قیمت پلن‌ها: PUT data-save-url { plans:[{id,price,old_price,recommended,active}] }
  *     یا رویداد لغوشدنی admin:plans-save { plans, done(), fail(msg) }.
- *   • خروجی CSV: data-export-url (با همان query فعلی)؛ بدون آن، ردیف‌های همین صفحه CSV می‌شوند.
+ *   • خروجی Excel/CSV: partial admin.partials.export + admin/export.js (data-export-url روی همین wrapper هم خوانده می‌شود)
  */
 
 /* ── توابع خالص (تست‌شده) ───────────────────────────────────── */
@@ -179,22 +179,6 @@ $(function () {
         } finally {
             $btn.prop('disabled', false).text(act ? t('act.' + act) : '');
         }
-    });
-
-    /* ── CSV ── */
-    $root.on('click', '[data-bl-export]', function () {
-        const url = $root.attr('data-export-url');
-        if (url) { location.assign(url + location.search); return; }
-        const c = (k) => t('col.' + k);
-        const rows = $root.find('[data-bl-rows] tr').map(function () { return readJSON($(this), 'data-p', null); }).get().filter(Boolean)
-            .map((p) => [p.ref, p.bank_ref || '', p.user.name, p.user.contact, t('plan.' + p.plan), p.amount, t('status.' + p.status), new Date(p.at * 1000).toISOString()]);
-        const csv = '﻿' + toCsv(rows, [c('ref'), t('detail.bank_ref'), c('user'), t('detail.user'), c('plan'), c('amount'), c('status'), c('at')]);
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-        a.download = 'payments.csv';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
     });
 });
 

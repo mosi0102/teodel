@@ -33,6 +33,9 @@
             <h1 class="ad-h1">{{ __('adminticket.title') }}</h1>
             <p class="ad-sub">{{ __('adminticket.sub') }}</p>
         </div>
+        <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'tickets', 'url' => $urls['export'] ?? null])
+        </div>
     </div>
 
     @if ($uid)

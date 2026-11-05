@@ -638,3 +638,13 @@ a.ad-user:hover b { @apply text-brand-700; }
 .st-cover a { @apply underline underline-offset-2; }
 .st-form .ad-field.is-off { @apply opacity-50; }
 .st-form [hidden] { display: none; }
+
+/* ═════════ خروجی Excel / CSV ═════════ */
+.ad-exp { @apply relative; }
+.ad-exp__menu { @apply absolute end-0 top-full z-30 mt-2 w-52 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-lg; animation: ad-exp-in .16s ease-out; }
+.ad-exp__menu[hidden] { @apply hidden; }
+.ad-exp__item { @apply flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-start text-sm text-slate-700 transition-colors hover:bg-slate-50 focus-visible:bg-slate-50; }
+.ad-exp__item small { @apply text-xs text-slate-400; direction: ltr; }
+.ad-exp__hint { @apply mt-1 border-t border-slate-100 px-3 pb-1.5 pt-2 text-[11px] leading-5 text-slate-500; }
+@keyframes ad-exp-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ad-exp__menu { animation: none; } }

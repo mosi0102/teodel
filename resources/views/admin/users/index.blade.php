@@ -25,6 +25,9 @@
             <h1 class="ad-h1">{{ __('admin.users.title') }}</h1>
             <p class="ad-sub">{{ __('admin.users.sub') }}</p>
         </div>
+        <div class="ad-acts">
+            @include('admin.partials.export', ['name' => 'users', 'url' => $urls['export'] ?? null])
+        </div>
     </div>
 
     <form method="GET" class="ad-tools" data-ad-filter role="search">

@@ -17,6 +17,8 @@ namespace App\Support;
  *   recommended  [ { id, title, artist, cover?, level('a'|'b'|'c'), duration (ثانیه), is_free, url } ]  ← حداکثر ۳ آهنگ مناسب سطح کاربر
  *   level_test   { taken (۰ تا ۳), total: 3, url }
  *   tickets   { open, unread, url }
+ *   tip_english  { show: bool, switch_url, dismiss_url? } | null   ← پیشنهاد استفاده از سایت به انگلیسی؛ بک‌اند بعد از «اولین آهنگ تمام‌شده» show=true می‌کند
+ *                (تا وقتی کاربر «دیگر نشان نده» نزده). فقط وقتی زبان فعلی فارسی است نمایش داده می‌شود.
  *
  * رویداد هدف روزانه: $(document).on('dashboard:goal', (e, { minutes }) => …) یا data-goal-url (POST JSON { minutes } + CSRF).
  */
@@ -40,6 +42,7 @@ class Dashboard
             'week' => array_map(fn ($i) => ['at' => $now - (6 - $i) * $day, 'minutes' => $mins[$i]], range(0, 6)),
             'week_prev_total' => 84,
             'totals' => ['songs_done' => 4, 'words_saved' => 38],
+            'tip_english' => ['show' => true, 'switch_url' => url('/lang/en'), 'dismiss_url' => null],
             'resume' => [
                 'song' => ['id' => 2, 'title' => 'Say My Name', 'artist' => 'David Guetta', 'cover' => null, 'level' => 'a'],
                 'step' => 3, 'steps' => 8, 'step_key' => 'words', 'percent' => 28,
