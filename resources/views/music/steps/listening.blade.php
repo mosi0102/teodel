@@ -5,7 +5,7 @@
 --}}
 @php
     $sets = \App\Support\Listening::forSong($song);
-    $all = array_merge($sets['easy'], $sets['hard']);
+    $all = array_merge($sets['easy'], $sets['hard'], $sets['sentence'] ?? []);
     $src = (string) ($song['audio'] ?? '');
     if ($src !== '' && ! preg_match('#^(https?:)?//|^/#i', $src)) {
         $src = asset($src);
@@ -16,8 +16,8 @@
 
 <div class="space-y-7" data-clips data-listening-step data-song="{{ $song['id'] }}" data-src="{{ $src }}" data-duration="{{ $demoDuration }}" data-total="{{ count($all) }}"
     data-msg-correct="{{ __('lesson.listening.correct') }}" data-msg-wrong="{{ __('lesson.listening.wrong') }}" data-msg-fill="{{ __('lesson.listening.fill') }}" data-msg-revealed="{{ __('lesson.listening.revealed') }}">
-    @foreach (['easy', 'hard'] as $mode)
-        @if (count($sets[$mode]))
+    @foreach (['easy', 'hard', 'sentence'] as $mode)
+        @if (count($sets[$mode] ?? []))
             <section aria-labelledby="ls-{{ $mode }}-title">
                 {{-- سرتیتر بخش (آسان / سخت) --}}
                 <div class="lsec lsec--{{ $mode }}">

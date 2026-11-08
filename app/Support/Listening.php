@@ -8,6 +8,9 @@ namespace App\Support;
  *  - آسان: بخشی از موزیک پخش می‌شود و متنش با «یک» کلمه‌ی خالی نشان داده می‌شود؛ کاربر همان کلمه را می‌نویسد.
  *  - سخت: یک عبارت یا چند کلمه‌ی پشت‌سرهم خالی است؛ کاربر باید بشنود و کلمه‌ها را بنویسد.
  *
+ *  - جمله (sentence): فقط برای پادکست؛ کل جمله خالی است (answer = خود جمله بدون نقطه‌ی پایانی)؛ کاربر همه‌ی کلمه‌ها را می‌نویسد.
+ *    سیستم جمله‌ها را انتخاب می‌کند، نه کاربر ($song['listening']['sentence']).
+ *
  * 🔌 بک‌اند در $song['listening'] می‌دهد (هر تمرین = یک بخش از موزیک):
  *   [
  *     'easy' => [ ['start' => 24.4, 'end' => 28.1, 'text' => "I don't run like I did back then", 'answer' => 'run'] , ...],
@@ -27,9 +30,9 @@ class Listening
     public static function forSong(array $song): array
     {
         $raw = $song['listening'] ?? self::demo($song);
-        $out = ['easy' => [], 'hard' => []];
+        $out = ['easy' => [], 'hard' => [], 'sentence' => []];
 
-        foreach (['easy', 'hard'] as $mode) {
+        foreach (['easy', 'hard', 'sentence'] as $mode) {
             foreach (array_values($raw[$mode] ?? []) as $i => $ex) {
                 $built = self::build($mode, $i + 1, $ex);
                 if ($built) {

@@ -34,6 +34,17 @@
         </span>
     </div>
 
+    {{-- راهنمای لحن (فقط وقتی بخش‌ها prosody دارند: پادکست) --}}
+    @if (collect($parts)->contains(fn ($p) => ! empty($p['prosody'])))
+        <div class="pr-legend" role="note">
+            <b class="text-xs font-extrabold text-brand-900 md:text-sm">{{ __('lesson.shadowing.tone_title') }}</b>
+            <span class="pr-chip pr-seg--rise"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 13 C38 13 62 3 98 3" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.rise') }}</span>
+            <span class="pr-chip pr-seg--fall"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 3 C38 3 62 13 98 13" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.fall') }}</span>
+            <span class="pr-chip pr-seg--mid"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 L98 8" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.mid') }}</span>
+            <span class="pr-chip"><span class="pr-w is-stress">Abc</span>{{ __('lesson.shadowing.tone.stress') }}</span>
+        </div>
+    @endif
+
     <div class="grid gap-4 md:grid-cols-2">
         @foreach ($parts as $p)
             <article class="sx" data-sx data-id="{{ $p['id'] }}" data-rounds="0" data-state="idle">
@@ -56,9 +67,13 @@
                 {{-- متن بخش: اول تار؛ با کلیک نمایش داده می‌شود --}}
                 <button type="button" class="sx-lyrics" data-sx-reveal aria-pressed="false"
                     data-label-show="{{ __('lesson.shadowing.show') }}" data-label-hide="{{ __('lesson.shadowing.hide') }}" aria-label="{{ __('lesson.shadowing.show') }}">
-                    <span class="sx-lyrics__text" dir="ltr" lang="en">
-                        @foreach ($p['lines'] as $line)<span class="block">{{ $line }}</span>@endforeach
-                    </span>
+                    @if (! empty($p['prosody']))
+                        <span class="sx-lyrics__text"><x-lesson.prosody :lines="$p['prosody']" /></span>
+                    @else
+                        <span class="sx-lyrics__text" dir="ltr" lang="en">
+                            @foreach ($p['lines'] as $line)<span class="block">{{ $line }}</span>@endforeach
+                        </span>
+                    @endif
                     <span class="sx-lyrics__veil">
                         <x-icon name="eye-off" class="size-5 sx-off" />
                         <x-icon name="eye" class="size-5 sx-on" />

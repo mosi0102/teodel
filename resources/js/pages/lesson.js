@@ -9,4 +9,6 @@ import '../modules/listening';
 import '../modules/shadowing';
 import '../modules/karaoke';
 import '../modules/details';
+import '../modules/podcast-idea';
+import '../modules/shadowing-topic';
 import '../modules/progress-sync';

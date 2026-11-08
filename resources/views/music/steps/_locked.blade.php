@@ -1,3 +1,4 @@
+@php $kind = $kind ?? 'music'; @endphp
 {{-- مرحله‌ی قفل برای کاربر رایگان (آهنگ‌های غیررایگان: فقط free_steps مرحله‌ی اول باز است) --}}
 <div class="flex min-h-[18rem] flex-col items-center justify-center text-center md:min-h-[26rem]">
     <span class="mb-5 grid size-20 place-items-center rounded-full bg-amber-50 text-amber-500">
@@ -14,7 +15,7 @@
             <x-icon name="sparkles" class="size-4" />
             {{ __('ui.buy') }}
         </a>
-        <a href="{{ route('music.step', ['id' => $song['id'], 'step' => $song['free_steps']]) }}" class="btn-ghost flex-1">
+        <a href="{{ route($kind . '.step', ['id' => $song['id'], 'step' => $song['free_steps']]) }}" class="btn-ghost flex-1">
             {{ __('lesson.locked.back') }}
         </a>
     </div>

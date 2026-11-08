@@ -68,7 +68,7 @@ $('[data-listening-step]').each(function () {
     }
 
     function refresh() {
-        ['easy', 'hard'].forEach((m) => {
+        ['easy', 'hard', 'sentence'].forEach((m) => {
             const n = $all.filter('[data-mode="' + m + '"]').filter((_, el) => isDone($(el))).length;
             $root.find('[data-ls-count="' + m + '"]').text(digits(n));
         });

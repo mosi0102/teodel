@@ -129,6 +129,8 @@ return [
     'listening' => [
         'easy' => 'Easy',
         'hard' => 'Hard',
+        'sentence' => 'Sentence',
+        'sentence_hint' => 'The whole sentence is missing; listen and type every word.',
         'easy_hint' => 'One word is missing. Listen and type it.',
         'hard_hint' => 'A whole phrase is missing. Listen and type every word.',
         'part' => 'Part :n',
@@ -145,6 +147,8 @@ return [
 
     // Step 5 (shadowing)
     'shadowing' => [
+        'tone_title' => 'Tone and rhythm guide',
+        'tone' => ['rise' => 'Rising', 'fall' => 'Falling', 'mid' => 'Level', 'stress' => 'Stressed word'],
         'how_listen' => 'Listen to the part',
         'how_repeat' => 'Your turn: repeat out loud',
         'how_again' => 'Do it at least :n times',

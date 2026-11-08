@@ -8,8 +8,14 @@
 
 @php
     // آیکون مرحله‌ی «جاری» (دایره‌ی نارنجی)
-    $stepIcons = ['play' => 'play', 'lyrics' => 'file-text', 'words' => 'bookmark', 'listening' => 'headphones', 'shadowing' => 'mic', 'karaoke' => 'music', 'repeat' => 'repeat', 'details' => 'info'];
+    $stepIcons = ['play' => 'play', 'lyrics' => 'file-text', 'words' => 'bookmark', 'listening' => 'headphones', 'shadowing' => 'mic', 'karaoke' => 'music', 'repeat' => 'repeat', 'details' => 'info',
+        // Shadowing (موضوع‌ها)
+        'listen' => 'headphones', 'record' => 'mic', 'practice' => 'repeat', 'text' => 'file-text', 'questions' => 'info'];
     $isLast = $step >= $total;
+    // پادکست از همین view استفاده می‌کند ($kind = 'podcast' از PodcastController): آیکون سربرگ و پوشه‌ی محتوای مرحله‌ها عوض می‌شود
+    $kind = $kind ?? 'music';
+    $headIcon = match ($kind) { 'podcast' => 'mic', 'shadowing' => 'repeat', default => 'music' };
+    $stepView = fn (string $key) => (in_array($kind, ['podcast', 'shadowing'], true) && view()->exists($kind . '.steps.' . $key)) ? $kind . '.steps.' . $key : 'music.steps.' . $key;
 @endphp
 
 @section('content')
@@ -20,7 +26,7 @@
 
     data-completed = تعداد مرحله‌های کاملاً تمام‌شده | data-fraction = بخشی از مرحله‌ی بعدی که انجام شده (۰ تا ۱)
 --}}
-<div class="page-wrap pb-24 md:pb-0" data-lesson
+<div class="page-wrap pb-24 md:pb-0" data-lesson data-kind="{{ $kind }}"
     data-song="{{ $song['id'] }}" data-step="{{ $step }}" data-total="{{ $total }}"
     data-completed="{{ $completed }}" data-fraction="{{ $fraction }}"
     data-finish-url="{{ $finishUrl }}">
@@ -30,7 +36,7 @@
         <div class="min-w-0">
             <h1 class="flex items-center gap-2.5 text-xl font-extrabold text-brand-900 md:text-2xl">
                 <span class="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand-700">
-                    <x-icon name="music" class="size-5" />
+                    <x-icon :name="$headIcon" class="size-5" />
                 </span>
                 {{ __('lesson.title') }}
             </h1>
@@ -38,7 +44,7 @@
 
             {{-- آهنگ جاری --}}
             <p class="mt-2.5 inline-flex max-w-full items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-sm shadow-card">
-                <x-icon name="music" class="size-4 shrink-0 text-brand-700" />
+                <x-icon :name="$headIcon" class="size-4 shrink-0 text-brand-700" />
                 <bdi class="truncate font-bold text-brand-900">{{ $song['title'] }}</bdi>
                 <span class="text-slate-300" aria-hidden="true">•</span>
                 <bdi class="truncate text-slate-500">{{ $song['artist'] }}</bdi>
@@ -108,7 +114,7 @@
                 @if ($s['locked'])
                     @include('music.steps._locked', ['step' => $s['n']])
                 @else
-                    @include('music.steps.' . $s['key'], ['step' => $s['n']])
+                    @include($stepView($s['key']), ['step' => $s['n']])
                 @endif
             </div>
         @endforeach

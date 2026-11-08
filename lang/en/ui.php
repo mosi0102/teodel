@@ -22,6 +22,7 @@ return [
         'music' => 'Music',
         'podcast' => 'Podcast',
         'video' => 'Movies & Videos',
+        'shadowing' => 'Shadowing',
         'game' => 'Games',
         'books' => 'Books',
         'words' => 'Highlighted words & phrases',

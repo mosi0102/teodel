@@ -7,7 +7,7 @@ namespace App\Support;
  * سمت کاربر همین سؤال‌ها را در /level-test می‌خواند (قرارداد: app/Support/PlacementTest.php).
  *
  * 🔌 بک‌اند — مدل یک سؤال (همان کلیدهای PlacementTest + چند کلید مدیریتی):
- *   id, status ('draft'|'published')، section (vocab|grammar|listening)، level (a1|a2|b1|b2|c1)
+ *   id, status ('draft'|'published')، section (vocab|grammar|listening)، level (a1|a2|b1|b2|c1|c2)
  *   title    عنوان نوع آزمون (Vocabulary / Grammar / Listening) — پیش‌فرض از بخش
  *   fa       دستور فارسی بالای سؤال      q  متن سؤال انگلیسی (جای خالی: ____)
  *   options  دقیقاً ۴ گزینه              answer  اندیس گزینه‌ی درست (۰ تا ۳)

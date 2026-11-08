@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\MusicController;
+use App\Http\Controllers\PodcastController;
+use App\Http\Controllers\ShadowingController;
 use App\Http\Controllers\PlacementController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +32,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/lang/{locale}', LocaleController::class)->whereIn('locale', ['fa', 'en'])->name('lang');
 
     Route::get('/music', [MusicController::class, 'index'])->name('music.index');
+    Route::get('/podcast', [PodcastController::class, 'index'])->name('podcast.index');
+    Route::get('/shadowing', [ShadowingController::class, 'index'])->name('shadowing.index');
 
     // داشبورد کاربر (نمای کلی یادگیری)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -56,6 +60,13 @@ Route::middleware(['web'])->group(function () {
     // صفحه‌ی آموزش: /music/5 به مرحله‌ی فعلی کاربر می‌رود؛ /music/5/step/2 مرحله‌ی دوم
     Route::get('/music/{id}', [MusicController::class, 'show'])->whereNumber('id')->name('music.show');
     Route::get('/music/{id}/step/{step}', [MusicController::class, 'step'])->whereNumber(['id', 'step'])->name('music.step');
+    // پادکست: همان ساختار موزیک با ۷ مرحله
+    Route::get('/podcast/series/{id}', [PodcastController::class, 'series'])->whereNumber('id')->name('podcast.series');
+    Route::get('/podcast/{id}', [PodcastController::class, 'show'])->whereNumber('id')->name('podcast.show');
+    Route::get('/podcast/{id}/step/{step}', [PodcastController::class, 'step'])->whereNumber(['id', 'step'])->name('podcast.step');
+    Route::get('/shadowing/{id}', [ShadowingController::class, 'show'])->whereNumber('id')->name('shadowing.show');
+    Route::get('/shadowing/{id}/step/{step}', [ShadowingController::class, 'step'])->whereNumber(['id', 'step'])->name('shadowing.step');
+    Route::get('/podcast/{id}/words.pdf', [PodcastController::class, 'wordsPdf'])->whereNumber('id')->name('podcast.words-pdf');
 });
 Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');

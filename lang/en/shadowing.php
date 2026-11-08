@@ -1,0 +1,101 @@
+<?php
+
+return [
+    'title' => 'Shadowing',
+    'subtitle' => 'Pick topics at your level; every topic has a coherent text for each level (A1 to C2). You listen to each sentence, repeat it, and AI checks your pronunciation.',
+
+    'stats' => [
+        'label' => 'Shadowing stats',
+        'completed' => 'Versions completed',
+        'in_progress' => 'In progress',
+        'points' => 'Points earned',
+        'highlights' => 'Highlighted words',
+        'view' => 'View',
+    ],
+
+    'search' => 'Search topics',
+    'filters' => 'Filter and sort',
+    'filter_label' => 'Filter by',
+    'sort_label' => 'Sort by',
+    'apply' => 'Apply',
+    'filter' => ['all' => 'All', 'new' => 'Not started', 'in_progress' => 'In progress', 'done' => 'Completed', 'free' => 'Free'],
+    'sort' => ['default' => 'Default', 'newest' => 'Newest', 'title' => 'Topic name'],
+    'levels_label' => 'Level',
+    'levels' => ['all' => 'All levels'],
+
+    'empty' => [
+        'title' => 'No topics found',
+        'text' => 'Change the filter or search; this level may not have a topic yet.',
+        'reset' => 'Clear filters',
+    ],
+    'load_more' => 'Show more',
+    'load_error' => 'Could not load more. Please try again.',
+
+    'topic' => [
+        'introductions' => ['title' => 'Introducing yourself'],
+        'job' => ['title' => 'Jobs'],
+        'routine' => ['title' => 'Daily routine'],
+        'travel' => ['title' => 'Travel'],
+        'shopping' => ['title' => 'Shopping'],
+    ],
+
+    'card' => [
+        'free' => 'Free',
+        'limited' => 'Limited (:n steps)',
+        'sentences' => 'Sentences',
+        'sentences_value' => ':n sentences',
+        'duration' => 'Practice time',
+        'versions' => 'Version for each level (tap a level)',
+        'version_title' => 'Level :level — :n sentences, about :time',
+        'no_version' => 'This topic has no version for this level yet',
+        'progress' => 'Level :level progress',
+    ],
+    'cta' => [
+        'start' => 'Start level :level',
+        'continue' => 'Continue level :level',
+        'review' => 'Review level :level',
+    ],
+    'dur' => ['ms' => ':m min :s sec', 's' => ':s sec', 'range_s' => ':a–:b sec', 'range' => ':a–:b min'],
+
+    'step' => [
+        'sentence' => 'Sentence :n',
+        'question' => 'Question :n',
+        'play' => 'Play sentence',
+        'stop' => 'Stop',
+        'slow' => 'Slow speed',
+        'listened' => 'Listened :n of :total times',
+        'listened_done' => 'Great! You listened 3 times',
+        'record' => 'Record',
+        'record_locked' => 'Listen 3 times first',
+        'stop_record' => 'Finish recording',
+        'similarity' => 'Similarity',
+        'pronunciation' => 'Pronunciation',
+        'heard' => 'What we understood from your voice:',
+        'verdict_good' => 'Well done! You said the sentence very well.',
+        'verdict_ok' => 'Good! Listen again to the red words and try once more.',
+        'verdict_retry' => 'Try again: listen to the sentence once more and say it slowly and clearly.',
+        'retry' => 'Try again',
+        'simulate' => 'Simulate result (demo only)',
+        'no_mic' => 'The microphone is not available in this browser. Use Chrome or Safari on a secure (https) connection.',
+        'mic_denied' => 'Microphone permission was denied. Allow it in your browser settings.',
+
+        'listen_hint' => 'Listen to the first sentence 3 times, carefully; notice the rhythm and tone.',
+        'listen_note' => 'Use the speed button (0.7x) to hear it more slowly if you need to. After 3 times, go to the next step.',
+        'record_hint' => 'Now say the same sentence in your own voice; AI checks similarity and pronunciation.',
+        'record_note' => 'You can listen again and record as many times as you like. Your voice is only used for the check.',
+        'practice_hint' => 'Do the same (listen 3 times, then record) for the rest of the sentences.',
+        'practice_done' => 'Well done! You practised every sentence. Next you will see the full text and the words.',
+
+        'hard_title' => 'Hard words and where they appear',
+        'in_sentence' => 'Sentence :n',
+
+        'questions_hint' => 'Listen to a few questions at the level of the text and answer them out loud; your answer is checked.',
+        'answer' => 'Answer',
+        'keywords' => 'Answer keywords:',
+        'model' => 'Model answer',
+        'q_good' => 'Well done! Your answer was complete.',
+        'q_ok' => 'Good! A few key points were missing; see the model answer.',
+        'q_retry' => 'Look at the model answer and try once more.',
+        'questions_done' => 'Congratulations! You answered every question and finished this version.',
+    ],
+];

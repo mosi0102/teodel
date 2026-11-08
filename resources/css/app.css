@@ -295,6 +295,9 @@ html.sidebar-closed { --rail: 0px; }
        وضعیت تمرین با data-state روی .lx: idle | wrong | correct | revealed */
     .lsec { @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-2xl px-4 py-3 md:px-5 md:py-3.5; }
     .lsec--easy { background: linear-gradient(to right, rgb(220 252 231), rgb(240 253 244 / 0.3)); }
+    .lsec--sentence { background: linear-gradient(to right, rgb(224 231 255), rgb(238 242 255 / 0.3)); }
+    [dir='rtl'] .lsec--sentence { background: linear-gradient(to left, rgb(224 231 255), rgb(238 242 255 / 0.3)); }
+    .lsec--sentence .lsec__icon { @apply text-brand-700; }
     .lsec--hard { background: linear-gradient(to right, rgb(254 226 226), rgb(254 242 242 / 0.3)); }
     [dir='rtl'] .lsec--easy { background: linear-gradient(to left, rgb(220 252 231), rgb(240 253 244 / 0.3)); }
     [dir='rtl'] .lsec--hard { background: linear-gradient(to left, rgb(254 226 226), rgb(254 242 242 / 0.3)); }
@@ -1374,3 +1377,87 @@ html.sidebar-closed { --rail: 0px; }
 .db-tip__acts { @apply mt-3 flex flex-wrap items-center gap-2; }
 .db-tip__x { @apply grid size-9 shrink-0 place-items-center rounded-full text-slate-400 transition-colors hover:bg-white hover:text-slate-600; }
 @media (prefers-reduced-motion: reduce) { .db-tip { transition: none; transform: none; } }
+
+/* لحن و ریتم (shadowing پادکست) */
+.pr { @apply block; }
+.pr-line { @apply mb-3 flex flex-wrap items-end gap-x-2 gap-y-2 last:mb-0; }
+.pr-seg { @apply inline-flex flex-col; --pr: theme('colors.amber.500'); }
+.pr-seg--rise { --pr: theme('colors.emerald.500'); }
+.pr-seg--fall { --pr: theme('colors.rose.500'); }
+.pr-words { @apply text-[15px] leading-7 text-slate-700 md:text-base; }
+.pr-w { @apply rounded px-0.5; }
+.pr-w.is-stress { @apply font-extrabold text-brand-900; background: color-mix(in srgb, var(--pr) 18%, transparent); }
+.pr-curve { @apply -mt-0.5 block h-3.5 w-full overflow-visible; }
+.pr-curve path, .pr-chip svg path { fill: none; stroke: var(--pr); stroke-width: 2.5; stroke-linecap: round; }
+.pr-legend { @apply flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-slate-200 bg-white px-4 py-3; }
+.pr-chip { @apply inline-flex items-center gap-1.5 text-xs font-bold text-slate-600; --pr: theme('colors.amber.500'); }
+.pr-chip svg { @apply h-3.5 w-8; }
+
+/* Main idea (پادکست، مرحله‌ی ۱) */
+.idea { @apply rounded-2xl border border-slate-200 bg-white p-4 md:p-5; }
+
+/* کارت پادکست و لیست اپیزودها */
+.pc-reco { @apply absolute start-4 -top-3 z-10 shadow-sm ring-2 ring-white inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-extrabold text-amber-700; }
+.pc-stat { @apply flex items-center gap-2.5 rounded-xl border border-slate-200 px-3 py-2.5; }
+.pc-stat__ic { @apply grid size-9 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-700; }
+.pc-stat dt { @apply text-[11px] text-slate-500; }
+.pc-stat dd { @apply text-sm font-extrabold leading-5 text-brand-900; }
+.pc-ep { @apply flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-card transition-shadow duration-200 hover:shadow-lift md:gap-4 md:p-4; }
+.pc-ep[data-status='done'] { @apply border-emerald-200; }
+.pc-ep__n { @apply grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-sm font-extrabold text-brand-700; }
+.pc-ep[data-status='done'] .pc-ep__n { @apply bg-emerald-50 text-emerald-600; }
+.pc-ep__time { @apply inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[13px] font-extrabold tabular-nums text-brand-900; }
+
+/* Shadowing (موضوع‌ها): چیپ سطح روی کارت، کارت جمله، نتیجه‌ی AI */
+.sh-lv { @apply relative flex h-9 items-center justify-center gap-0.5 rounded-lg border border-slate-200 bg-white text-[11px] font-extrabold text-slate-600 transition duration-150 hover:border-brand-300 hover:bg-brand-50; }
+.sh-lv--none { @apply cursor-default border-dashed bg-slate-50 text-slate-300 hover:border-slate-200 hover:bg-slate-50; }
+.sh-lv--doing { @apply border-amber-300 bg-amber-50 text-amber-700; }
+.sh-lv--done { @apply border-emerald-300 bg-emerald-50 text-emerald-700; }
+.sh-lv.is-mine { @apply ring-2 ring-brand-200; }
+.sh-lv.is-focus { @apply border-brand-700 bg-brand-700 text-white hover:bg-brand-800; }
+.sh-lv.is-focus.sh-lv--done { @apply border-emerald-600 bg-emerald-600 text-white; }
+.sh-lv__dot { @apply size-1.5 rounded-full bg-amber-500; }
+.sh-lv.is-focus .sh-lv__dot { @apply bg-white; }
+
+.shc { @apply flex min-w-0 flex-col gap-3.5 rounded-3xl border border-slate-200 bg-white p-4 shadow-card transition duration-300 md:p-5; }
+.shc[data-state='done'] { @apply border-emerald-300; }
+.shc__no { @apply rounded-full bg-brand-50 px-3 py-1 text-xs font-extrabold text-brand-700; }
+.shc__tick { @apply text-emerald-600; opacity: 0; transform: scale(0.6); transition: opacity 0.3s, transform 0.3s; }
+.shc[data-state='done'] .shc__tick { opacity: 1; transform: none; }
+.shc__text { @apply text-left text-base font-bold leading-8 text-brand-900 md:text-lg md:leading-9; }
+.shc__listen { @apply flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3; }
+.shc__play { @apply grid size-12 shrink-0 place-items-center rounded-full bg-brand-700 text-white shadow-card transition duration-200 hover:bg-brand-800 active:scale-95; }
+.shc__ico-stop { display: none; }
+.shc__play.is-playing .shc__ico-stop { display: block; }
+.shc__play.is-playing .shc__ico-play { display: none; }
+.shc__speed { @apply grid h-9 min-w-12 place-items-center rounded-full border border-slate-200 bg-white px-2.5 text-xs font-extrabold tabular-nums text-slate-600 transition; }
+.shc__speed[aria-pressed='true'] { @apply border-brand-700 bg-brand-50 text-brand-700; }
+.shc[data-state='done'] .sx__dot.is-on { @apply bg-emerald-500; }
+.shc[data-state='done'] [data-shc-count] { @apply text-emerald-700; }
+
+.shc__rec { @apply flex flex-wrap items-center gap-3; }
+.shc__mic { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-rose-600 px-5 text-sm font-extrabold text-white shadow-card transition duration-200 hover:bg-rose-700 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none; }
+.shc__mic.is-live { @apply animate-pulse bg-slate-900; }
+.shc__msg { @apply rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs font-bold leading-6 text-amber-800; }
+.shc__sim { @apply self-start rounded-full border border-dashed border-slate-300 px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-50; }
+.shc__result { @apply rounded-2xl border border-slate-200 bg-slate-50/70 p-3.5; }
+.shc__meter { @apply rounded-xl bg-white px-3 py-2.5 shadow-card; }
+.shc__meter span { @apply block text-[11px] font-bold text-slate-500; }
+.shc__meter b { @apply block text-lg font-extrabold tabular-nums text-brand-900; }
+.shc__meter i { @apply mt-1.5 block h-1.5 overflow-hidden rounded-full bg-slate-100; }
+.shc__meter u { @apply block h-full rounded-full bg-slate-300 no-underline transition-[width] duration-700; width: 0; }
+.shc__meter[data-level='good'] u { @apply bg-emerald-500; }
+.shc__meter[data-level='ok'] u { @apply bg-amber-500; }
+.shc__meter[data-level='low'] u { @apply bg-rose-500; }
+.shc__words { @apply mt-1.5 text-left text-sm font-bold leading-7; }
+.shc__words .is-ok { @apply text-emerald-700; }
+.shc__words .is-miss { @apply rounded bg-rose-50 text-rose-600 underline decoration-rose-300 decoration-wavy underline-offset-4; }
+.shc__verdict { @apply mt-3 rounded-xl px-3.5 py-2.5 text-sm font-extrabold leading-6; }
+.shc__verdict[data-kind='good'] { @apply bg-emerald-50 text-emerald-800; }
+.shc__verdict[data-kind='ok'] { @apply bg-amber-50 text-amber-800; }
+.shc__verdict[data-kind='retry'] { @apply bg-rose-50 text-rose-700; }
+.sq-key { @apply rounded-full px-3 py-1 text-xs font-extrabold; }
+.sq-key.is-ok { @apply bg-emerald-50 text-emerald-700; }
+.sq-key.is-miss { @apply bg-rose-50 text-rose-600 line-through; }
+.sh-ref { @apply rounded-full bg-white px-2.5 py-1 text-[11px] font-extrabold text-brand-700 shadow-card transition hover:bg-brand-50; }
+.wline.is-flash { @apply rounded-lg bg-amber-100/70; transition: background-color 0.4s; }
