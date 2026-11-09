@@ -14,6 +14,7 @@ class WordsController extends Controller
     {
         return view('words.index', [
             'words' => SavedWords::demo(),
+            'sentences' => SavedWords::sentences(), // جمله‌های محبوب (کتاب‌ها)
             // 'viewUrl' => route('words.view'),  // POST {id} ← ثبت هر بار دیدن لغت (بعد از SavedWords::LEARN_AT بار، «یاد گرفته‌ام» می‌شود)
         ]);
     }

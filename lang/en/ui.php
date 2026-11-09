@@ -5,7 +5,6 @@ return [
     'menu' => 'Menu',
     'sidebar_close' => 'Close sidebar',
     'sidebar_open' => 'Open sidebar',
-    'soon' => 'Soon',
     'points' => 'Points',
     'streak' => 'Day streak',
     'days_left' => 'Subscription days left',

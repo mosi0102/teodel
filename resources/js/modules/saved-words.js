@@ -101,7 +101,7 @@ function init(root) {
                 translate: info.translate || '', synonyms: info.synonyms || [], antonyms: info.antonyms || [],
                 tags: info.tags || [], connotation: info.connotation || '', senses: info.senses || [], collocations: info.collocations || [],
                 family: info.family || [], morphemes: info.morphemes || [], origin: info.origin || '',
-                image: info.image || null, song: v.song ? { id: v.song, title: '' } : null, saved_at: v.at || 0, status: 'new',
+                image: info.image || null, song: v.song ? { id: v.song, title: v.book_title || '', kind: v.kind || 'music' } : null, saved_at: v.at || 0, status: 'new',
             });
         });
 
@@ -380,7 +380,8 @@ function init(root) {
         const hasSong = !!(w.song && w.song.id);
         $s.prop('hidden', !hasSong);
         if (hasSong) {
-            $s.attr('href', songUrl + '/' + w.song.id + '/step/3');
+            // لغت ذخیره‌شده از کتاب ← خواننده‌ی همان کتاب (مرحله‌ی ۲)
+            $s.attr('href', w.song.kind === 'book' ? '/books/' + w.song.id + '/step/2' : songUrl + '/' + w.song.id + '/step/3');
             $s.find('[data-d="song"]').text(w.song.title || '#' + w.song.id);
         }
         setBlur(true); // ترجمه‌ها همیشه تار شروع می‌شوند

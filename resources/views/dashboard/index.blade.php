@@ -8,6 +8,7 @@
 
 {{--
     داشبورد: نمای کلی یادگیری — ادامه‌ی آخرین موزیک، هدف روزانه، آمار هفته، سطح و مهارت‌ها، مرور لغت، پیشنهادها، اشتراک و پشتیبانی.
+    همه‌ی چهار بخش: ادامه‌ی آموزش‌های نیمه‌کاره (موزیک/پادکست/شدوئینگ/کتاب)، آمار کل، مسیرهای یادگیری، پیشنهادهای ترکیبی.
     رفتار (سلام بر اساس ساعت، انیمیشن حلقه‌ها و نمودار، تغییر هدف): resources/js/modules/dashboard.js
     قرارداد داده: app/Support/Dashboard.php و README.
 --}}
@@ -21,7 +22,10 @@
     $cover = fn ($s) => ! empty($s['cover'])
         ? 'background-image:url('.e($s['cover']).');background-size:cover;background-position:center'
         : 'background: radial-gradient(120% 120% at 15% 0%, hsl('.(($hue($s['id']) + 40) % 360).' 85% 66%), transparent 60%), linear-gradient(135deg, hsl('.$hue($s['id']).' 65% 46%), hsl('.(($hue($s['id']) + 50) % 360).' 60% 28%))';
-    $mmss = fn ($sec) => num(intdiv($sec, 60)).':'.str_pad((string) ($sec % 60), 2, '0', STR_PAD_LEFT);
+    $kinds = \App\Support\Dashboard::KINDS;
+    $kindLabel = fn ($k) => __('ui.nav.'.($kinds[$k]['nav'] ?? $k));
+    $resume = array_values($d['resume'] ?? []);
+    $doneTotal = array_sum($d['totals']['done'] ?? []);
     $goal = $d['goal'];
     $goalPct = $goal['minutes'] > 0 ? min(100, (int) round($goal['today'] / $goal['minutes'] * 100)) : 0;
     $weekTotal = array_sum(array_column($d['week'], 'minutes'));
@@ -66,25 +70,41 @@
                 </p>
             </div>
 
-            @if (! empty($d['resume']))
-                @php $r = $d['resume']; @endphp
+            @if ($resume)
+                @php $r = $resume[0]; @endphp
                 <a href="{{ $r['url'] }}" class="db-resume group">
-                    <span class="db-resume__cover" style="{!! $cover($r['song']) !!}" aria-hidden="true"></span>
+                    <span class="db-resume__cover" style="{!! $cover($r) !!}" aria-hidden="true">
+                        <span class="db-kind" data-kind="{{ $r['kind'] }}"><x-icon :name="$kinds[$r['kind']]['icon']" class="size-3.5" /></span>
+                    </span>
                     <span class="min-w-0 flex-1">
-                        <span class="block text-[0.7rem] font-extrabold text-brand-600">{{ __('dashboard.resume.title') }}</span>
-                        <span class="mt-0.5 block truncate text-base font-extrabold text-brand-900" dir="ltr"><bdi>{{ $r['song']['title'] }}</bdi></span>
-                        <span class="block truncate text-xs text-slate-500" dir="ltr"><bdi>{{ $r['song']['artist'] }}</bdi></span>
+                        <span class="block text-[0.7rem] font-extrabold text-brand-600">{{ __('dashboard.resume.title') }} · {{ $kindLabel($r['kind']) }}</span>
+                        <span class="mt-0.5 block truncate text-base font-extrabold text-brand-900" dir="ltr"><bdi>{{ $r['title'] }}</bdi></span>
+                        <span class="block truncate text-xs text-slate-500" dir="ltr"><bdi>{{ $r['subtitle'] }}</bdi></span>
                         <span class="mt-2 flex items-center gap-2">
                             <span class="db-bar min-w-0 flex-1"><i data-db-bar="{{ $r['percent'] }}"></i></span>
                             <span class="shrink-0 text-xs font-extrabold text-brand-800">{{ num($r['percent']) }}٪</span>
                         </span>
                         <span class="mt-1.5 block truncate text-xs font-medium text-slate-500">
-                            {{ __('dashboard.resume.step_of', ['n' => num($r['step']), 'total' => num($r['steps'])]) }} · <bdi dir="ltr">{{ __('lesson.steps.'.$r['step_key'].'.label') }}</bdi>
+                            {{ __('dashboard.resume.step_of', ['n' => num($r['step']), 'total' => num($r['steps'])]) }} · <bdi>{{ \App\Support\Dashboard::stepLabel($r['kind'], $r['step_key']) }}</bdi>
                         </span>
                     </span>
                     <span class="db-resume__go" aria-hidden="true">{!! $chev !!}</span>
                     <span class="sr-only">{{ __('dashboard.resume.cta') }}</span>
                 </a>
+                @if (count($resume) > 1)
+                    <div class="db-more" aria-label="{{ __('dashboard.resume.more') }}">
+                        @foreach (array_slice($resume, 1, 3) as $r)
+                            <a href="{{ $r['url'] }}" class="db-more__a">
+                                <span class="db-kind" data-kind="{{ $r['kind'] }}"><x-icon :name="$kinds[$r['kind']]['icon']" class="size-3.5" /></span>
+                                <span class="min-w-0 flex-1">
+                                    <bdi class="block truncate text-xs font-extrabold text-white" dir="ltr">{{ $r['title'] }}</bdi>
+                                    <span class="db-bar db-bar--light mt-1"><i data-db-bar="{{ $r['percent'] }}"></i></span>
+                                </span>
+                                <span class="shrink-0 text-[0.7rem] font-extrabold text-white/80">{{ num($r['percent']) }}٪</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             @else
                 <div class="db-resume">
                     <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-700">{!! $ic('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>', 'size-7') !!}</span>
@@ -92,7 +112,7 @@
                         <span class="block text-base font-extrabold text-brand-900">{{ __('dashboard.resume.empty_title') }}</span>
                         <span class="mt-1 block text-xs leading-6 text-slate-500">{{ __('dashboard.resume.empty_text') }}</span>
                     </span>
-                    <a href="{{ url('/music') }}" class="btn-primary shrink-0">{{ __('dashboard.resume.empty_cta') }}</a>
+                    <a href="#db-paths-t" class="btn-primary shrink-0">{{ __('dashboard.resume.empty_cta') }}</a>
                 </div>
             @endif
         </section>
@@ -142,15 +162,17 @@
                 <span>{{ __('dashboard.stats.streak') }}</span>
                 <small>{{ __('dashboard.stats.streak_best', ['n' => num($d['streak']['best'])]) }}</small>
             </div>
-            <a href="{{ url('/music') }}?filter=done" class="db-stat" data-tone="green">
+            <div class="db-stat" data-tone="green">
                 <span class="db-stat__ic">{!! $ic('<circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/>') !!}</span>
-                <b data-db-num="{{ $d['totals']['songs_done'] }}">{{ num($d['totals']['songs_done']) }}</b>
-                <span>{{ __('dashboard.stats.songs') }}</span>
-            </a>
+                <b data-db-num="{{ $doneTotal }}">{{ num($doneTotal) }}</b>
+                <span>{{ __('dashboard.stats.done') }}</span>
+                <small>{{ __('dashboard.stats.done_split', ['m' => num($d['totals']['done']['music'] ?? 0), 'p' => num($d['totals']['done']['podcast'] ?? 0), 's' => num($d['totals']['done']['shadowing'] ?? 0), 'b' => num($d['totals']['done']['books'] ?? 0)]) }}</small>
+            </div>
             <a href="{{ url('/words') }}" class="db-stat" data-tone="brand">
                 <span class="db-stat__ic">{!! $ic('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>') !!}</span>
                 <b data-db-num="{{ $d['totals']['words_saved'] }}">{{ num($d['totals']['words_saved']) }}</b>
                 <span>{{ __('dashboard.stats.words') }}</span>
+                @if (! empty($d['totals']['sentences_saved']))<small>{{ __('dashboard.stats.sentences', ['n' => num($d['totals']['sentences_saved'])]) }}</small>@endif
             </a>
             <div class="db-stat" data-tone="sky">
                 <span class="db-stat__ic">{!! $ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>') !!}</span>
@@ -226,10 +248,17 @@
                     <p class="mt-1 text-sm font-bold text-emerald-700">{{ __('dashboard.plan.paid_days', ['n' => num($d['plan']['days_left'])]) }}</p>
                     <a href="{{ url('/subscription') }}" class="btn-outline mt-3.5 w-full">{{ __('dashboard.plan.renew') }}</a>
                 @else
-                    @php $p = $d['plan']; $pp = $p['free_songs_total'] ? (int) round($p['free_songs_used'] / $p['free_songs_total'] * 100) : 0; @endphp
                     <h2 id="db-plan-t" class="db-title">{{ __('dashboard.plan.free_title') }}</h2>
-                    <p class="mt-1 text-sm font-bold text-slate-700">{{ __('dashboard.plan.free_used', ['a' => num($p['free_songs_used']), 'b' => num($p['free_songs_total'])]) }}</p>
-                    <span class="db-bar mt-2.5"><i data-db-bar="{{ $pp }}"></i></span>
+                    <p class="mt-1 text-xs font-bold text-slate-500">{{ __('dashboard.plan.free_used') }}</p>
+                    <ul class="db-free">
+                        @foreach ($d['plan']['free'] ?? [] as $f)
+                            <li>
+                                <span class="db-kind" data-kind="{{ $f['kind'] }}"><x-icon :name="$kinds[$f['kind']]['icon']" class="size-3.5" /></span>
+                                <span class="min-w-0 flex-1 truncate">{{ $kindLabel($f['kind']) }}</span>
+                                <b class="tabular-nums">{{ num($f['used']) }}/{{ num($f['total']) }}</b>
+                            </li>
+                        @endforeach
+                    </ul>
                     <p class="mt-2.5 text-xs leading-6 text-slate-500">{{ __('dashboard.plan.free_text') }}</p>
                     <a href="{{ url('/subscription') }}" class="btn-primary mt-3.5 w-full">{{ __('dashboard.plan.buy') }}</a>
                 @endif
@@ -252,22 +281,37 @@
 
         {{-- ───────── پیشنهاد موزیک ───────── --}}
         <section class="db-rec" aria-labelledby="db-rec-t">
-            <div class="mb-3 flex items-center justify-between gap-3">
-                <h2 id="db-rec-t" class="db-title !text-base">{{ __('dashboard.recommended.title') }}</h2>
-                <a href="{{ url('/music') }}" class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-700 transition hover:text-brand-900">{{ __('dashboard.recommended.all') }} <span class="size-4">{!! $ic('<path d="m9 6 6 6-6 6"/>', 'size-4 rtl:-scale-x-100') !!}</span></a>
-            </div>
+            {{-- ───────── مسیرهای یادگیری (موزیک، پادکست، شدوئینگ، کتاب) ───────── --}}
+            @if (! empty($d['sections']))
+                <h2 class="db-title mb-3 !text-base" id="db-paths-t">{{ __('dashboard.paths.title') }}</h2>
+                <ul class="db-paths mb-6" aria-labelledby="db-paths-t">
+                    @foreach ($d['sections'] as $sec)
+                        @php $pct = $sec['total'] ? (int) round($sec['done'] / $sec['total'] * 100) : 0; @endphp
+                        <li>
+                            <a href="{{ $sec['url'] }}" class="db-path" data-path="{{ $sec['key'] }}">
+                                <span class="db-path__ic"><x-icon :name="['music' => 'music', 'podcast' => 'mic', 'shadowing' => 'repeat', 'books' => 'book'][$sec['key']]" class="size-5" /></span>
+                                <b>{{ __('ui.nav.' . $sec['key']) }}</b>
+                                <small>{{ __('dashboard.paths.done', ['n' => num($sec['done']), 't' => num($sec['total'])]) }}@if ($sec['started']) · {{ __('dashboard.paths.started', ['n' => num($sec['started'])]) }}@endif</small>
+                                <span class="db-path__bar" aria-hidden="true"><i style="width: {{ $pct }}%"></i></span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+            <h2 id="db-rec-t" class="db-title mb-3 !text-base">{{ __('dashboard.recommended.title') }}</h2>
             <ul class="db-rec__list">
                 @foreach ($d['recommended'] as $s)
                     <li>
                         <a href="{{ $s['url'] }}" class="db-song">
                             <span class="db-song__cover" style="{!! $cover($s) !!}">
                                 <span class="db-song__tag {{ $s['is_free'] ? 'is-free' : '' }}">{{ $s['is_free'] ? __('dashboard.recommended.free') : __('dashboard.recommended.locked') }}</span>
+                                <span class="db-kind db-kind--tag" data-kind="{{ $s['kind'] }}"><x-icon :name="$kinds[$s['kind']]['icon']" class="size-3.5" />{{ $kindLabel($s['kind']) }}</span>
                             </span>
                             <span class="mt-2.5 block truncate text-sm font-extrabold text-brand-900" dir="ltr"><bdi>{{ $s['title'] }}</bdi></span>
-                            <span class="block truncate text-xs text-slate-500" dir="ltr"><bdi>{{ $s['artist'] }}</bdi></span>
+                            <span class="block truncate text-xs text-slate-500" dir="ltr"><bdi>{{ $s['subtitle'] }}</bdi></span>
                             <span class="mt-1.5 flex items-center gap-2 text-[0.7rem] font-bold text-slate-400">
                                 <span class="rounded-md bg-brand-50 px-1.5 py-0.5 text-brand-700" dir="ltr">{{ strtoupper($s['level']) }}</span>
-                                <span>{{ $mmss($s['duration']) }}</span>
+                                <span>{{ __('dashboard.recommended.min', ['n' => num($s['minutes'])]) }}</span>
                             </span>
                         </a>
                     </li>

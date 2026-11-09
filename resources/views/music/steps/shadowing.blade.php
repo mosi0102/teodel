@@ -37,11 +37,11 @@
     {{-- راهنمای لحن (فقط وقتی بخش‌ها prosody دارند: پادکست) --}}
     @if (collect($parts)->contains(fn ($p) => ! empty($p['prosody'])))
         <div class="pr-legend" role="note">
-            <b class="text-xs font-extrabold text-brand-900 md:text-sm">{{ __('lesson.shadowing.tone_title') }}</b>
-            <span class="pr-chip pr-seg--rise"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 13 C38 13 62 3 98 3" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.rise') }}</span>
-            <span class="pr-chip pr-seg--fall"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 3 C38 3 62 13 98 13" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.fall') }}</span>
-            <span class="pr-chip pr-seg--mid"><svg viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 L98 8" vector-effect="non-scaling-stroke" /></svg>{{ __('lesson.shadowing.tone.mid') }}</span>
-            <span class="pr-chip"><span class="pr-w is-stress">Abc</span>{{ __('lesson.shadowing.tone.stress') }}</span>
+            <b class="pr-legend__title">{{ __('lesson.shadowing.tone_title') }}</b>
+            @foreach (['rise', 'fall', 'mid'] as $tone)
+                <span class="pr-chip pr-seg--{{ $tone }}"><x-lesson.tone-icon :tone="$tone" />{{ __('lesson.shadowing.tone.' . $tone) }}</span>
+            @endforeach
+            <span class="pr-chip"><span class="pr-chip__stress" dir="ltr">Abc</span>{{ __('lesson.shadowing.tone.stress') }}</span>
         </div>
     @endif
 

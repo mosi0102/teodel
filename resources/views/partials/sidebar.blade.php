@@ -58,15 +58,7 @@
                 @foreach ($items as $item)
                     @php $label = __('ui.nav.' . $item['key']); @endphp
 
-                    @if ($item['soon'])
-                        <div class="nav-link justify-center lg:justify-start" aria-disabled="true" title="{{ $label }}">
-                            <x-icon :name="$item['icon']" class="size-5 shrink-0"/>
-                            <span class="hidden min-w-0 flex-1 truncate lg:inline">{{ $label }}</span>
-                            <span
-                                class="hidden rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500 lg:inline">{{ __('ui.soon') }}</span>
-                        </div>
-                    @else
-                        <a href="{{ $item['href'] }}" class="nav-link justify-center lg:justify-start"
+                    <a href="{{ $item['href'] }}" class="nav-link justify-center lg:justify-start"
                            title="{{ $label }}" @if ($item['active']) aria-current="page" @endif>
                             <x-icon :name="$item['icon']" class="size-5 shrink-0"/>
                             <span class="hidden min-w-0 flex-1 truncate lg:inline">{{ $label }}</span>
@@ -75,7 +67,6 @@
                                       dir="ltr" data-user-level>{{ $u['level'] }}</span>
                             @endif
                         </a>
-                    @endif
                 @endforeach
             </nav>
 

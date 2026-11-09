@@ -23,7 +23,7 @@ class Nav
             ['key' => 'podcast',    'icon' => 'mic',             'href' => route('podcast.index'), 'active' => request()->routeIs('podcast.*'), 'soon' => false],
             ['key' => 'shadowing',  'icon' => 'repeat',          'href' => route('shadowing.index'), 'active' => request()->routeIs('shadowing.*'), 'soon' => false],
             ['key' => 'game',       'icon' => 'gamepad',         'href' => '#',                 'active' => false,                         'soon' => true],
-            ['key' => 'books',      'icon' => 'book',            'href' => '#',                 'active' => false,                         'soon' => true],
+            ['key' => 'books',      'icon' => 'book',            'href' => \Illuminate\Support\Facades\Route::has('books.index') ? route('books.index') : '#', 'active' => request()->routeIs('books.*'), 'soon' => ! \Illuminate\Support\Facades\Route::has('books.index')],
             ['key' => 'words',      'icon' => 'bookmark',        'href' => url('/words'),       'active' => request()->is('words*'),       'soon' => false],
             ['key' => 'level_test', 'icon' => 'clipboard-check', 'href' => url('/level-test'),  'active' => request()->is('level-test*'), 'soon' => false],
             ['key' => 'dictionary', 'icon' => 'languages',       'href' => url('/dictionary'),  'active' => request()->is('dictionary*'),  'soon' => false],

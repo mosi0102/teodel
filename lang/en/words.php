@@ -73,4 +73,21 @@ return [
         'continue' => 'Next',
         'finish' => 'Finish review',
     ],
+    // Page tabs + favourite sentences (books)
+    'switch_label' => 'Page sections',
+    'switch' => ['words' => 'Words', 'sentences' => 'Favourite sentences'],
+    'sentences' => [
+        'search' => 'Search sentences or books',
+        'chapter' => 'Chapter :n',
+        'open' => 'Open book',
+        'remove' => 'Remove',
+        'removed' => 'Sentence removed',
+        'undo' => 'Undo',
+        'copy' => 'Copy',
+        'copied' => 'Copied',
+        'speak' => 'Read aloud',
+        'empty_title' => 'No saved sentences yet',
+        'empty_text' => 'While reading a book, select a sentence you like and tap “Save sentence” to keep it here.',
+        'go_books' => 'Go to books',
+    ],
 ];

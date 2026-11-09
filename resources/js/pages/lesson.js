@@ -11,4 +11,5 @@ import '../modules/karaoke';
 import '../modules/details';
 import '../modules/podcast-idea';
 import '../modules/shadowing-topic';
+import '../modules/book-reader';
 import '../modules/progress-sync';

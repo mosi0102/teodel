@@ -23,6 +23,9 @@ return [
     'nav' => [
         'dashboard' => 'Dashboard',
         'songs' => 'Music lessons',
+        'podcast' => 'Podcasts',
+        'shadowing' => 'Shadowing',
+        'books' => 'Books',
         'placement' => 'Level-test bank',
         'dictionary' => 'Dictionary',
         'users' => 'Users',
@@ -30,6 +33,7 @@ return [
         'tickets' => 'Tickets',
         'reports' => 'Error reports',
         'settings' => 'Settings',
+        'staff' => 'Admins & access',
     ],
 
     'common' => [
@@ -115,6 +119,9 @@ return [
         'quick' => [
             'title' => 'Shortcuts',
             'song' => 'New song',
+            'podcast' => 'New podcast',
+            'shadowing' => 'Shadowing topic',
+            'book' => 'New book',
             'question' => 'Test question',
             'word' => 'Dictionary entry',
             'ticket' => 'Unanswered tickets',
@@ -167,9 +174,18 @@ return [
             'ref' => 'Reference',
         ],
         'songs' => [
-            'title' => 'Most played songs',
+            'title' => 'Most played lessons',
+            'tabs' => ['music' => 'Music', 'podcast' => 'Podcast', 'shadowing' => 'Shadowing', 'books' => 'Books'],
             'plays' => ':n plays',
             'done' => ':p% finished it',
+        ],
+        'sections' => [
+            'title' => 'Lessons at a glance',
+            'section' => 'Section',
+            'published' => 'Published',
+            'learners' => 'Active learners (week)',
+            'completions' => 'Completions (30 days)',
+            'avg' => 'Average progress',
         ],
         'health' => [
             'title' => 'Content health',

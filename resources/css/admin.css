@@ -648,3 +648,114 @@ a.ad-user:hover b { @apply text-brand-700; }
 .ad-exp__hint { @apply mt-1 border-t border-slate-100 px-3 pb-1.5 pt-2 text-[11px] leading-5 text-slate-500; }
 @keyframes ad-exp-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ad-exp__menu { animation: none; } }
+
+/* ---------- ویرایشگر مشترک محتوا (ce-*): پادکست، Shadowing، کتاب — resources/js/admin/content.js ---------- */
+[data-ce-if][hidden], [data-ce-empty][hidden], [data-ce-player][hidden], [data-ce-noaudio][hidden] { display: none !important; }
+.ce-player { @apply mt-1.5 rounded-2xl bg-white p-1.5 shadow-card; }
+.ce-player audio { height: 40px; }
+.ad-ai.is-busy { @apply pointer-events-none opacity-60; }
+.ad-ai.is-busy svg { animation: spin 1s linear infinite; }
+
+/* اپیزودهای یک سری */
+.ce-eps { @apply space-y-1.5; }
+.ce-ep { @apply flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-2.5 transition-colors hover:border-brand-200; }
+.ce-ep__n { @apply grid size-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-xs font-extrabold text-brand-700; }
+.ce-ep__t { @apply min-w-0 flex-1; }
+.ce-ep__t b { @apply block truncate text-sm text-brand-900; }
+.ce-ep__t small { @apply block truncate text-[0.7rem] font-bold text-slate-400; }
+a.ed-del { @apply grid; }
+
+/* ویرایشگر لحن */
+.ce-pr__bar { @apply mb-2 flex flex-wrap gap-1.5; }
+.ce-pr__b { @apply inline-flex min-h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white py-0.5 pe-2.5 ps-1 text-[0.7rem] font-bold text-slate-600 transition hover:border-brand-300 hover:text-brand-700; }
+.ce-pr__b > b { @apply grid h-6 min-w-6 place-items-center rounded-full bg-slate-100 px-1 text-[0.7rem] text-slate-700; }
+.ce-pr__b .pr-tone { @apply size-6 rounded-full; }
+.ce-pr__b--auto { @apply border-violet-200 bg-violet-50 ps-2.5 text-violet-700; }
+.ce-pr__out { @apply mt-2 min-h-12 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-3; }
+
+/* آپلود */
+.ce-audio { @apply h-10 w-full max-w-sm; }
+.ce-file { @apply inline-block max-w-full truncate rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-brand-700 hover:underline; }
+
+/* Shadowing: منبع صوت و نسخه‌ها */
+.ce-src { @apply rounded-2xl border border-slate-100 p-3.5; }
+.ce-src__t { @apply mb-3 flex items-center gap-1.5 text-xs font-extrabold text-slate-500; }
+.ce-vchip { @apply relative flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-sm font-extrabold text-slate-400 transition; }
+.ce-vchip input { @apply absolute inset-0 cursor-pointer opacity-0; }
+.ce-vchip:has(input:checked) { @apply border-brand-600 bg-brand-50 text-brand-800; }
+.ce-vchip:has(input:focus-visible) { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+.ce-vswitch { @apply border border-slate-200 bg-white; }
+.ce-lv { @apply rounded-md bg-slate-100 px-1.5 py-0.5 text-[0.62rem] font-extrabold text-slate-300; }
+.ce-lv.is-on { @apply bg-brand-50 text-brand-700; }
+.ce-chtext textarea.field { @apply min-h-56 font-serif text-sm leading-7; }
+
+/* داشبورد — آموزش‌ها در یک نگاه */
+.ad-cover--sm { @apply size-9 rounded-lg; }
+.ad-cover[data-sec] { background-image: none; @apply bg-brand-50 text-brand-700; }
+.ad-cover[data-sec="podcast"] { @apply bg-violet-50 text-violet-700; }
+.ad-cover[data-sec="shadowing"] { @apply bg-emerald-50 text-emerald-700; }
+.ad-cover[data-sec="books"] { @apply bg-amber-50 text-amber-700; }
+.ad-rank[hidden] { display: none; }
+
+/* ---------- مدیران و دسترسی‌ها (st-*) — resources/js/admin/staff.js ---------- */
+.st-note { @apply flex items-start gap-2.5 rounded-2xl bg-violet-50 px-4 py-3 text-xs font-bold leading-6 text-violet-800; }
+.st-av { @apply grid size-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-base font-extrabold not-italic text-brand-700; }
+.st-av[data-role='owner'] { @apply bg-violet-600 text-white; }
+.st-secs { @apply flex flex-wrap gap-1; }
+.st-secs span { @apply rounded-md bg-slate-100 px-1.5 py-0.5 text-[0.65rem] font-bold text-slate-600; }
+
+/* رمز */
+.st-pw { @apply flex items-center gap-1.5; }
+.st-pw .field { @apply min-w-0 flex-1 tracking-wider; }
+.st-pw__b { @apply grid size-11 shrink-0 place-items-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-brand-300 hover:text-brand-700; }
+.st-pw__b[aria-pressed='true'] { @apply border-brand-300 bg-brand-50 text-brand-700; }
+.st-meter { @apply mt-2 grid grid-cols-4 gap-1; }
+.st-meter i { @apply h-1.5 rounded-full bg-slate-200 transition-colors; }
+.st-meter[data-s='1'] i:nth-child(-n+1) { @apply bg-rose-500; }
+.st-meter[data-s='2'] i:nth-child(-n+2) { @apply bg-amber-500; }
+.st-meter[data-s='3'] i:nth-child(-n+3) { @apply bg-emerald-500; }
+.st-meter[data-s='4'] i { @apply bg-emerald-600; }
+
+/* نقش‌ها */
+.st-roles { @apply grid gap-2 sm:grid-cols-2 xl:grid-cols-3; }
+.st-role { @apply relative flex cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-3.5 pe-9 transition hover:border-brand-300; }
+.st-role b { @apply text-sm font-extrabold text-brand-900; }
+.st-role small { @apply mt-0.5 text-xs leading-5 text-slate-500; }
+.st-role::after { content: ''; @apply absolute end-3.5 top-3.5 size-4 rounded-full border-2 border-slate-300; }
+.st-role:has(input:checked) { @apply border-brand-600 bg-brand-50 ring-1 ring-brand-600; }
+.st-role:has(input:checked)::after { @apply border-[5px] border-brand-700; }
+.st-role:has(input:focus-visible) { @apply outline outline-2 outline-offset-2 outline-brand-600; }
+
+/* راهنمای سطح‌ها */
+.st-legend { @apply my-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-500; }
+.st-legend li { @apply flex items-center gap-1.5; }
+.st-legend b { @apply text-slate-700; }
+.st-dot { @apply size-2.5 rounded-full; }
+.st-dot[data-lv='none'], .st-seg [data-lv='none'] { --lv: 148 163 184; }
+.st-dot[data-lv='view'], .st-seg [data-lv='view'] { --lv: 14 165 233; }
+.st-dot[data-lv='edit'], .st-seg [data-lv='edit'] { --lv: 245 158 11; }
+.st-dot[data-lv='full'], .st-seg [data-lv='full'] { --lv: 16 185 129; }
+.st-dot { background: rgb(var(--lv)); }
+
+/* جدول دسترسی */
+.st-matrix { @apply divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200; }
+.st-row { @apply flex flex-col gap-2.5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between md:px-4; }
+.st-row--head { @apply bg-slate-50 text-xs font-extrabold text-slate-500; }
+.st-row[data-lv='none'] .st-ic { @apply bg-slate-100 text-slate-400; }
+.st-row[data-lv='none'] b { @apply text-slate-400; }
+.st-row b { @apply text-sm font-extrabold text-brand-900; }
+.st-row small { @apply text-[0.7rem] text-slate-400; }
+.st-ic { @apply grid size-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700; }
+.st-seg { @apply grid shrink-0 grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 sm:w-[24rem]; }
+.st-seg label { @apply cursor-pointer; }
+.st-seg label span, .st-seg button { @apply flex min-h-9 items-center justify-center rounded-lg px-1.5 text-center text-[0.7rem] font-extrabold text-slate-500 transition; }
+.st-seg input:checked + span { background: rgb(var(--lv)); @apply text-white shadow-sm; }
+.st-seg input:focus-visible + span { @apply outline outline-2 outline-offset-1 outline-brand-600; }
+.st-seg--all { @apply bg-white ring-1 ring-slate-200; }
+.st-seg--all button:hover { @apply bg-slate-100 text-brand-700; }
+
+/* اطلاعات ورود بعد از ساخت */
+.st-cred { @apply mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200; }
+.st-cred div { @apply flex items-center justify-between gap-3 px-3.5 py-2.5; }
+.st-cred dt { @apply text-xs font-bold text-slate-500; }
+.st-cred dd { @apply text-sm font-extrabold text-brand-900; }

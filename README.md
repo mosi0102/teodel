@@ -498,3 +498,11 @@ PHP با `php -l` و JS با `node --check` بررسی شده. **بیلد Vite �
 - **قبل از انتشار:** `LOCAL = true` در JSهای ادمین و حالت دمو در `auth.js` را بعد از اتصال بک‌اند خاموش کنید، میدلورهای `auth` و `can:admin` را روی مسیرها بگذارید و `php artisan config:cache route:cache view:cache` را اجرا کنید.
 
 **صفحه‌های خطا:** `resources/views/errors/{404,500,403,419,429,503}.blade.php` را خود Laravel برای همان کد نشان می‌دهد (همه از `errors/layout.blade.php`). قالب عمداً مستقل است (بدون دیتابیس، session و کاربر)، چون خودِ خطا ممکن است از همان‌ها آمده باشد. متن: `lang/{fa,en}/errors.php`؛ کد دیگری (مثلاً 401) بخواهید، یک ردیف در lang و یک فایل دو‌خطی کنار بقیه اضافه کنید. برای دیدنشان در محیط توسعه: `APP_DEBUG=false` و یک آدرس نامعتبر، یا یک مسیر موقت که `abort(500)` بزند.
+
+## کتاب‌ها، ادمین پادکست/Shadowing/کتاب و لحن (به‌روزرسانی آبان ۱۴۰۵)
+
+- **کتاب‌ها (سمت کاربر):** `/books` و صفحه‌ی آموزش ۴ مرحله‌ای (معرفی، خواندن، مرور، نویسنده). خواننده با فصل‌ها، نشانک و ادامه، تم/فونت/اندازه برای هر کتاب، کارت لغت، ذخیره‌ی جمله و خلاصه‌ی فصل با AI. داده: `app/Support/Books.php`؛ رفتار: `resources/js/modules/book-reader.js`.
+- **جمله‌های محبوب:** تب دوم صفحه‌ی `/words` (`?tab=sentences`) — `resources/js/modules/saved-sentences.js`.
+- **ادمین:** `/admin/podcast` (سری ← اپیزود با ۶ تب)، `/admin/shadowing` (نسخه‌های A1–C2)، `/admin/books`. همه با یک موتور مشترک: `resources/js/admin/content.js` + قالب‌های `resources/views/admin/content/*` + کامپوننت‌های `x-ad.f`، `x-ad.up`، `x-ad.prosody`.
+- **لحن (prosody):** نمایش جدید با کپسول هر گروه معنایی و نشان فلش (`x-lesson.tone-icon`)؛ ادمین ویرایشگر با پیش‌نمایش زنده دارد.
+- جزئیات کامل: `TEODEL-PROJECT-GUIDE.md`؛ اتصال بک‌اند: `TEODEL-BACKEND-CHECKLIST.md`.

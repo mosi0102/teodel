@@ -20,7 +20,7 @@
         : __('podcast.card.range', ['a' => num((int) round($series['min_seconds'] / 60)), 'b' => num((int) round($series['max_seconds'] / 60))]);
 @endphp
 
-<article class="song-card group relative flex animate-rise flex-col overflow-hidden rounded-2xl border border-transparent bg-white p-4 shadow-card transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lift sm:p-5"
+<article class="song-card group relative flex animate-rise flex-col rounded-2xl border border-transparent bg-white p-4 shadow-card transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lift sm:p-5"
     style="animation-delay: {{ min($index, 8) * 45 }}ms" data-series data-series-id="{{ $series['id'] }}" data-status="{{ $status }}" data-progress="{{ $progress }}">
 
     @if ($series['recommended'])

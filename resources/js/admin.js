@@ -11,6 +11,8 @@ import './admin/dashboard';
 import './admin/ai';
 import './admin/users';
 import './admin/song';
+import './admin/content'; // ویرایشگر مشترک پادکست، Shadowing و کتاب
+import './admin/staff'; // مدیران و دسترسی‌ها
 import './admin/placement';
 import './admin/dictionary';
 import './admin/billing';

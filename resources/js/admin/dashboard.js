@@ -102,6 +102,14 @@ $(function () {
     });
     draw();
 
+    // پربازدیدترین‌ها: تب هر بخش (موزیک، پادکست، شدوئینگ، کتاب)
+    $root.on('click', '[data-ad-top-tab]', function () {
+        const k = $(this).attr('data-ad-top-tab');
+        $root.find('[data-ad-top-tab]').attr({ 'aria-pressed': 'false', 'aria-selected': 'false' });
+        $(this).attr({ 'aria-pressed': 'true', 'aria-selected': 'true' });
+        $root.find('[data-ad-top-list]').each(function () { $(this).prop('hidden', $(this).attr('data-ad-top-list') !== k); });
+    });
+
     // پر شدن نوارها
     requestAnimationFrame(() => requestAnimationFrame(() => {
         $root.find('.ad-mix i, .ad-meter i').each(function () {

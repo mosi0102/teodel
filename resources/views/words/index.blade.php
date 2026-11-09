@@ -39,7 +39,17 @@
         <x-page-tools class="shrink-0 flex-wrap" />
     </header>
 
-    <div data-sw-content>
+    {{-- دو تب: لغت‌ها | جمله‌های محبوب (کتاب‌ها) — ?tab=sentences مستقیم تب دوم را باز می‌کند (resources/js/modules/saved-sentences.js) --}}
+    <div class="sw-switch" role="tablist" aria-label="{{ __('words.switch_label') }}" data-ss-tabs>
+        <button type="button" role="tab" id="sw-tab-words" aria-controls="sw-panel-words" aria-selected="true" data-ss-tab="words">
+            <x-icon name="bookmark" class="size-4" />{{ __('words.switch.words') }}
+        </button>
+        <button type="button" role="tab" id="sw-tab-sentences" aria-controls="sw-panel-sentences" aria-selected="false" tabindex="-1" data-ss-tab="sentences">
+            <x-icon name="quote" class="size-4" />{{ __('words.switch.sentences') }} <b class="sw-switch__n" data-ss-total>{{ num(count($sentences ?? [])) }}</b>
+        </button>
+    </div>
+
+    <div data-sw-content id="sw-panel-words" role="tabpanel" aria-labelledby="sw-tab-words">
         {{-- نوار ابزار: جست‌وجو + فیلتر + مرتب‌سازی + تب‌های سطح --}}
         <div class="card p-3 md:p-4" data-sw-toolbar>
             <div class="grid gap-2 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] md:gap-3">
@@ -145,6 +155,31 @@
             </div>
         </article>
     </template>
+
+    {{-- جمله‌های محبوب: از کتاب‌ها ذخیره می‌شوند (داده: SavedWords::sentences() + ذخیره‌ی مرورگر در دمو) --}}
+    <section id="sw-panel-sentences" role="tabpanel" aria-labelledby="sw-tab-sentences" hidden data-ss
+        data-sentences='@json($sentences ?? [], JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_UNESCAPED_UNICODE)'
+        data-book-url="{{ url('/books') }}" data-t-chapter="{{ __('words.sentences.chapter') }}" data-t-removed="{{ __('words.sentences.removed') }}"
+        data-t-undo="{{ __('words.sentences.undo') }}" data-t-open="{{ __('words.sentences.open') }}" data-t-remove="{{ __('words.sentences.remove') }}"
+        data-t-copy="{{ __('words.sentences.copy') }}" data-t-copied="{{ __('words.sentences.copied') }}" data-t-speak="{{ __('words.sentences.speak') }}">
+        <div class="card p-3 md:p-4">
+            <label class="relative block min-w-0">
+                <span class="sr-only">{{ __('words.sentences.search') }}</span>
+                <x-icon name="search" class="pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2 text-slate-400" />
+                <input type="search" data-ss-q enterkeyhint="search" autocomplete="off" placeholder="{{ __('words.sentences.search') }}" class="field h-12 rounded-full ps-12 pe-4">
+            </label>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2" data-ss-list></div>
+        <div class="card mt-4 flex flex-col items-center px-6 py-14 text-center" data-ss-empty hidden>
+            <span class="mb-4 grid size-16 place-items-center rounded-full bg-amber-50 text-amber-600"><x-icon name="quote" class="size-8" /></span>
+            <h2 class="text-base font-extrabold text-brand-900">{{ __('words.sentences.empty_title') }}</h2>
+            <p class="mt-1.5 max-w-sm text-sm leading-7 text-slate-500">{{ __('words.sentences.empty_text') }}</p>
+            @if (Route::has('books.index'))
+                <a href="{{ route('books.index') }}" class="btn-primary mt-5"><x-icon name="book" class="size-4" />{{ __('words.sentences.go_books') }}</a>
+            @endif
+        </div>
+        <p class="ss-undo" data-ss-undo hidden role="status" aria-live="polite"><span data-ss-undo-text></span><button type="button" data-ss-undo-btn>{{ __('words.sentences.undo') }}</button></p>
+    </section>
 </div>
 @endsection
 

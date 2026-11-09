@@ -3,7 +3,7 @@
 @section('title', __('admin.dash.title'))
 
 {{--
-    داشبورد مدیریت: KPI، روند ۳۰ روز، ترکیب پلن‌ها، نیازمند اقدام، آخرین پرداخت‌ها، پربازدیدها و سلامت محتوا.
+    داشبورد مدیریت: KPI، روند ۳۰ روز، ترکیب پلن‌ها، نیازمند اقدام، آخرین پرداخت‌ها، آموزش‌ها در یک نگاه، پربازدیدهای هر بخش و سلامت محتوا.
     داده: app/Support/AdminDashboard.php (قرارداد) — رفتار: resources/js/admin/dashboard.js
 --}}
 @php
@@ -45,6 +45,9 @@
 
     <nav class="ad-quick mb-4 xl:mb-5" aria-label="{{ __('admin.dash.quick.title') }}">
         <a href="{{ url('/admin/songs/create') }}">{!! AdminNav::icon('songs') !!}{{ __('admin.dash.quick.song') }}</a>
+        <a href="{{ url('/admin/podcast/create') }}">{!! AdminNav::icon('podcast') !!}{{ __('admin.dash.quick.podcast') }}</a>
+        <a href="{{ url('/admin/shadowing/create') }}">{!! AdminNav::icon('shadowing') !!}{{ __('admin.dash.quick.shadowing') }}</a>
+        <a href="{{ url('/admin/books/create') }}">{!! AdminNav::icon('books') !!}{{ __('admin.dash.quick.book') }}</a>
         <a href="{{ url('/admin/placement/create') }}">{!! AdminNav::icon('placement') !!}{{ __('admin.dash.quick.question') }}</a>
         <a href="{{ url('/admin/dictionary/create') }}">{!! AdminNav::icon('dictionary') !!}{{ __('admin.dash.quick.word') }}</a>
         <a href="{{ url('/admin/tickets?status=open') }}">{!! AdminNav::icon('tickets') !!}{{ __('admin.dash.quick.ticket') }}</a>
@@ -165,18 +168,52 @@
             </div>
         </section>
 
-        <section class="ad-card is-2" aria-labelledby="ad-top-t">
+        {{-- آموزش‌ها در یک نگاه (موزیک، پادکست، شدوئینگ، کتاب) --}}
+        <section class="ad-card lg:col-span-3" aria-labelledby="ad-sec-t">
+            <h2 class="ad-card__t mb-3" id="ad-sec-t">{{ __('admin.dash.sections.title') }}</h2>
+            <div class="ad-tbl-wrap">
+                <table class="ad-tbl">
+                    <thead><tr>
+                        <th>{{ __('admin.dash.sections.section') }}</th><th>{{ __('admin.dash.sections.published') }}</th><th>{{ __('admin.dash.sections.learners') }}</th>
+                        <th>{{ __('admin.dash.sections.completions') }}</th><th>{{ __('admin.dash.sections.avg') }}</th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach ($d['sections'] ?? [] as $sec)
+                            <tr>
+                                <td><a href="{{ url('/admin/'.$sec['key']) }}" class="ad-user"><i class="ad-cover ad-cover--sm" data-sec="{{ $sec['key'] }}" aria-hidden="true">{!! AdminNav::icon($sec['key'], 'size-4') !!}</i><b>{{ __('admin.nav.'.$sec['key']) }}</b></a></td>
+                                <td data-label="{{ __('admin.dash.sections.published') }}" class="ad-num">{{ $n($sec['published']) }}</td>
+                                <td data-label="{{ __('admin.dash.sections.learners') }}" class="ad-num">{{ $n($sec['learners']) }}</td>
+                                <td data-label="{{ __('admin.dash.sections.completions') }}" class="ad-num">{{ $n($sec['completions']) }}</td>
+                                <td data-label="{{ __('admin.dash.sections.avg') }}">
+                                    <div class="flex items-center gap-2"><div class="ad-meter min-w-16 flex-1" data-state="{{ $sec['avg'] >= 50 ? 'ok' : 'low' }}"><i data-w="{{ $sec['avg'] }}"></i></div><span class="ad-num text-xs">{{ $digits($sec['avg']) }}٪</span></div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- پربازدیدترین‌ها: یک تب برای هر بخش (رفتار: resources/js/admin/dashboard.js، data-ad-top) --}}
+        <section class="ad-card is-2" aria-labelledby="ad-top-t" data-ad-top>
             <h2 class="ad-card__t mb-3" id="ad-top-t">{{ __('admin.dash.songs.title') }}</h2>
-            <ol class="ad-rank">
-                @foreach ($d['top_songs'] as $i => $s)
-                    <li><a href="{{ url($s['url']) }}">
-                        <span class="ad-rank__n">{{ $digits($i + 1) }}</span>
-                        <span class="ad-rank__c" style="{!! $cover($s) !!}"></span>
-                        <span class="ad-rank__t"><b>{{ $s['title'] }}</b><small>{{ $s['artist'] }}</small></span>
-                        <span class="ad-rank__s"><b>{{ $n($s['plays']) }}</b>{{ __('admin.dash.songs.done', ['p' => $digits($s['completion'])]) }}</span>
-                    </a></li>
+            <div class="ad-seg mb-3 flex max-w-full overflow-x-auto" role="tablist" aria-label="{{ __('admin.dash.songs.title') }}">
+                @foreach (array_keys($d['top'] ?? []) as $i => $tk)
+                    <button type="button" role="tab" class="flex-1 whitespace-nowrap" aria-pressed="{{ $i === 0 ? 'true' : 'false' }}" aria-selected="{{ $i === 0 ? 'true' : 'false' }}" data-ad-top-tab="{{ $tk }}">{{ __('admin.dash.songs.tabs.'.$tk) }}</button>
                 @endforeach
-            </ol>
+            </div>
+            @foreach ($d['top'] ?? [] as $tk => $rows)
+                <ol class="ad-rank" data-ad-top-list="{{ $tk }}" @if (! $loop->first) hidden @endif>
+                    @foreach ($rows as $i => $s)
+                        <li><a href="{{ url($s['url']) }}">
+                            <span class="ad-rank__n">{{ $digits($i + 1) }}</span>
+                            <span class="ad-rank__c" style="{!! $cover($s) !!}"></span>
+                            <span class="ad-rank__t"><b>{{ $s['title'] }}</b><small>{{ $s['artist'] }}</small></span>
+                            <span class="ad-rank__s"><b>{{ $n($s['plays']) }}</b>{{ __('admin.dash.songs.done', ['p' => $digits($s['completion'])]) }}</span>
+                        </a></li>
+                    @endforeach
+                </ol>
+            @endforeach
         </section>
 
         <section class="ad-card" aria-labelledby="ad-health-t">
@@ -192,6 +229,15 @@
                     <div><span>{{ __('admin.dash.health.songs') }}</span><b>{{ $n($hs['published']) }}</b></div>
                     <small>{{ __('admin.dash.health.drafts') }}: {{ $n($hs['drafts']) }} · {{ __('admin.dash.health.incomplete') }}: {{ $n($hs['incomplete']) }}</small>
                 </div>
+                @foreach (['podcast', 'shadowing', 'books'] as $sec)
+                    @isset($d['health'][$sec])
+                        @php $hx = $d['health'][$sec]; @endphp
+                        <div class="ad-hrow">
+                            <div><a href="{{ url('/admin/'.$sec) }}" class="hover:text-brand-700"><span>{{ __('admin.nav.'.$sec) }}</span></a><b>{{ $n($hx['published']) }}</b></div>
+                            <small>{{ __('admin.dash.health.drafts') }}: {{ $n($hx['drafts']) }} · {{ __('admin.dash.health.incomplete') }}: {{ $n($hx['incomplete']) }}</small>
+                        </div>
+                    @endisset
+                @endforeach
                 <div class="ad-hrow">
                     <div><span>{{ __('admin.dash.health.words') }}</span><b>{{ $n($hw['total']) }}</b></div>
                     <div class="ad-meter" data-state="{{ $hw['no_image'] / max(1, $hw['total']) > .5 ? 'low' : 'ok' }}"><i data-w="{{ 100 - $bar($hw['no_image'], $hw['total']) }}"></i></div>

@@ -70,6 +70,17 @@ class SavedWords
         return $out;
     }
 
+    /**
+     * 🔌 جمله‌های محبوب کاربر (از کتاب‌ها) — تب «جمله‌های محبوب» در /words و مرحله‌ی مرور کتاب.
+     * هر مورد: ['id' => 's12', 'book' => 3001, 'book_title' => '…', 'chapter' => 1, 'text' => '…', 'ref' => 2 (شماره‌ی پاراگراف), 'at' => timestamp]
+     * ذخیره/حذف: رویدادهای sentence:save / sentence:remove (resources/js/modules/book-reader.js).
+     * در دمو خالی است و جمله‌ها در مرورگر (localStorage) نگه داشته می‌شوند.
+     */
+    public static function sentences(): array
+    {
+        return [];
+    }
+
     /** نمونه برای تست فرانت (فقط تا وصل‌شدن بک‌اند) */
     public static function demo(): array
     {

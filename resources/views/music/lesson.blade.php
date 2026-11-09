@@ -10,12 +10,15 @@
     // آیکون مرحله‌ی «جاری» (دایره‌ی نارنجی)
     $stepIcons = ['play' => 'play', 'lyrics' => 'file-text', 'words' => 'bookmark', 'listening' => 'headphones', 'shadowing' => 'mic', 'karaoke' => 'music', 'repeat' => 'repeat', 'details' => 'info',
         // Shadowing (موضوع‌ها)
-        'listen' => 'headphones', 'record' => 'mic', 'practice' => 'repeat', 'text' => 'file-text', 'questions' => 'info'];
+        'listen' => 'headphones', 'record' => 'mic', 'practice' => 'repeat', 'text' => 'file-text', 'questions' => 'info',
+        // کتاب
+        'intro' => 'info', 'read' => 'book', 'review' => 'bookmark', 'author' => 'user'];
     $isLast = $step >= $total;
-    // پادکست از همین view استفاده می‌کند ($kind = 'podcast' از PodcastController): آیکون سربرگ و پوشه‌ی محتوای مرحله‌ها عوض می‌شود
+    // پادکست، شدوئینگ و کتاب از همین view استفاده می‌کنند ($kind از کنترلر): آیکون سربرگ و پوشه‌ی محتوای مرحله‌ها عوض می‌شود
     $kind = $kind ?? 'music';
-    $headIcon = match ($kind) { 'podcast' => 'mic', 'shadowing' => 'repeat', default => 'music' };
-    $stepView = fn (string $key) => (in_array($kind, ['podcast', 'shadowing'], true) && view()->exists($kind . '.steps.' . $key)) ? $kind . '.steps.' . $key : 'music.steps.' . $key;
+    $headIcon = match ($kind) { 'podcast' => 'mic', 'shadowing' => 'repeat', 'book' => 'book', default => 'music' };
+    $stepDir = match ($kind) { 'podcast' => 'podcast', 'shadowing' => 'shadowing', 'book' => 'books', default => 'music' };
+    $stepView = fn (string $key) => ($stepDir !== 'music' && view()->exists($stepDir . '.steps.' . $key)) ? $stepDir . '.steps.' . $key : 'music.steps.' . $key;
 @endphp
 
 @section('content')

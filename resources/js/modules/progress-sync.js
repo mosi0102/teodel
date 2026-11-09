@@ -34,6 +34,7 @@ function setCard(card, percent) {
         this.style.setProperty('--dash', (p * 0.5655).toFixed(2));
     });
     $card.find('[data-prog-text]').text(toLocaleDigits(p) + '%');
+    $card.find('[data-prog-bar]').css('width', p + '%'); // کارت کتاب (نوار خطی)
 }
 
 window.Teodel = window.Teodel || {};

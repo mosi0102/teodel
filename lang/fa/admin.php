@@ -23,6 +23,9 @@ return [
     'nav' => [
         'dashboard' => 'داشبورد',
         'songs' => 'آموزش موزیک',
+        'podcast' => 'پادکست‌ها',
+        'shadowing' => 'Shadowing',
+        'books' => 'کتاب‌ها',
         'placement' => 'بانک آزمون سطح',
         'dictionary' => 'دیکشنری',
         'users' => 'کاربران',
@@ -30,6 +33,7 @@ return [
         'tickets' => 'تیکت‌ها',
         'reports' => 'گزارش خطا',
         'settings' => 'تنظیمات',
+        'staff' => 'مدیران و دسترسی‌ها',
     ],
 
     'common' => [
@@ -115,6 +119,9 @@ return [
         'quick' => [
             'title' => 'میان‌بُر',
             'song' => 'موزیک جدید',
+            'podcast' => 'پادکست جدید',
+            'shadowing' => 'موضوع Shadowing',
+            'book' => 'کتاب جدید',
             'question' => 'سؤال آزمون',
             'word' => 'مدخل دیکشنری',
             'ticket' => 'تیکت‌های بی‌پاسخ',
@@ -167,9 +174,18 @@ return [
             'ref' => 'کد پیگیری',
         ],
         'songs' => [
-            'title' => 'پربازدیدترین موزیک‌ها',
+            'title' => 'پربازدیدترین آموزش‌ها',
+            'tabs' => ['music' => 'موزیک', 'podcast' => 'پادکست', 'shadowing' => 'Shadowing', 'books' => 'کتاب'],
             'plays' => ':n بازدید',
             'done' => ':p٪ تا آخر رفتند',
+        ],
+        'sections' => [
+            'title' => 'آموزش‌ها در یک نگاه',
+            'section' => 'بخش',
+            'published' => 'منتشرشده',
+            'learners' => 'یادگیرنده‌ی فعال (هفته)',
+            'completions' => 'تکمیل (۳۰ روز)',
+            'avg' => 'میانگین پیشرفت',
         ],
         'health' => [
             'title' => 'سلامت محتوا',

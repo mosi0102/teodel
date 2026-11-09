@@ -48,18 +48,10 @@
             @foreach ($moreItems as $item)
                 @php $label = __('ui.nav.' . $item['key']); @endphp
 
-                @if ($item['soon'])
-                    <div class="flex min-h-14 items-center gap-3 rounded-2xl bg-slate-50 px-3.5 text-sm font-medium text-slate-400" aria-disabled="true">
-                        <x-icon :name="$item['icon']" class="size-5 shrink-0" />
-                        <span class="min-w-0 flex-1 truncate">{{ $label }}</span>
-                        <span class="rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">{{ __('ui.soon') }}</span>
-                    </div>
-                @else
-                    <a href="{{ $item['href'] }}" class="flex min-h-14 items-center gap-3 rounded-2xl bg-slate-50 px-3.5 text-sm font-semibold text-slate-700 transition active:scale-95" @if ($item['active']) aria-current="page" @endif>
+                <a href="{{ $item['href'] }}" class="flex min-h-14 items-center gap-3 rounded-2xl bg-slate-50 px-3.5 text-sm font-semibold text-slate-700 transition active:scale-95" @if ($item['active']) aria-current="page" @endif>
                         <x-icon :name="$item['icon']" class="size-5 shrink-0 text-brand-700" />
                         <span class="min-w-0 flex-1 truncate">{{ $label }}</span>
                     </a>
-                @endif
             @endforeach
         </div>
 
